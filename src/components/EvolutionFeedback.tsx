@@ -4,7 +4,11 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { CheckCircle, TrendingUp } from "lucide-react";
 
-export default function EvolutionFeedback() {
+interface EvolutionFeedbackProps {
+    onRestart: () => void;
+}
+
+export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps) {
     const [feedback, setFeedback] = useState("");
     const [submitted, setSubmitted] = useState(false);
 
@@ -55,6 +59,13 @@ export default function EvolutionFeedback() {
                             Current: V2.1 (Expanded)
                         </div>
                     </div>
+
+                    <button
+                        onClick={onRestart}
+                        className="mt-8 text-sm text-white/50 hover:text-white transition-colors underline decoration-dotted block mx-auto"
+                    >
+                        Start New Simulation
+                    </button>
                 </div>
             </motion.div>
         );

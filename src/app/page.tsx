@@ -27,6 +27,10 @@ export default function Home() {
     setView("feedback");
   };
 
+  const handleRestart = () => {
+    setView("input");
+  };
+
   return (
     <main className="min-h-screen w-full flex flex-col items-center justify-center p-4 relative overflow-hidden text-white">
       {/* Background Ambience */}
@@ -43,7 +47,7 @@ export default function Home() {
 
       {view === "chat" && <BlindChat onEndChat={handleEndChat} />}
 
-      {view === "feedback" && <EvolutionFeedback />}
+      {view === "feedback" && <EvolutionFeedback onRestart={handleRestart} />}
     </main>
   );
 }
