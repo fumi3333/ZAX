@@ -6,17 +6,36 @@ import EssenceVisualizer from "@/components/EssenceVisualizer";
 import ResonanceResult from "@/components/ResonanceResult";
 import BlindChat from "@/components/BlindChat";
 import EvolutionFeedback from "@/components/EvolutionFeedback";
+import { AnalysisResult } from "@/lib/gemini";
 
 export default function Home() {
   const [view, setView] = useState<"input" | "analyzing" | "match" | "chat" | "feedback">("input");
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
-  const handleInputComplete = (data: string[]) => {
+  const handleInputComplete = async (data: string[]) => {
     console.log("Input data:", data);
     setView("analyzing");
-    // Simulate analysis delay
-    setTimeout(() => {
-      setView("match"); // Proceed to match after analysis
-    }, 4000);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inputs: data }),
+      });
+      const result: AnalysisResult = await response.json();
+      setAnalysisResult(result);
+
+      // Allow user to see the crystallized vector for a moment
+      setTimeout(() => {
+        setView("match");
+      }, 3000);
+    } catch (e) {
+      console.error("Analysis failed", e);
+      // Fallback or error handling
+      setTimeout(() => {
+        setView("match");
+      }, 3000);
+    }
   };
 
   const handleStartChat = () => {
@@ -28,6 +47,7 @@ export default function Home() {
   };
 
   const handleRestart = () => {
+    setAnalysisResult(null);
     setView("input");
   };
 
@@ -41,9 +61,15 @@ export default function Home() {
 
       {view === "input" && <EssenceInput onComplete={handleInputComplete} />}
 
-      {view === "analyzing" && <EssenceVisualizer />}
+      {view === "analyzing" && <EssenceVisualizer vector={analysisResult?.vector} />}
 
-      {view === "match" && <ResonanceResult onStartChat={handleStartChat} />}
+      {view === "match" && (
+        <ResonanceResult
+          onStartChat={handleStartChat}
+          reasoning={analysisResult?.reasoning}
+          score={analysisResult?.resonance_score}
+        />
+      )}
 
       {view === "chat" && <BlindChat onEndChat={handleEndChat} />}
 

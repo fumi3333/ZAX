@@ -3,19 +3,29 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-export default function EssenceVisualizer() {
-    const [points, setPoints] = useState([50, 50, 50, 50, 50]);
+interface EssenceVisualizerProps {
+    vector?: number[];
+}
+
+export default function EssenceVisualizer({ vector }: EssenceVisualizerProps) {
+    // Default mock initialization
+    const [points, setPoints] = useState([50, 50, 50, 50, 50, 50]);
 
     useEffect(() => {
-        // Simulate data analysis updating the vector points
-        const interval = setInterval(() => {
-            setPoints(points.map(() => Math.random() * 80 + 20));
-        }, 800);
-        return () => clearInterval(interval);
-    }, [points]);
+        if (vector && vector.length === 6) {
+            // If vector is provided, animate to it
+            setPoints(vector);
+        } else {
+            // Simulate data analysis updating the vector points if no vector yet
+            const interval = setInterval(() => {
+                setPoints(points.map(() => Math.random() * 80 + 20));
+            }, 800);
+            return () => clearInterval(interval);
+        }
+    }, [vector]); // Check dependency
 
     const polyPoints = points.map((val, i) => {
-        const angle = (Math.PI * 2 * i) / 5;
+        const angle = (Math.PI * 2 * i) / 6; // 6 dimensions
         const x = 100 + val * Math.cos(angle);
         const y = 100 + val * Math.sin(angle);
         return `${x},${y}`;
@@ -29,8 +39,8 @@ export default function EssenceVisualizer() {
                     <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-zax-muted" />
                     <circle cx="100" cy="100" r="60" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-zax-muted" />
                     <circle cx="100" cy="100" r="30" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-zax-muted" />
-                    {[0, 1, 2, 3, 4].map(i => {
-                        const angle = (Math.PI * 2 * i) / 5;
+                    {[0, 1, 2, 3, 4, 5].map(i => {
+                        const angle = (Math.PI * 2 * i) / 6;
                         const x = 100 + 90 * Math.cos(angle);
                         const y = 100 + 90 * Math.sin(angle);
                         return <line key={i} x1="100" y1="100" x2={x} y2={y} stroke="currentColor" strokeWidth="0.5" className="text-zax-muted" />;
@@ -56,7 +66,7 @@ export default function EssenceVisualizer() {
                 transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
                 className="mt-8 text-zax-glow font-mono text-sm tracking-widest"
             >
-                ANALYZING ESSENCE VECTORS...
+                {vector ? "ESSENCE CRYSTALLIZED" : "ANALYZING ESSENCE VECTORS..."}
             </motion.p>
         </div>
     );

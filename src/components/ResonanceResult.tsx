@@ -5,9 +5,11 @@ import { User, ShieldQuestion, BrainCircuit } from "lucide-react";
 
 interface ResonanceResultProps {
     onStartChat: () => void;
+    reasoning?: string;
+    score?: number;
 }
 
-export default function ResonanceResult({ onStartChat }: ResonanceResultProps) {
+export default function ResonanceResult({ onStartChat, reasoning, score }: ResonanceResultProps) {
     return (
         <div className="max-w-xl mx-auto w-full p-6">
             <motion.div
@@ -33,14 +35,13 @@ export default function ResonanceResult({ onStartChat }: ResonanceResultProps) {
                             <span className="text-sm font-bold uppercase">AI Resonance Logic</span>
                         </div>
                         <p className="text-sm leading-relaxed text-gray-300">
-                            あなたの「変わろうとする意思」と、相手の「現状を打破する経験」が高い次元で補完し合っています。
-                            また、あなたが隠している「こだわり」を、この相手は最も純粋に評価する可能性が示唆されました。
+                            {reasoning || "あなたの「変わろうとする意思」と、相手の「現状を打破する経験」が高い次元で補完し合っています。また、あなたが隠している「こだわり」を、この相手は最も純粋に評価する可能性が示唆されました。"}
                         </p>
                     </div>
 
                     <div className="flex justify-between items-center text-sm text-gray-400 px-2">
                         <span>Attribute Distance: High (Good)</span>
-                        <span className="text-zax-glow">Essence Overlap: 94%</span>
+                        <span className="text-zax-glow">Essence Overlap: {score || 94}%</span>
                     </div>
                 </div>
 
