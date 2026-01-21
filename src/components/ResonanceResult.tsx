@@ -29,13 +29,13 @@ export default function ResonanceResult({ onStartChat, reasoning, score }: Reson
                 </div>
 
                 <div className="space-y-4 mb-8">
-                    <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                        <div className="flex items-center gap-2 mb-2 text-zax-accent">
-                            <BrainCircuit size={18} />
-                            <span className="text-sm font-bold uppercase">AI Resonance Logic</span>
+                    <div className="bg-black/40 rounded-lg p-6 border border-white/10 font-mono">
+                        <div className="flex items-center gap-2 mb-4 text-zax-glow border-b border-white/10 pb-2">
+                            <BrainCircuit size={16} />
+                            <span className="text-xs font-bold tracking-widest uppercase">ZAX-9000 // LOGIC KERNEL</span>
                         </div>
-                        <p className="text-sm leading-relaxed text-gray-300">
-                            {reasoning || "あなたの「変わろうとする意思」と、相手の「現状を打破する経験」が高い次元で補完し合っています。また、あなたが隠している「こだわり」を、この相手は最も純粋に評価する可能性が示唆されました。"}
+                        <p className="text-xs leading-relaxed text-zax-glow/80 whitespace-pre-line">
+                            {reasoning || "ANALYZING VECTOR SPACE...\nCALCULATING DELTA...\nNO MATCH FOUND."}
                         </p>
                     </div>
 

@@ -25,6 +25,30 @@ export default function Home() {
       const result: AnalysisResult = await response.json();
       setAnalysisResult(result);
 
+      // 2. Find Match (Experiment)
+      if (result.vector) {
+        try {
+          const matchResponse = await fetch("/api/match", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ vector: result.vector }),
+          });
+          const matchData = await matchResponse.json();
+
+          if (matchData.success && matchData.match) {
+            // Update result with Scientific Match Data
+            setAnalysisResult(prev => {
+              if (!prev) return null;
+              return {
+                ...prev,
+                reasoning: matchData.match.reasoning,
+                resonance_score: matchData.match.growthScore
+              };
+            });
+          }
+        } catch (me) { console.error("Match API failed", me); }
+      }
+
       // Allow user to see the crystallized vector for a moment
       setTimeout(() => {
         setView("match");
