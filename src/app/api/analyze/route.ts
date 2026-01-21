@@ -4,13 +4,13 @@ import { analyzeEssence } from "@/lib/gemini";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { inputs } = body;
+        const { inputs, biases } = body;
 
         if (!inputs || !Array.isArray(inputs)) {
             return NextResponse.json({ error: "Invalid inputs" }, { status: 400 });
         }
 
-        const result = await analyzeEssence(inputs);
+        const result = await analyzeEssence(inputs, biases);
 
         return NextResponse.json(result);
     } catch (error) {

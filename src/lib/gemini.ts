@@ -11,7 +11,7 @@ export interface AnalysisResult {
     resonance_score: number;
 }
 
-export async function analyzeEssence(inputs: string[]): Promise<AnalysisResult> {
+export async function analyzeEssence(inputs: string[], biases: number[] = [50, 50, 50]): Promise<AnalysisResult> {
     if (!API_KEY) {
         console.warn("GOOGLE_API_KEY not found. Using mock data.");
         return {
@@ -27,6 +27,12 @@ export async function analyzeEssence(inputs: string[]): Promise<AnalysisResult> 
     1. ${inputs[0]}
     2. ${inputs[1]}
     3. ${inputs[2]}
+
+    User Self-Reported Bias (0=Intuition, 100=Logic):
+    1. ${biases[0]}
+    2. ${biases[1]}
+    3. ${biases[2]}
+    * Use this bias to weight the "Logic" vs "Intuition" dimensions. High bias > 50 should boost Logic. Low bias < 50 should boost Intuition.
 
     Dimensions (0-100):
     - Logic (Logic & Structure)
@@ -69,7 +75,7 @@ export interface DeltaResult {
     growth_score: number;
 }
 
-export async function calculateDeltaVector(feedback: string, currentVector: number[] = [50, 50, 50, 50, 50, 50]): Promise<DeltaResult> {
+export async function calculateDeltaVector(feedback: string, currentVector: number[] = [50, 50, 50, 50, 50, 50], tags: string[] = []): Promise<DeltaResult> {
     if (!API_KEY) {
         return {
             delta_vector: [5, -2, 10, 0, 5, 5],
@@ -81,6 +87,8 @@ export async function calculateDeltaVector(feedback: string, currentVector: numb
     const prompt = `
     User Context Vector: [${currentVector.join(", ")}] (Logic, Intuition, Empathy, Determination, Creativity, Flexibility)
     User Feedback after interaction: "${feedback}"
+    Selected Resonance Tags: "${tags.join(", ")}"
+    * Tags like "Reassurance" should stabilize vector. "Challenge" should trigger larger delta. "Inspiration" increases Creativity.
 
     Task:
     1. Analyze the feedback to understand how the user's internal state has changed.

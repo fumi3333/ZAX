@@ -11,8 +11,18 @@ interface EvolutionFeedbackProps {
 export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps) {
     const [feedback, setFeedback] = useState("");
     const [submitted, setSubmitted] = useState(false);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    const toggleTag = (tag: string) => {
+        if (selectedTags.includes(tag)) {
+            setSelectedTags(selectedTags.filter(t => t !== tag));
+        } else {
+            setSelectedTags([...selectedTags, tag]);
+        }
+    };
 
     if (submitted) {
+        // ... (Keep existing submitted view logic)
         return (
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -94,8 +104,11 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                     {["安心感 (Reassurance)", "違和感 (Challenge)", "閃き (Inspiration)", "肯定 (Validation)"].map((tag) => (
                         <button
                             key={tag}
-                            onClick={() => { /* Toggle Tag Logic here if full impl */ }}
-                            className="px-3 py-1 rounded-full text-xs font-mono border border-white/20 text-zax-muted hover:text-zax-glow hover:border-zax-glow transition-colors"
+                            onClick={() => toggleTag(tag)}
+                            className={`px-3 py-1 rounded-full text-xs font-mono border transition-colors ${selectedTags.includes(tag)
+                                    ? "bg-zax-glow/20 border-zax-glow text-zax-glow"
+                                    : "border-white/20 text-zax-muted hover:text-zax-glow hover:border-zax-glow"
+                                }`}
                         >
                             {tag}
                         </button>
@@ -112,7 +125,7 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                                 body: JSON.stringify({
                                     feedback,
                                     currentVector: [50, 60, 70, 60, 50, 80],
-                                    tags: ["Inspiration"] // Send selected tags in real impl
+                                    tags: selectedTags
                                 }),
                             });
                         } catch (e) { console.error(e); }

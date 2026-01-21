@@ -6,11 +6,12 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface EssenceInputProps {
-    onComplete: (data: string[]) => void;
+    onComplete: (data: { fragments: string[], biases: number[] }) => void;
 }
 
 export default function EssenceInput({ onComplete }: EssenceInputProps) {
     const [fragments, setFragments] = useState(["", "", ""]);
+    const [biases, setBiases] = useState([50, 50, 50]); // 50 = Neutral, 0 = Intuition, 100 = Logic
     const [activeindex, setActiveIndex] = useState(0);
 
     const placeholders = [
@@ -23,7 +24,8 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
         if (activeindex < 2) {
             setActiveIndex(activeindex + 1);
         } else {
-            onComplete(fragments);
+            // Pass structured data
+            onComplete({ fragments, biases });
         }
     };
 
@@ -31,6 +33,12 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
         const newFragments = [...fragments];
         newFragments[activeindex] = text;
         setFragments(newFragments);
+    };
+
+    const updateBias = (val: number) => {
+        const newBiases = [...biases];
+        newBiases[activeindex] = val;
+        setBiases(newBiases);
     };
 
     return (
@@ -81,6 +89,8 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
                                     type="range"
                                     min="0"
                                     max="100"
+                                    value={biases[idx]}
+                                    onChange={(e) => updateBias(parseInt(e.target.value))}
                                     className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-zax-glow"
                                 />
                             </div>

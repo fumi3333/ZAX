@@ -12,15 +12,18 @@ export default function Home() {
   const [view, setView] = useState<"input" | "analyzing" | "match" | "chat" | "feedback">("input");
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
-  const handleInputComplete = async (data: string[]) => {
-    console.log("Input data:", data);
+  const handleInputComplete = async (inputData: { fragments: string[], biases: number[] }) => {
+    console.log("Input data:", inputData);
     setView("analyzing");
 
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inputs: data }),
+        body: JSON.stringify({
+          inputs: inputData.fragments,
+          biases: inputData.biases
+        }),
       });
       const result: AnalysisResult = await response.json();
       setAnalysisResult(result);

@@ -4,14 +4,14 @@ import { calculateDeltaVector } from "@/lib/gemini";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { feedback, currentVector } = body;
+        const { feedback, currentVector, tags } = body;
 
         if (!feedback) {
             return NextResponse.json({ error: "Feedback required" }, { status: 400 });
         }
 
         // Calculate Delta Vector based on feedback emotional shift
-        const deltaResult = await calculateDeltaVector(feedback, currentVector);
+        const deltaResult = await calculateDeltaVector(feedback, currentVector, tags);
 
         // In a real app with DB, we would:
         // 1. Insert new row to user_embeddings with valid_from = NOW()
