@@ -66,7 +66,7 @@ export default function EssenceVisualizer({ vector }: EssenceVisualizerProps) {
                 transition={{ repeat: Infinity, duration: 1.5, repeatType: "reverse" }}
                 className="mt-8 text-zax-glow font-mono text-sm tracking-widest"
             >
-                {vector ? "ESSENCE CRYSTALLIZED" : "ANALYZING ESSENCE VECTORS..."}
+                {vector ? "本質の結晶" : "ANALYZING ESSENCE VECTORS..."}
             </motion.p>
         </div>
     );

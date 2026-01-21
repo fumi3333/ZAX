@@ -22,19 +22,19 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                 <div className="glass-panel p-8 rounded-2xl text-center border border-zax-glow/30 relative overflow-hidden">
                     <div className="absolute inset-0 bg-zax-glow/5" />
                     <CheckCircle size={64} className="text-zax-glow mx-auto mb-6" />
-                    <h2 className="text-3xl font-bold text-white mb-2">Evolution Recorded</h2>
+                    <h2 className="text-3xl font-bold text-white mb-2">進化が記録されました</h2>
                     <p className="text-zax-muted mb-8">あなたの本質ベクトルが更新されました。</p>
 
                     <div className="flex justify-center gap-8 mb-8">
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-white">Using Logic</div>
-                            <div className="text-sm text-zax-muted">Type</div>
+                            <div className="text-2xl font-bold text-white">論理思考</div>
+                            <div className="text-sm text-zax-muted">強化領域</div>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl font-bold text-zax-glow flex items-center gap-1 justify-center">
                                 +5% <TrendingUp size={16} />
                             </div>
-                            <div className="text-sm text-zax-muted">Receptivity</div>
+                            <div className="text-sm text-zax-muted">受容性</div>
                         </div>
                     </div>
 
@@ -56,7 +56,7 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                             />
                         </svg>
                         <div className="absolute top-4 right-4 text-xs text-zax-glow">
-                            Current: V2.1 (Expanded)
+                            現在: V2.1 (Expanded)
                         </div>
                     </div>
 
@@ -64,7 +64,7 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                         onClick={onRestart}
                         className="mt-8 text-sm text-white/50 hover:text-white transition-colors underline decoration-dotted block mx-auto"
                     >
-                        Start New Simulation
+                        新しいシミュレーションを開始
                     </button>
                 </div>
             </motion.div>
@@ -78,7 +78,7 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                 animate={{ opacity: 1, y: 0 }}
                 className="glass-panel p-8 rounded-2xl border border-white/10"
             >
-                <h2 className="text-2xl font-bold text-white mb-6">Reflection</h2>
+                <h2 className="text-2xl font-bold text-white mb-6">内省と振り返り</h2>
                 <p className="text-gray-300 mb-4">
                     相手との対話を通じて、自分の中に新しく発見した感情や側面はありますか？
                 </p>
@@ -91,7 +91,7 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
 
                 {/* Structured Signal Tags (Data Design Refinement) */}
                 <div className="flex flex-wrap gap-2 mb-8">
-                    {["Reassurance (安心感)", "Challenge (違和感)", "Inspiration (閃き)", "Validation (肯定)"].map((tag) => (
+                    {["安心感 (Reassurance)", "違和感 (Challenge)", "閃き (Inspiration)", "肯定 (Validation)"].map((tag) => (
                         <button
                             key={tag}
                             onClick={() => { /* Toggle Tag Logic here if full impl */ }}
@@ -121,7 +121,7 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                     disabled={!feedback}
                     className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
                 >
-                    COMPLETE EVOLUTION
+                    進化を確定する
                 </button>
             </motion.div>
         </div>

@@ -41,7 +41,7 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
                 className="text-center mb-12"
             >
                 <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zax-glow to-zax-accent mb-4">
-                    Core Essence
+                    本質の核
                 </h1>
                 <p className="text-zax-muted text-lg">
                     属性というノイズを捨て、本質の断片を入力してください。
@@ -74,8 +74,8 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
                             {/* Context Slider (Data Design Refinement) */}
                             <div className="w-full bg-black/20 rounded-lg p-4 border border-white/5">
                                 <div className="flex justify-between text-xs text-zax-muted mb-2 uppercase tracking-widest">
-                                    <span>Intuition (直感)</span>
-                                    <span>Logic (論理)</span>
+                                    <span>直感 (Intuition)</span>
+                                    <span>論理 (Logic)</span>
                                 </div>
                                 <input
                                     type="range"
@@ -99,7 +99,7 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
                 <div className="absolute inset-0 bg-gradient-to-r from-zax-accent to-zax-glow opacity-20 group-hover:opacity-30 transition-opacity" />
                 <div className="absolute inset-0 border border-white/20 rounded-full" />
                 <span className="relative flex items-center gap-2 text-white text-lg tracking-wider">
-                    {activeindex < 2 ? "NEXT FRAGMENT" : "ANALYZE ESSENCE"}
+                    {activeindex < 2 ? "次の断片へ" : "本質を解析する"}
                     {activeindex < 2 ? <ArrowRight size={20} /> : <Sparkles size={20} />}
                 </span>
             </motion.button>

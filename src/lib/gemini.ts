@@ -22,16 +22,27 @@ export async function analyzeEssence(inputs: string[]): Promise<AnalysisResult> 
     }
 
     const prompt = `
-    Analyze the following 3 "Essence Fragments" of a person:
-    ${inputs.map((i, idx) => `${idx + 1}. ${i}`).join("\n")}
+    Analyze the following three personal fragments to construct a 6-dimensional "Essence Vector".
+    Fragments:
+    1. ${inputs[0]}
+    2. ${inputs[1]}
+    3. ${inputs[2]}
 
-    Based on these, generate a JSON response with:
-    1. "vector": An array of 6 integers (0-100) representing these traits in order: [Logic, Intuition, Empathy, Determination, Creativity, Flexibility].
-    2. "reasoning": A short Japanese text (max 100 chars) explaining why this person matches with someone who is "Complimentary". Focus on hidden potential.
-    3. "resonance_score": A calculated integer (0-100) representing potential for growth.
+    Dimensions (0-100):
+    - Logic (Logic & Structure)
+    - Intuition (Insight & Pattern)
+    - Empathy (Emotional Resonance)
+    - Determination (Willpower & Drive)
+    - Creativity (Novelty & Art)
+    - Flexibility (Adaptability & Openness)
 
-    Format: JSON only.
-  `;
+    Task:
+    1. Estimate values (0-100) for each dimension.
+    2. Generate a "Reasoning" summary (Max 100 chars, in JAPANESE) explaining the core personality trait detected.
+    3. Calculate a "Resonance Score" (0-100) representing potential for growth.
+
+    Format: JSON only. Keys: "vector" (array), "reasoning" (string), "resonance_score" (number).
+    `;
 
     try {
         const result = await model.generateContent(prompt);

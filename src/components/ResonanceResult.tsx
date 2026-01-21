@@ -24,24 +24,24 @@ export default function ResonanceResult({ onStartChat, reasoning, score }: Reson
                             <ShieldQuestion size={40} className="text-zax-glow" />
                         </div>
                     </div>
-                    <h2 className="text-2xl font-bold mt-4 text-white">Resonance Detected</h2>
-                    <p className="text-zax-muted">Match ID: #88X-29</p>
+                    <h2 className="text-2xl font-bold mt-4 text-white">共鳴を検知</h2>
+                    <p className="text-zax-muted">マッチID: #88X-29</p>
                 </div>
 
                 <div className="space-y-4 mb-8">
                     <div className="bg-black/40 rounded-lg p-6 border border-white/10 font-mono">
                         <div className="flex items-center gap-2 mb-4 text-zax-glow border-b border-white/10 pb-2">
                             <BrainCircuit size={16} />
-                            <span className="text-xs font-bold tracking-widest uppercase">ZAX-9000 // LOGIC KERNEL</span>
+                            <span className="text-xs font-bold tracking-widest uppercase">ZAX-9000 // 論理カーネル</span>
                         </div>
                         <p className="text-xs leading-relaxed text-zax-glow/80 whitespace-pre-line">
-                            {reasoning || "ANALYZING VECTOR SPACE...\nCALCULATING DELTA...\nNO MATCH FOUND."}
+                            {reasoning || "ベクトル空間を解析中...\nデルタ変数を計算中...\n適合する対象を検索しています..."}
                         </p>
                     </div>
 
                     <div className="flex justify-between items-center text-sm text-gray-400 px-2">
-                        <span>Attribute Distance: High (Good)</span>
-                        <span className="text-zax-glow">Essence Overlap: {score || 94}%</span>
+                        <span>属性距離: 高 (良好)</span>
+                        <span className="text-zax-glow">本質適合率: {score || 94}%</span>
                     </div>
                 </div>
 
@@ -49,7 +49,7 @@ export default function ResonanceResult({ onStartChat, reasoning, score }: Reson
                     onClick={onStartChat}
                     className="w-full py-4 bg-gradient-to-r from-zax-accent to-zax-glow rounded-xl text-white font-bold tracking-widest hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(112,0,255,0.5)]"
                 >
-                    ENTER BLIND CHAT
+                    ブラインドチャットを開始
                 </button>
             </motion.div>
         </div>
