@@ -51,3 +51,47 @@ export async function analyzeEssence(inputs: string[]): Promise<AnalysisResult> 
         };
     }
 }
+
+export interface DeltaResult {
+    delta_vector: number[];
+    new_vector: number[];
+    growth_score: number;
+}
+
+export async function calculateDeltaVector(feedback: string, currentVector: number[] = [50, 50, 50, 50, 50, 50]): Promise<DeltaResult> {
+    if (!API_KEY) {
+        return {
+            delta_vector: [5, -2, 10, 0, 5, 5],
+            new_vector: currentVector.map((v, i) => Math.min(100, Math.max(0, v + (i % 2 === 0 ? 5 : -2)))),
+            growth_score: 15
+        };
+    }
+
+    const prompt = `
+    User Context Vector: [${currentVector.join(", ")}] (Logic, Intuition, Empathy, Determination, Creativity, Flexibility)
+    User Feedback after interaction: "${feedback}"
+
+    Task:
+    1. Analyze the feedback to understand how the user's internal state has changed.
+    2. Calculate a "Delta Vector" (6 dims) representing this shift. Positive means growth/increase, negative means decrease.
+    3. Calculate the "New Vector" = Current + Delta. Ensure bounds 0-100.
+    4. Calculate a "Growth Score" (0-100) based on the magnitude of positive, constructive change.
+
+    Format: JSON only. Keys: "delta_vector" (array), "new_vector" (array), "growth_score" (number).
+    `;
+
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        const jsonStr = text.replace(/```json/g, "").replace(/```/g, "").trim();
+        return JSON.parse(jsonStr) as DeltaResult;
+    } catch (e) {
+        console.error("Delta Calc Error", e);
+        return {
+            delta_vector: [0, 0, 0, 0, 0, 0],
+            new_vector: currentVector,
+            growth_score: 0
+        };
+    }
+}

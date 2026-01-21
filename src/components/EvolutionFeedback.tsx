@@ -89,7 +89,20 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                     placeholder="例：自分のこだわりが、実は他人にとっても価値があることに気づいた..."
                 />
                 <button
-                    onClick={() => setSubmitted(true)}
+                    onClick={async () => {
+                        if (!feedback) return;
+                        try {
+                            await fetch("/api/feedback", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    feedback,
+                                    currentVector: [50, 60, 70, 60, 50, 80]
+                                }),
+                            });
+                        } catch (e) { console.error(e); }
+                        setSubmitted(true);
+                    }}
                     disabled={!feedback}
                     className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
                 >

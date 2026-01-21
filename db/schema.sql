@@ -26,6 +26,11 @@ CREATE TABLE user_embeddings (
     
     -- Distinguish between long-term personality and short-term mood
     embedding_type VARCHAR(20) CHECK (embedding_type IN ('personality', 'interest', 'mood', 'feedback')),
+
+    -- Delta Vector (MVP Step 1): explicitly track the "Movement"
+    -- This stores the difference from the previous state: V_current - V_prev
+    -- Crucial for analyzing "Growth Direction"
+    delta_vector VECTOR(1536), 
     
     -- SCD Type 2 Columns for History Tracking
     valid_from TIMESTAMPTZ NOT NULL DEFAULT NOW(),
