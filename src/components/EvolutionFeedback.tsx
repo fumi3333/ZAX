@@ -88,6 +88,20 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                     className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-zax-glow/50 mb-6"
                     placeholder="例：自分のこだわりが、実は他人にとっても価値があることに気づいた..."
                 />
+
+                {/* Structured Signal Tags (Data Design Refinement) */}
+                <div className="flex flex-wrap gap-2 mb-8">
+                    {["Reassurance (安心感)", "Challenge (違和感)", "Inspiration (閃き)", "Validation (肯定)"].map((tag) => (
+                        <button
+                            key={tag}
+                            onClick={() => { /* Toggle Tag Logic here if full impl */ }}
+                            className="px-3 py-1 rounded-full text-xs font-mono border border-white/20 text-zax-muted hover:text-zax-glow hover:border-zax-glow transition-colors"
+                        >
+                            {tag}
+                        </button>
+                    ))}
+                </div>
+
                 <button
                     onClick={async () => {
                         if (!feedback) return;
@@ -97,7 +111,8 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
                                     feedback,
-                                    currentVector: [50, 60, 70, 60, 50, 80]
+                                    currentVector: [50, 60, 70, 60, 50, 80],
+                                    tags: ["Inspiration"] // Send selected tags in real impl
                                 }),
                             });
                         } catch (e) { console.error(e); }

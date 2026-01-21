@@ -66,10 +66,24 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
                             <textarea
                                 value={fragments[idx]}
                                 onChange={(e) => updateFragment(e.target.value)}
-                                className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-lg text-white placeholder-white/20 focus:outline-none focus:border-zax-glow/50 focus:ring-1 focus:ring-zax-glow/50 transition-all resize-none glass-panel"
+                                className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-lg text-white placeholder-white/20 focus:outline-none focus:border-zax-glow/50 focus:ring-1 focus:ring-zax-glow/50 transition-all resize-none glass-panel mb-6"
                                 placeholder="ここに記述してください..."
                                 autoFocus
                             />
+
+                            {/* Context Slider (Data Design Refinement) */}
+                            <div className="w-full bg-black/20 rounded-lg p-4 border border-white/5">
+                                <div className="flex justify-between text-xs text-zax-muted mb-2 uppercase tracking-widest">
+                                    <span>Intuition (直感)</span>
+                                    <span>Logic (論理)</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-zax-glow"
+                                />
+                            </div>
                         </motion.div>
                     )
                 ))}
