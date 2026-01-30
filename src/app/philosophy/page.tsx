@@ -9,7 +9,7 @@ export default function PhilosophyPage() {
     return (
         <div className="min-h-screen bg-[#08080C] text-white selection:bg-zax-glow/30 selection:text-zax-glow font-sans pb-40 overflow-x-hidden">
             {/* ... Ambient Background ... */}
-             <div className="fixed inset-0 pointer-events-none z-0">
+            <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-[-20%] right-[-10%] w-[1000px] h-[1000px] bg-indigo-900/10 rounded-full blur-[180px] animate-pulse-slow" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-slate-900/10 rounded-full blur-[150px]" />
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
@@ -19,8 +19,8 @@ export default function PhilosophyPage() {
             {/* Navigation removed - moved to Global Layout */}
 
             <div className="relative z-10 max-w-5xl mx-auto px-6 pt-48">
-                 {/* ... Header ... */}
-                 <motion.div
+                {/* ... Header ... */}
+                <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1.0, ease: "easeOut" }}
@@ -41,7 +41,7 @@ export default function PhilosophyPage() {
                     </p>
                 </motion.div>
 
-                 {/* Section 1: The Bug - Glitch Aesthetic */}
+                {/* Section 1: The Bug - Glitch Aesthetic */}
                 <motion.section
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -65,7 +65,7 @@ export default function PhilosophyPage() {
                     </div>
                 </motion.section>
 
-                 {/* Section 2: The Solution - Technology Aesthetic */}
+                {/* Section 2: The Solution - Technology Aesthetic */}
                 <motion.section
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -129,29 +129,10 @@ export default function PhilosophyPage() {
 
                     <h2 className="text-4xl md:text-5xl font-bold mb-20 text-center">
                         <span className="block text-sm font-mono text-zax-accent tracking-[0.3em] mb-4">03. IMPACT</span>
-                         孤独の経済損失とGDP
+                        孤独の経済損失とGDP
                     </h2>
 
                     <div className="relative pl-8 md:pl-0 space-y-24">
-                        {/* Steps 1-3 removed for brevity here, assumed correct in target */}
-                        {/* ... (Previous Impact Steps) ... */}
-                        
-                        {/* Graph Section - Restored & Wrapped in Card */}
-                        <div className="relative z-10 pt-10">
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.8 }}
-                            >
-                                <Card className="border-zax-accent/20 bg-black/60 overflow-hidden">
-                                     <CardContent className="p-0">
-                                         <ImpactSimulationGraph />
-                                     </CardContent>
-                                </Card>
-                            </motion.div>
-                        </div>
-                    </div>
-                </motion.section>
 
                         {/* Step 1: PROBLEM (Negative) */}
                         <div className="md:grid md:grid-cols-2 gap-12 items-center relative">
@@ -225,6 +206,21 @@ export default function PhilosophyPage() {
                             <div className="hidden md:block" />
                         </div>
 
+                        {/* Graph Section */}
+                        <div className="relative z-10 pt-10">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.8 }}
+                            >
+                                <Card className="border-zax-accent/20 bg-black/60 overflow-hidden">
+                                    <CardContent className="p-0">
+                                        <ImpactSimulationGraph />
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        </div>
+
                     </div>
                 </motion.section>
 
@@ -247,7 +243,7 @@ export default function PhilosophyPage() {
                             まずは「武蔵野大学」という、多様性と哲学が共存するコミュニティを最初の実験場（Sandbox）とし、ここから世界へ波及させます。
                         </p>
                     </div>
-                </motion.section >
+                </motion.section>
 
                 <div className="mt-32 text-center pb-20">
                     <Link href="/" className="group relative inline-flex items-center gap-4 text-white bg-white/5 hover:bg-white/10 border border-white/10 px-10 py-5 rounded-full font-bold transition-all hover:border-zax-glow/50">
