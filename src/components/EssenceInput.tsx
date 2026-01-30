@@ -2,17 +2,26 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Heart, Users, Sun } from "lucide-react"; // Icons for purposes
 import { cn } from "@/lib/utils";
 
 interface EssenceInputProps {
-    onComplete: (data: { fragments: string[], biases: number[] }) => void;
+    onComplete: (data: { fragments: string[], biases: number[], purpose: string }) => void;
 }
 
 export default function EssenceInput({ onComplete }: EssenceInputProps) {
+    const [step, setStep] = useState<"purpose" | "fragments">("purpose"); // New step state
+    const [purpose, setPurpose] = useState<string>(""); // Store selected purpose
+
     const [fragments, setFragments] = useState(["", "", ""]);
     const [biases, setBiases] = useState([50, 50, 50]); // 50 = Neutral, 0 = Intuition, 100 = Logic
     const [activeindex, setActiveIndex] = useState(0);
+
+    const purposes = [
+        { id: "happiness", label: "人生単位の幸福", icon: Sun, desc: "自己実現と精神的な充足を最大化する" },
+        { id: "romance", label: "パートナーシップ", icon: Heart, desc: "深いレベルで共鳴し合う関係性" },
+        { id: "friendship", label: "盟友・親友", icon: Users, desc: "互いに高め合える生涯の友" },
+    ];
 
     const placeholders = [
         "誰にも理解されない、あなたの密かなこだわりは？",
@@ -20,12 +29,17 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
         "変えたいと思っている、自分自身の矛盾点は？"
     ];
 
+    const handlePurposeSelect = (id: string) => {
+        setPurpose(id);
+        setTimeout(() => setStep("fragments"), 300); // Smooth transition
+    };
+
     const handleNext = () => {
         if (activeindex < 2) {
             setActiveIndex(activeindex + 1);
         } else {
-            // Pass structured data
-            onComplete({ fragments, biases });
+            // Pass structured data including purpose
+            onComplete({ fragments, biases, purpose });
         }
     };
 
@@ -41,6 +55,51 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
         setBiases(newBiases);
     };
 
+    // 1. Purpose Selection View
+    if (step === "purpose") {
+        return (
+            <div className="w-full max-w-4xl mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center mb-16"
+                >
+                    <h1 className="text-3xl font-bold text-white mb-4">
+                        何のために、共鳴を求めますか？
+                    </h1>
+                    <p className="text-zax-muted">
+                        ZAXは「人生単位の幸福」を最大化するためのプロトコルです。<br />
+                        あなたの現在の羅針盤を教えてください。
+                    </p>
+                </motion.div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                    {purposes.map((p) => (
+                        <motion.button
+                            key={p.id}
+                            whileHover={{ scale: 1.03, borderColor: "rgba(255,255,255,0.4)" }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handlePurposeSelect(p.id)}
+                            className={cn(
+                                "flex flex-col items-center p-8 rounded-2xl border transition-all duration-300 gap-4 group",
+                                purpose === p.id
+                                    ? "bg-white/10 border-white/50 shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                                    : "bg-black/40 border-white/10 hover:bg-white/5"
+                            )}
+                        >
+                            <p.icon className={cn("w-8 h-8 transition-colors", purpose === p.id ? "text-zax-glow" : "text-zax-muted group-hover:text-white")} />
+                            <div className="text-center">
+                                <h3 className="text-lg font-bold text-white mb-2">{p.label}</h3>
+                                <p className="text-xs text-zax-muted leading-relaxed">{p.desc}</p>
+                            </div>
+                        </motion.button>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    // 2. Fragments Input View (Existing)
     return (
         <div className="w-full max-w-2xl mx-auto p-6 flex flex-col items-center justify-center min-h-[60vh]">
             <motion.div
@@ -48,6 +107,11 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center mb-12"
             >
+                <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 bg-white/5 rounded-full border border-white/10">
+                    <span className="text-xs text-zax-muted uppercase tracking-widest">
+                        Objective: {purposes.find(p => p.id === purpose)?.label}
+                    </span>
+                </div>
                 <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-zax-glow to-zax-accent mb-4">
                     本質の核
                 </h1>
@@ -79,7 +143,7 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
                                 autoFocus
                             />
 
-                            {/* Context Slider (Data Design Refinement) */}
+                            {/* Context Slider */}
                             <div className="w-full bg-black/20 rounded-lg p-4 border border-white/5">
                                 <div className="flex justify-between text-xs text-zax-muted mb-2 uppercase tracking-widest">
                                     <span>直感 (Intuition)</span>

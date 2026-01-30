@@ -17,7 +17,7 @@ export default function Home() {
     setView("input");
   };
 
-  const handleInputComplete = async (inputData: { fragments: string[], biases: number[] }) => {
+  const handleInputComplete = async (inputData: { fragments: string[], biases: number[], purpose: string }) => {
     // ... (Keep existing logic)
     console.log("Input data:", inputData);
     setView("analyzing");
@@ -28,7 +28,8 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           inputs: inputData.fragments,
-          biases: inputData.biases
+          biases: inputData.biases,
+          purpose: inputData.purpose // Pass purpose
         }),
       });
       const result: AnalysisResult = await response.json();

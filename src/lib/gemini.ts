@@ -4,14 +4,16 @@ const API_KEY = process.env.GOOGLE_API_KEY || "";
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const embeddingModel = genAI.getGenerativeModel({ model: "embedding-001" }); // High-Dim Core
 
 export interface AnalysisResult {
-    vector: number[]; // 6-dim radar chart stats (0-100)
+    vector: number[]; // 6-dim radar chart stats (0-100) -> V_display
+    embedding?: number[]; // 768-dim raw embedding -> V_essence (Hidden)
     reasoning: string;
     resonance_score: number;
 }
 
-export async function analyzeEssence(inputs: string[], biases: number[] = [50, 50, 50]): Promise<AnalysisResult> {
+export async function analyzeEssence(inputs: string[], biases: number[] = [50, 50, 50], purpose: string = "general"): Promise<AnalysisResult> {
     if (!API_KEY) {
         console.warn("GOOGLE_API_KEY not found. Using mock data.");
         return {
@@ -21,8 +23,16 @@ export async function analyzeEssence(inputs: string[], biases: number[] = [50, 5
         };
     }
 
+    // 1. Generate V_display (6-dim) via LLM
     const prompt = `
     Analyze the following three personal fragments to construct a 6-dimensional "Essence Vector".
+    
+    User Goal/Purpose: "${purpose}"
+    * Important: The user is seeking "${purpose}" functionality to maximize their life happiness. 
+    * If purpose is "romance", prioritize Empathy and Chemistry cues.
+    * If "happiness" (growth), prioritize Determination and Creativity.
+    * If "friendship", prioritize Flexibility and Intuition.
+
     Fragments:
     1. ${inputs[0]}
     2. ${inputs[1]}
@@ -43,21 +53,28 @@ export async function analyzeEssence(inputs: string[], biases: number[] = [50, 5
     - Flexibility (Adaptability & Openness)
 
     Task:
-    1. Estimate values (0-100) for each dimension.
-    2. Generate a "Reasoning" summary (Max 100 chars, in JAPANESE) explaining the core personality trait detected.
-    3. Calculate a "Resonance Score" (0-100) representing potential for growth.
+    1. Estimate values (0-100) for each dimension, keeping the User Goal in mind for nuances.
+    2. Generate a "Reasoning" summary (Max 100 chars, in JAPANESE) explaining the core personality trait detected in relation to their goal.
+    3. Calculate a "Resonance Score" (0-100) representing potential for success in their chosen goal.
 
     Format: JSON only. Keys: "vector" (array), "reasoning" (string), "resonance_score" (number).
     `;
 
     try {
-        const result = await model.generateContent(prompt);
+        const [result, embeddingResult] = await Promise.all([
+            model.generateContent(prompt),
+            embeddingModel.embedContent(inputs.join(" ")) // Generate V_essence (High-Dim)
+        ]);
+
         const response = await result.response;
         const text = response.text();
-
-        // Simple cleaning for JSON parsing if markdown is included
         const jsonStr = text.replace(/```json/g, "").replace(/```/g, "").trim();
-        return JSON.parse(jsonStr) as AnalysisResult;
+        const parsed = JSON.parse(jsonStr) as AnalysisResult;
+
+        return {
+            ...parsed,
+            embedding: embeddingResult.embedding.values // Attach High-Dim Vector
+        };
     } catch (error) {
         console.error("Gemini Analysis Error:", error);
         // Fallback on error

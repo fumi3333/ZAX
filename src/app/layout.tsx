@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import CorporateHeader from "@/components/CorporateHeader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,20 +14,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZAX | Unlock Your Resonance",
-  description: "属性というノイズを捨て、6次元の「本質ベクトル」で繋がる。ZAXはDeep Techによる次世代の人間関係最適化プロトコルです。",
+  title: "ZAX | Value-Based Connection",
+  description: "表面的な属性ではなく、あなたの「本質」と「価値観」で繋がる、新しいマッチングプラットフォーム。",
   openGraph: {
-    title: "ZAX | Unlock Your Resonance",
-    description: "Unlock your hidden potential through vector-based resonance.",
+    title: "ZAX | Value-Based Connection",
+    description: "Connect through values, not just attributes.",
     url: "https://fumiproject.dev",
-    siteName: "ZAX Protocol",
+    siteName: "ZAX",
     locale: "ja_JP",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZAX | Unlock Your Resonance",
-    description: "属性を捨て、本質で繋がる。",
+    title: "ZAX | Value-Based Connection",
+    description: "属性ではなく、価値観で繋がる。",
   },
 };
 
@@ -36,10 +37,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ja" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <CorporateHeader />
         {children}
       </body>
     </html>
