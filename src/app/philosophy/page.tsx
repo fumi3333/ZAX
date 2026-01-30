@@ -107,118 +107,70 @@ export default function PhilosophyPage() {
 
                 {/* Section 3: Macro-Economics - Vertical Logic Pipe Design */}
                 <motion.section
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true, margin: "-20%" }}
                     transition={{ duration: 0.8 }}
-                    className="mb-32 relative group"
+                    className="min-h-screen flex flex-col justify-center mb-0 relative group" // Full screen section
                 >
-                    <h2 className="text-3xl font-bold mb-16 flex items-center gap-4">
-                        <span className="font-mono text-sm text-zax-accent tracking-widest bg-zax-accent/10 px-2 py-1 rounded">03. 経済効果 (IMPACT)</span>
+                    <div className="absolute left-[39px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent hidden md:block" />
+                    <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent md:hidden" />
+
+                    <h2 className="text-4xl md:text-5xl font-bold mb-20 text-center">
+                        <span className="block text-sm font-mono text-zax-accent tracking-[0.3em] mb-4">03. IMPACT</span>
                         孤独の経済損失とGDP
                     </h2>
 
-                    <div className="relative pl-8 md:pl-0">
-                        {/* Central Logic Pipe Line - Background */}
-                        <div className="absolute left-[39px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-red-500/50 via-zax-glow to-zax-accent/50 hidden md:block" />
-                        <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-red-500/50 via-zax-glow to-zax-accent/50 md:hidden" />
+                    <div className="relative pl-8 md:pl-0 space-y-24">
 
                         {/* Step 1: PROBLEM (Negative) */}
-                        <div className="md:grid md:grid-cols-2 gap-12 items-center mb-16 relative">
-                            {/* Node Point */}
-                            <div className="absolute left-[-4px] md:left-1/2 md:-ml-1 top-6 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)] z-20" />
-
-                            <div className="md:text-right">
-                                <span className="font-mono text-xs text-red-500 tracking-widest mb-2 block">公的データ (PUBLIC DATA)</span>
-                                <h3 className="text-xl font-bold text-white mb-2">年間数兆円規模の損失</h3>
-                                <p className="text-zax-muted text-sm leading-relaxed">
-                                    孤独による医療費増大、マッチング不全による離職、<br />
-                                    エンゲージメント低下は、GDPを押し下げる「負債」です。
-                                </p>
-                            </div>
-                            <div className="hidden md:block" /> {/** Spacer for grid */}
-                        </div>
-
-                        {/* Step 2: INTERVENTION (Transformation) */}
-                        <div className="md:grid md:grid-cols-2 gap-12 items-center mb-16 relative">
-                            {/* Node Point */}
-                            <div className="absolute left-[-4px] md:left-1/2 md:-ml-1 top-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] z-20" />
-
-                            <div className="hidden md:block" /> {/** Spacer for grid */}
-                            <div>
-                                <div className="bg-zax-glow/10 border border-zax-glow/30 p-6 rounded-xl relative overflow-hidden backdrop-blur-md">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-zax-glow/5 to-transparent" />
-                                    <span className="font-mono text-xs text-zax-glow tracking-widest mb-2 block relative z-10">ZAXによる介入 (INTERVENTION)</span>
-                                    <h3 className="text-xl font-bold text-white mb-2 relative z-10">摩擦を「熱量」へ変換</h3>
-                                    <p className="text-zax-muted text-sm leading-relaxed relative z-10">
-                                        探索コストを極小化し、ベクトル共鳴によって<br />
-                                        個人の潜在能力（Human Capital）を最大化します。
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Step 3: OUTCOME (Positive) */}
-                        <div className="md:grid md:grid-cols-2 gap-12 items-center relative mb-20">
-                            {/* Node Point */}
-                            <div className="absolute left-[-4px] md:left-1/2 md:-ml-1 top-6 w-2 h-2 rounded-full bg-zax-accent shadow-[0_0_10px_rgba(0,240,255,0.8)] z-20" />
-
-                            <div className="md:text-right">
-                                <span className="font-mono text-xs text-zax-accent tracking-widest mb-2 block">マクロ経済的成果 (OUTCOME)</span>
-                                <h3 className="text-xl font-bold text-white mb-2">全要素生産性(TFP)の向上</h3>
-                                <p className="text-zax-muted text-sm leading-relaxed">
-                                    個人の幸福が最適化されることで、社会全体の生産性が向上。<br />
-                                    <strong className="text-zax-accent">「幸福の最大化」こそが、最強の成長戦略です。</strong>
-                                </p>
-                            </div>
-                            <div className="hidden md:block" /> {/** Spacer for grid */}
-                        </div>
-
-                        {/* New Graph Section to Fill Space & Provide Data */}
-                        <div className="relative z-10">
-                            <ImpactSimulationGraph />
-                        </div>
-
-                    </div>
-                </motion.section>
-
-                {/* Section 3: The Vision - Emotive Aesthetic */}
-                <motion.section
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="mb-32 w-full"
-                >
-                    <div className="relative overflow-hidden bg-gradient-to-br from-white/10 via-black to-black p-10 md:p-16 rounded-3xl border border-white/10 text-center group">
-                        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.05]" />
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-zax-glow to-transparent opacity-50" />
-
-                        <Quote className="w-12 h-12 text-white/20 mx-auto mb-8" />
-
-                        <h2 className="text-3xl md:text-4xl font-bold mb-8">
-                            ビジョン：人類を一つの知性体へ
-                        </h2>
-                        <p className="text-lg text-zax-muted leading-loose mb-10 max-w-2xl mx-auto">
-                            ZAXが目指すのは、単なる「友達探し」のツールではありません。<br />
-                            属性というノイズを排し、魂の本質で人々が滑らかに接続されるインフラを構築すること。
-                            それによって、個々の人間が孤立した点ではなく、一つの巨大な、そして温かい<strong className="text-white">「地球規模の知性体」</strong>として機能する世界を作ることです。
-                        </p>
-                        <p className="text-base text-white/80 font-serif italic tracking-wide">
-                            「誰と出会うか」が、その人の人生の質を決定する。<br />
-                            ならば、その接続を最適化することは、人類の進化そのものである。
+                        <h3 className="text-xl font-bold text-white mb-2">年間数兆円規模の損失</h3>
+                        <p className="text-zax-muted text-sm leading-relaxed">
+                            孤独による医療費増大、マッチング不全による離職、<br />
+                            エンゲージメント低下は、GDPを押し下げる「負債」です。
                         </p>
                     </div>
-                </motion.section>
+                    <div className="hidden md:block" /> {/** Spacer for grid */}
+            </div>
 
-                {/* Footer Notes: Why Now & Field - Minimalist Grid */}
-                <motion.section
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-white/10 pt-16"
-                >
+            {/* Step 2: INTERVENTION (Transformation) */}
+            <div className="md:grid md:grid-cols-2 gap-12 items-center mb-16 relative">
+                {/* Node Point */}
+                <div className="absolute left-[-4px] md:left-1/2 md:-ml-1 top-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] z-20" />
+
+                <div className="hidden md:block" /> {/** Spacer for grid */}
+                <div>
+                    <div className="bg-zax-glow/10 border border-zax-glow/30 p-6 rounded-xl relative overflow-hidden backdrop-blur-md">
+                        <div className="absolute inset-0 bg-gradient-to-r from-zax-glow/5 to-transparent" />
+                        <span className="font-mono text-xs text-zax-glow tracking-widest mb-2 block relative z-10">ZAXによる介入 (INTERVENTION)</span>
+                        <h3 className="text-xl font-bold text-white mb-2 relative z-10">摩擦を「熱量」へ変換</h3>
+                        <p className="text-zax-muted text-sm leading-relaxed relative z-10">
+                            探索コストを極小化し、ベクトル共鳴によって<br />
+                            個人の潜在能力（Human Capital）を最大化します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Step 3: OUTCOME (Positive) */}
+            <div className="md:grid md:grid-cols-2 gap-12 items-center relative mb-20">
+                {/* Node Point */}
+                <div className="absolute left-[-4px] md:left-1/2 md:-ml-1 top-6 w-2 h-2 rounded-full bg-zax-accent shadow-[0_0_10px_rgba(0,240,255,0.8)] z-20" />
+
+                <div className="md:text-right">
+                    <span className="font-mono text-xs text-zax-accent tracking-widest mb-2 block">マクロ経済的成果 (OUTCOME)</span>
+                    <h3 className="text-xl font-bold text-white mb-2">全要素生産性(TFP)の向上</h3>
+                    <p className="text-zax-muted text-sm leading-relaxed">
+                        個人の幸福が最適化されることで、社会全体の生産性が向上。<br />
+                        <strong className="text-zax-accent">「幸福の最大化」こそが、最強の成長戦略です。</strong>
+                    </p>
+                </div>
+                <div className="hidden md:block" /> {/** Spacer for grid */}
+            </div>
+
+transition = {{ duration: 0.6 }}
+className = "grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-white/10 pt-16"
+    >
                     <div>
                         <h3 className="text-xs font-bold text-white/50 mb-4 uppercase tracking-[0.2em]">Why Now? (なぜ今か)</h3>
                         <p className="text-sm text-zax-muted leading-relaxed">
@@ -231,16 +183,16 @@ export default function PhilosophyPage() {
                             まずは「武蔵野大学」という、多様性と哲学が共存するコミュニティを最初の実験場（Sandbox）とし、ここから世界へ波及させます。
                         </p>
                     </div>
-                </motion.section>
+                </motion.section >
 
-                <div className="mt-32 text-center pb-20">
-                    <Link href="/" className="group relative inline-flex items-center gap-4 text-white bg-white/5 hover:bg-white/10 border border-white/10 px-10 py-5 rounded-full font-bold transition-all hover:border-zax-glow/50">
-                        <span className="text-sm tracking-widest uppercase">プロトコルを開始 (Start)</span>
-                        <ArrowRight className="w-4 h-4 text-zax-glow group-hover:translate-x-1 transition-transform" />
-                        <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-zax-glow to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </Link>
-                </div>
-            </div>
-        </div>
+    <div className="mt-32 text-center pb-20">
+        <Link href="/" className="group relative inline-flex items-center gap-4 text-white bg-white/5 hover:bg-white/10 border border-white/10 px-10 py-5 rounded-full font-bold transition-all hover:border-zax-glow/50">
+            <span className="text-sm tracking-widest uppercase">プロトコルを開始 (Start)</span>
+            <ArrowRight className="w-4 h-4 text-zax-glow group-hover:translate-x-1 transition-transform" />
+            <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-zax-glow to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Link>
+    </div>
+            </div >
+        </div >
     );
 }
