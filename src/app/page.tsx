@@ -6,13 +6,19 @@ import EssenceVisualizer from "@/components/EssenceVisualizer";
 import ResonanceResult from "@/components/ResonanceResult";
 import BlindChat from "@/components/BlindChat";
 import EvolutionFeedback from "@/components/EvolutionFeedback";
+import LandingPage from "@/components/LandingPage";
 import { AnalysisResult } from "@/lib/gemini";
 
 export default function Home() {
-  const [view, setView] = useState<"input" | "analyzing" | "match" | "chat" | "feedback">("input");
+  const [view, setView] = useState<"landing" | "input" | "analyzing" | "match" | "chat" | "feedback">("landing");
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
+  const handleEnter = () => {
+    setView("input");
+  };
+
   const handleInputComplete = async (inputData: { fragments: string[], biases: number[] }) => {
+    // ... (Keep existing logic)
     console.log("Input data:", inputData);
     setView("analyzing");
 
@@ -75,8 +81,12 @@ export default function Home() {
 
   const handleRestart = () => {
     setAnalysisResult(null);
-    setView("input");
+    setView("input"); // Loop back to Input, or "landing" if preferred
   };
+
+  if (view === "landing") {
+    return <LandingPage onEnter={handleEnter} />;
+  }
 
   return (
     <main className="min-h-screen w-full flex flex-col items-center justify-center p-4 relative overflow-hidden text-white">
