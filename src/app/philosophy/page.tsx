@@ -6,12 +6,13 @@ import Link from "next/link";
 
 export default function PhilosophyPage() {
     return (
-        <div className="min-h-screen bg-[#050505] text-white selection:bg-zax-glow/30 selection:text-zax-glow font-sans pb-20 overflow-x-hidden">
-            {/* Ambient Background - Dynamic & Subtle */}
+        <div className="min-h-screen bg-[#08080C] text-white selection:bg-zax-glow/30 selection:text-zax-glow font-sans pb-40 overflow-x-hidden">
+            {/* Ambient Background - Warm & Organic */}
             <div className="fixed inset-0 pointer-events-none z-0">
-                <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-zax-glow/5 rounded-full blur-[150px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-zax-accent/5 rounded-full blur-[120px]" />
-                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02]" />
+                <div className="absolute top-[-20%] right-[-10%] w-[1000px] h-[1000px] bg-indigo-900/10 rounded-full blur-[180px] animate-pulse-slow" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-slate-900/10 rounded-full blur-[150px]" />
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A0A10]/50 to-[#08080C]" />
             </div>
 
             {/* Navigation removed - moved to Global Layout */}
@@ -63,37 +64,41 @@ export default function PhilosophyPage() {
                     </div>
                 </motion.section>
 
+                import VectorTransformationVisual from "@/components/VectorTransformationVisual";
+
                 {/* Section 2: The Solution - Technology Aesthetic */}
                 <motion.section
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.8 }}
-                    className="mb-32 relative pl-8 md:pl-12 border-l border-white/10 hover:border-zax-glow/50 transition-colors duration-500 group"
+                    className="mb-40 relative pl-8 md:pl-12 border-l border-white/5 hover:border-zax-glow/30 transition-colors duration-700 max-w-4xl"
                 >
-                    <div className="absolute left-[-5px] top-0 h-0 w-[1px] bg-zax-glow group-hover:h-full transition-all duration-700 ease-in-out" />
+                    <div className="absolute left-[-5px] top-0 h-0 w-[1px] bg-zax-glow group-hover:h-full transition-all duration-1000 ease-in-out" />
 
-                    <h2 className="text-3xl font-bold mb-8 flex items-center gap-4">
-                        <span className="font-mono text-sm text-zax-glow tracking-widest bg-zax-glow/10 px-2 py-1 rounded">02. 解決策 (SOLUTION)</span>
+                    <h2 className="text-3xl font-bold mb-10 flex items-center gap-4">
+                        <span className="font-mono text-xs text-zax-glow tracking-[0.2em] bg-zax-glow/5 px-3 py-1.5 rounded-full border border-zax-glow/20">02. SOLUTION</span>
                         高次元ベクトルによる「本質」の抽出
                     </h2>
-                    <p className="text-zax-muted leading-loose mb-10 text-lg">
-                        ZAXは、計算資源の飛躍的向上を前提とした<strong className="text-white">「接続OS」</strong>です。
-                        あなたが発する言葉、思考の断片、そして時間とともに移ろいゆく心の変化を、数千次元の<strong className="text-white">「本質ベクトル ($V_essence$)」</strong>として空間上にプロットします。
+
+                    <p className="text-zax-muted leading-[2.2] mb-12 text-lg font-light tracking-wide max-w-2xl">
+                        ZAXは、計算資源の飛躍的向上を前提とした<strong className="text-white font-medium">「接続OS」</strong>です。
+                        あなたが発する言葉、思考の断片、そして時間とともに移ろいゆく心の変化を、
+                        数千次元の<strong className="text-white font-medium">「本質ベクトル ($V_essence$)」</strong>として空間上にプロットします。
                     </p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-black/40 p-8 rounded-xl border border-white/10 hover:border-zax-glow/40 transition-all hover:-translate-y-1 duration-300 backdrop-blur-sm">
-                            <h3 className="text-lg font-bold text-white mb-3">レゾナンス（共鳴）エンジン</h3>
-                            <div className="h-[1px] w-10 bg-zax-glow mb-4" />
-                            <p className="text-sm text-zax-muted leading-relaxed">
+                    <VectorTransformationVisual />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+                        <div className="group/card bg-white/[0.02] p-8 rounded-2xl border border-white/5 hover:bg-white/[0.04] transition-all duration-500">
+                            <h3 className="text-lg font-bold text-white mb-4 group-hover/card:text-zax-glow transition-colors">レゾナンス（共鳴）エンジン</h3>
+                            <p className="text-sm text-zax-muted leading-loose font-light">
                                 単なる条件のマッチングではなく、高次元空間においてベクトルの波長が重なり合う「共鳴」を演算します。
                             </p>
                         </div>
-                        <div className="bg-black/40 p-8 rounded-xl border border-white/10 hover:border-zax-accent/40 transition-all hover:-translate-y-1 duration-300 backdrop-blur-sm">
-                            <h3 className="text-lg font-bold text-white mb-3">デルタベクトルの蓄積</h3>
-                            <div className="h-[1px] w-10 bg-zax-accent mb-4" />
-                            <p className="text-sm text-zax-muted leading-relaxed">
+                        <div className="group/card bg-white/[0.02] p-8 rounded-2xl border border-white/5 hover:bg-white/[0.04] transition-all duration-500">
+                            <h3 className="text-lg font-bold text-white mb-4 group-hover/card:text-zax-accent transition-colors">デルタベクトルの蓄積</h3>
+                            <p className="text-sm text-zax-muted leading-loose font-light">
                                 過去と現在の差分 (<span className="font-mono text-white/70">ΔV</span>) を解析し続けることで、その人の「変化の指向性」までを考慮した、究極の相性を導き出します。
                             </p>
                         </div>
@@ -154,7 +159,7 @@ export default function PhilosophyPage() {
                         </div>
 
                         {/* Step 3: OUTCOME (Positive) */}
-                        <div className="md:grid md:grid-cols-2 gap-12 items-center relative">
+                        <div className="md:grid md:grid-cols-2 gap-12 items-center relative mb-20">
                             {/* Node Point */}
                             <div className="absolute left-[-4px] md:left-1/2 md:-ml-1 top-6 w-2 h-2 rounded-full bg-zax-accent shadow-[0_0_10px_rgba(0,240,255,0.8)] z-20" />
 
@@ -167,6 +172,11 @@ export default function PhilosophyPage() {
                                 </p>
                             </div>
                             <div className="hidden md:block" /> {/** Spacer for grid */}
+                        </div>
+
+                        {/* New Graph Section to Fill Space & Provide Data */}
+                        <div className="relative z-10">
+                            <ImpactSimulationGraph />
                         </div>
 
                     </div>
