@@ -68,7 +68,6 @@ export default function CorporateHeader() {
                     >
                         <ul className="flex flex-col gap-6 text-2xl font-bold text-slate-900 tracking-tight">
                             <li><Link href="/about" onClick={() => setIsMobileMenuOpen(false)}>ABOUT US</Link></li>
-                            <li><Link href="#" className="opacity-50" onClick={() => setIsMobileMenuOpen(false)}>NEWS</Link></li>
                         </ul>
                     </motion.div>
                 )}

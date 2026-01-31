@@ -49,18 +49,24 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="flex flex-col items-center mb-16"
+                    className="flex flex-col items-center mb-16 relative"
                 >
-                    <h1 className="text-8xl md:text-9xl font-bold tracking-tighter mb-6 text-slate-900">
+                    {/* Subtle Glow behind text */}
+                    <div className="absolute inset-0 bg-white/40 blur-3xl rounded-full -z-10" />
+
+                    <h1 className="text-8xl md:text-9xl font-bold tracking-tighter mb-6 text-slate-900 drop-shadow-sm">
                         ZAX
                     </h1>
-                    <p className="text-xl md:text-2xl font-medium text-slate-600 mb-6 tracking-wide leading-relaxed max-w-2xl">
+                    <p className="text-xl md:text-2xl font-bold text-slate-800 mb-6 tracking-wide leading-relaxed max-w-2xl drop-shadow-sm">
                         価値観でつながる、<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">新しい知性体コミュニケーション</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 drop-shadow-[0_2px_2px_rgba(255,255,255,0.8)]">新しい知性体コミュニケーション</span>
                     </p>
-                    <p className="text-sm text-slate-500 max-w-lg leading-relaxed">
+                    <p className="text-sm text-slate-600 font-medium max-w-lg leading-relaxed bg-white/30 backdrop-blur-sm p-4 rounded-xl border border-white/40 shadow-sm">
                         表面的なプロフィールではなく、あなたの「本質」から共鳴する相手を見つけ出します。
-                        AIが描く、6次元のベクトルの軌跡。
+                        <span className="block mt-2 text-xs text-slate-500 flex items-center justify-center gap-1">
+                            <BrainCircuit className="w-3 h-3" />
+                            AIが描く、6次元のベクトルの軌跡。
+                        </span>
                     </p>
                 </motion.div>
 
@@ -72,11 +78,11 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
                     className="mb-32 relative group"
                 >
                     <div className="relative group">
-                        {/* Glow Effect behind button */}
-                        <div className="absolute -inset-1 bg-gradient-to-r from-zax-glow to-zax-accent rounded-full blur opacity-20 group-hover:opacity-60 transition duration-500 group-hover:duration-200" />
+                        {/* Glow Effect behind button - Enhanced */}
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur opacity-40 group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-pulse" />
                         <button
                             onClick={onEnter}
-                            className="relative w-full md:w-auto min-w-[300px] px-12 py-6 bg-slate-900 text-white text-xl font-bold tracking-[0.2em] rounded-full hover:scale-105 transition-transform duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-4"
+                            className="relative w-full md:w-auto min-w-[300px] px-12 py-6 bg-slate-900 text-white text-xl font-bold tracking-[0.2em] rounded-full hover:scale-105 transition-transform duration-300 shadow-[0_0_40px_-5px_rgba(59,130,246,0.5)] hover:shadow-[0_0_60px_-5px_rgba(59,130,246,0.7)] flex items-center justify-center gap-4 border border-white/10"
                         >
                             <span>診断を開始</span>
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
@@ -91,21 +97,21 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
                             <Fingerprint className="w-6 h-6 text-blue-600" />
                         </div>
                         <h3 className="text-sm font-bold mb-2 text-slate-800 tracking-wide">本質分析</h3>
-                        <p className="text-[10px] text-slate-500 leading-relaxed max-w-[200px]">思考特性を6次元ベクトルとして分析</p>
+                        <p className="text-[10px] text-slate-500 leading-relaxed max-w-[200px]">思考特性を6次元ベクトルとして分析し、あなたの内面を可視化します。</p>
                     </div>
                     <div className="flex flex-col items-center group">
                         <div className="p-4 rounded-full bg-purple-50 mb-4 group-hover:bg-purple-100 transition-colors">
-                            <BrainCircuit className="w-6 h-6 text-purple-600" />
+                            <Zap className="w-6 h-6 text-purple-600" />
                         </div>
                         <h3 className="text-sm font-bold mb-2 text-slate-800 tracking-wide">共鳴マッチング</h3>
-                        <p className="text-[10px] text-slate-500 leading-relaxed max-w-[200px]">1000次元の空間計算による最適解</p>
+                        <p className="text-[10px] text-slate-500 leading-relaxed max-w-[200px]">1000次元の空間計算により、自分でも気づかない「共通点」を持つ相手を見つけます。</p>
                     </div>
                     <div className="flex flex-col items-center group">
                         <div className="p-4 rounded-full bg-slate-100 mb-4 group-hover:bg-slate-200 transition-colors">
-                            <Zap className="w-6 h-6 text-slate-600" />
+                            <BrainCircuit className="w-6 h-6 text-slate-600" />
                         </div>
                         <h3 className="text-sm font-bold mb-2 text-slate-800 tracking-wide">成長記録</h3>
-                        <p className="text-[10px] text-slate-500 leading-relaxed max-w-[200px]">対話を通じた自己の変化を可視化</p>
+                        <p className="text-[10px] text-slate-500 leading-relaxed max-w-[200px]">対話を通じた自己の変化を記録し、新たな価値観への気づきを促します。</p>
                     </div>
                 </div>
             </div>
