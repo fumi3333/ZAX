@@ -26,7 +26,25 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
             </div>
 
             {/* Main Content - Centralized */}
-            <div className="z-10 w-full max-w-4xl px-6 flex flex-col items-center text-center relative">
+            <div className="z-10 w-full max-w-6xl px-6 flex flex-col items-center text-center relative">
+
+                {/* Tech Decoration: Corner Brackets */}
+                <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-slate-300 opacity-50" />
+                <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-slate-300 opacity-50" />
+                <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-slate-300 opacity-50" />
+                <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-slate-300 opacity-50" />
+
+                {/* Tech Decoration: System Metadata */}
+                <div className="absolute top-10 right-10 hidden md:block text-[10px] font-mono text-slate-400 text-right leading-tight tracking-widest opacity-60">
+                    <div>COORDINATES: [35.6895, 139.6917]</div>
+                    <div>SYSTEM: ONLINE</div>
+                    <div>VERSION: 2.4.0-BETA</div>
+                </div>
+
+                <div className="absolute top-40 left-0 hidden md:flex items-center gap-2 -rotate-90 origin-left opacity-30">
+                    <div className="w-12 h-px bg-slate-900" />
+                    <span className="text-[10px] font-mono tracking-[0.3em] text-slate-900 uppercase">Resonance Field</span>
+                </div>
 
                 {/* Status Indicator */}
                 <motion.div
