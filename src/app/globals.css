@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #050510;
-  --foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #0f172a;
 }
 
 body {
@@ -14,23 +14,23 @@ body {
   overflow-x: hidden;
 }
 
-/* Glassmorphism Utilities */
+/* Glassmorphism Utilities - Light Mode */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 .glass-panel {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Light */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -40,19 +40,19 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #94a3b8;
 }
 
-/* Input Autofill Fix for Dark Mode */
+/* Input Autofill Fix for Light Mode */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #050510 inset !important;
-  -webkit-text-fill-color: white !important;
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
 }
