@@ -45,6 +45,10 @@ export default function CorporateHeader() {
                         PROJECT
                         <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
                     </Link></li>
+                    <li><Link href="/technology" className="hover:text-blue-600 transition-colors py-2 relative group">
+                        TECHNOLOGY
+                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
+                    </Link></li>
                     <li><Link href="#" className="hover:text-blue-600 transition-colors py-2 relative group">
                         SUSTAINABILITY
                         <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />

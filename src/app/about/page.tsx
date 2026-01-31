@@ -118,11 +118,14 @@ export default function AboutPage() {
                         </div>
 
                         {/* Math Visual - Light Mode */}
-                        <div className="flex justify-center my-12">
-                            <div className="bg-white border border-slate-200 px-10 py-8 rounded-2xl shadow-lg shadow-blue-500/5">
-                                <span className="font-serif text-2xl md:text-3xl text-slate-900 italic tracking-wider">
-                                    Maximize <span className="mx-2 text-blue-600">∑</span> H<sub className="text-sm text-slate-500">t</sub>(V<sub className="text-sm text-slate-500">subconscious</sub>)
-                                </span>
+                        <div className="flex justify-center my-16">
+                            <div className="relative group">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl blur opacity-40 group-hover:opacity-60 transition duration-500" />
+                                <div className="relative bg-white/80 backdrop-blur-xl border border-white/50 px-16 py-10 rounded-2xl shadow-2xl flex items-center justify-center">
+                                    <span className="font-serif text-3xl md:text-5xl text-slate-900 italic tracking-wider">
+                                        Maximize <span className="mx-3 text-blue-600">∑</span> H<sub className="text-lg text-slate-500">t</sub>(V<sub className="text-lg text-slate-500">subconscious</sub>)
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </motion.section>
@@ -135,13 +138,13 @@ export default function AboutPage() {
                         className="mb-24 prose prose-slate prose-lg text-slate-600 leading-relaxed mx-auto"
                     >
                         <span className="font-mono text-xs text-blue-500 tracking-widest mb-4 block">03. 納得の共有</span>
-                        <h3 className="text-2xl font-bold text-slate-900 mb-6">Chain of Thought</h3>
+                        <h3 className="text-2xl font-bold text-slate-900 mb-6">思考の連鎖 (Chain of Thought)</h3>
                         <p>
-                            また、ZAXにおいては「なぜこの人と響き合うのか」というプロセスも大切にしたいと考えています。
-                            AIがユーザーの潜在意識をどう解釈したのか、その思考の推論プロセス（Chain of Thought）を共有することで、ユーザーは自分自身の新しい一面に気づくことができます。
+                            計算資源の拡大により、高次元のデータを扱えるようになったことが、このプロジェクトの根幹にあります。
+                            従来不可能だった「人間の複雑な内面」をデータとして処理できるようになったことで、初めて真の共鳴を演算することが可能になりました。
                         </p>
                         <div className="border-l-4 border-blue-500/30 pl-6 my-6 italic text-slate-500 bg-white/50 py-2">
-                            「このCoTが生み出す『納得感』こそが、属性の壁を超えて深く繋がるための土台になると確信しています。」
+                            「圧倒的な計算力が、人の心の機微という『見えない変数』を可視化するのです。」
                         </div>
                     </motion.section>
 
@@ -163,7 +166,7 @@ export default function AboutPage() {
                         {/* Chart as "Evidence of Byproduct" - Light Mode Wrapper */}
                         <div className="mt-8 mb-12 border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
                             <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Economic Impact Simulation</span>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">経済効果シミュレーション</span>
                                 <div className="flex gap-2">
                                     <div className="w-2 h-2 rounded-full bg-red-400" />
                                     <div className="w-2 h-2 rounded-full bg-yellow-400" />

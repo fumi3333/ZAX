@@ -69,7 +69,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
-                    className="mb-24 relative group"
+                    className="mb-32 relative group"
                 >
                     {/* Glow Effect behind button */}
                     <div className="absolute -inset-1 bg-gradient-to-r from-zax-glow to-zax-accent rounded-full blur opacity-20 group-hover:opacity-60 transition duration-500 group-hover:duration-200" />
@@ -82,7 +82,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                     </button>
 
-                    <div className="mt-6">
+                    <div className="mt-8">
                         <a href="/about" className="text-xs text-slate-400 hover:text-blue-600 transition-colors tracking-widest border-b border-transparent hover:border-blue-600 pb-1">
                             ABOUT US (PHILOSOPHY)
                         </a>
