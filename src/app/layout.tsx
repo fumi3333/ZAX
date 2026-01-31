@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "ZAX | Value-Based Connection",
     description: "Connect through values, not just attributes.",
-    url: "https://fumiproject.dev",
+    url: "https://zax.fumiproject.dev",
     siteName: "ZAX",
     locale: "ja_JP",
     type: "website",
@@ -40,6 +40,7 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <CorporateHeader />
         {children}

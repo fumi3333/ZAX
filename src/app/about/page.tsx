@@ -5,6 +5,7 @@ import { ArrowRight, Globe, Building2, Users, Rocket } from "lucide-react";
 import Link from "next/link";
 import ImpactChart from "@/components/ImpactChart";
 import VectorClusterVisual from "@/components/VectorClusterVisual"; // Reuse visuals
+import EvidenceAnalysis from "@/components/EvidenceAnalysis"; // New Real Data Analysis
 
 export default function AboutPage() {
     return (
@@ -47,8 +48,6 @@ export default function AboutPage() {
                     {[
                         { icon: Building2, label: "Entity", value: "ZAX R.I." },
                         { icon: Globe, label: "HQ", value: "Musashino, Tokyo" },
-                        { icon: Users, label: "Members", value: "12 Researchers" },
-                        { icon: Rocket, label: "Founded", value: "2026.04" },
                     ].map((item, i) => (
                         <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center hover:shadow-md transition-shadow">
                             <item.icon className="w-6 h-6 text-blue-500 mb-3" />
@@ -206,14 +205,72 @@ export default function AboutPage() {
                             そんな、誰もが自分の人生を幸福だと思える未来を、私は作っていきたいと考えています。
                         </p>
                     </motion.section>
+
+                    {/* Section 5.5: Real Data Verification */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="mb-24 mx-auto max-w-full"
+                    >
+                        <div className="prose prose-slate prose-lg text-slate-600 leading-relaxed mx-auto mb-12">
+                            <span className="font-mono text-xs text-blue-500 tracking-widest mb-4 block">06. データによる実証</span>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-6">客観的事実としての「幸福と経済」</h3>
+                            <p>
+                                以下のデータは、インターネット上の公開データセット（World Happiness Report 2019）から、Pythonロジックを用いて抽出・分析した「事実（Fact）」です。
+                                「一人当たりGDP」と「幸福度」には明確な正の相関（<span className="font-mono text-blue-600 font-bold">R² &gt; 0.6</span>）が存在することが確認できます。
+                                ZAXはこの「相関」をテコに、新しい経済循環を生み出そうとしています。
+                            </p>
+                        </div>
+                        <EvidenceAnalysis />
+                    </motion.section>
+
+                    {/* Section 7: References & Data Sources */}
+                    <div className="mt-24 border-t border-slate-200 pt-12 text-sm text-slate-500">
+                        <h4 className="font-bold text-slate-700 mb-8 text-base">7. 参考文献・データ出典</h4>
+
+                        <div className="grid md:grid-cols-2 gap-10">
+                            <div>
+                                <h5 className="font-bold mb-4 text-xs uppercase tracking-wider text-blue-600 border-b border-blue-100 pb-2 inline-block">インターネットの資料（データ出典）</h5>
+                                <ul className="space-y-4 font-mono text-xs">
+                                    <li>
+                                        <p className="mb-1 text-slate-700 font-bold">Sustainable Development Solutions Network「World Happiness Report 2019」</p>
+                                        <a href="https://worldhappiness.report/ed/2019/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline break-all transition-colors">https://worldhappiness.report/ed/2019/</a>
+                                        <span className="block text-[10px] text-slate-400 mt-0.5">(2026年1月31日参照)</span>
+                                    </li>
+                                    <li>
+                                        <p className="mb-1 text-slate-700 font-bold">The World Bank「GDP per capita (current US$)」</p>
+                                        <a href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline break-all transition-colors">https://data.worldbank.org/indicator/NY.GDP.PCAP.CD</a>
+                                        <span className="block text-[10px] text-slate-400 mt-0.5">(2026年1月31日参照)</span>
+                                    </li>
+                                    <li>
+                                        <p className="mb-1 text-slate-700 font-bold">Kaggle「World Happiness Report」</p>
+                                        <a href="https://www.kaggle.com/datasets/unsdsn/world-happiness" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline break-all transition-colors">https://www.kaggle.com/datasets/unsdsn/world-happiness</a>
+                                        <span className="block text-[10px] text-slate-400 mt-0.5">(2026年1月31日参照)</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h5 className="font-bold mb-4 text-xs uppercase tracking-wider text-blue-600 border-b border-blue-100 pb-2 inline-block">使用ライブラリ・アルゴリズム</h5>
+                                <ul className="space-y-4 font-mono text-xs">
+                                    <li>
+                                        <p className="mb-1 text-slate-700 font-bold">Microsoft Corporation「LightGBM Documentation」</p>
+                                        <a href="https://lightgbm.readthedocs.io/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline break-all transition-colors">https://lightgbm.readthedocs.io/</a>
+                                        <span className="block text-[10px] text-slate-400 mt-0.5">(2026年1月31日参照)</span>
+                                    </li>
+                                    <li>
+                                        <p className="mb-1 text-slate-700 font-bold">pandas development team「pandas documentation」</p>
+                                        <a href="https://pandas.pydata.org/docs/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline break-all transition-colors">https://pandas.pydata.org/docs/</a>
+                                        <span className="block text-[10px] text-slate-400 mt-0.5">(2026年1月31日参照)</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="mt-20 text-center pb-20">
-                    <Link href="/" className="group relative inline-flex items-center gap-4 text-white bg-slate-900 hover:bg-blue-600 border border-transparent px-10 py-5 rounded-full font-bold transition-all shadow-lg hover:shadow-blue-500/30">
-                        <span className="text-sm tracking-widest uppercase">プロトコルを開始 (Start)</span>
-                        <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                </div>
+
             </div >
         </div >
     );
