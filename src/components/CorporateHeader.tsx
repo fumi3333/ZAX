@@ -33,9 +33,6 @@ export default function CorporateHeader() {
                         <Link href="/about" className="cursor-pointer font-bold hover:text-blue-600 transition-colors">ABOUT US</Link>
                         <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
                     </li>
-                    <li>
-                        <Link href="#" className="hover:text-blue-600 transition-colors text-slate-500">NEWS</Link>
-                    </li>
                 </ul>
             </nav>
 

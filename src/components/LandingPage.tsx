@@ -69,7 +69,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
-                    className="mb-32 flex flex-col items-center gap-6"
+                    className="mb-32 relative group"
                 >
                     <div className="relative group">
                         {/* Glow Effect behind button */}
@@ -82,10 +82,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                         </button>
                     </div>
-
-                    <a href="/about" className="text-xs text-slate-500 hover:text-blue-600 transition-colors font-bold tracking-widest border-b border-transparent hover:border-blue-600 pb-0.5">
-                        ABOUT US
-                    </a>
                 </motion.div>
 
                 {/* Minimal Feature List (No Borders) */}
