@@ -14,9 +14,6 @@ export default function CorporateHeader() {
 
     return (
         <motion.nav
-            initial={{ y: -100 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.6 }}
             className="fixed top-0 w-full flex justify-between items-center px-10 py-4 backdrop-blur-md bg-white/70 z-50 border-b border-white/50 shadow-sm"
         >
             {/* Logo Area */}
