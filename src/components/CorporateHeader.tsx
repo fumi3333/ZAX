@@ -1,8 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 
 export default function CorporateHeader() {
     const { scrollY } = useScroll();
@@ -10,12 +10,13 @@ export default function CorporateHeader() {
     const logoY = useTransform(scrollY, [0, 100], [0, -20]);
     const navBackground = useTransform(scrollY, [0, 50], ["rgba(255,255,255,0.9)", "rgba(255,255,255,0.8)"]);
 
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     return (
         <motion.nav
             style={{ backgroundColor: navBackground }}
             className="fixed top-0 left-0 right-0 h-[80px] z-[100] flex justify-between items-center px-8 md:px-12 backdrop-blur-md border-b border-slate-200 transaction-all"
         >
-            {/* Logo Area */}
             {/* Logo Area */}
             <motion.div style={{ opacity: logoOpacity, y: logoY, pointerEvents: "auto" }}>
                 <Link href="/" className="flex items-center gap-3 group">
@@ -79,14 +80,46 @@ export default function CorporateHeader() {
                 </div>
             </div>
 
-            {/* Mobile Menu Icon (Placeholder) */}
-            <div className="lg:hidden p-2 text-slate-900">
+            {/* Mobile Menu Icon */}
+            <button
+                className="lg:hidden p-2 text-slate-900 z-[120]"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
                 <div className="space-y-1.5">
-                    <div className="w-6 h-0.5 bg-slate-900" />
-                    <div className="w-6 h-0.5 bg-slate-900" />
-                    <div className="w-6 h-0.5 bg-slate-900" />
+                    <motion.div
+                        animate={{ rotate: isMobileMenuOpen ? 45 : 0, y: isMobileMenuOpen ? 8 : 0 }}
+                        className="w-6 h-0.5 bg-slate-900"
+                    />
+                    <motion.div
+                        animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
+                        className="w-6 h-0.5 bg-slate-900"
+                    />
+                    <motion.div
+                        animate={{ rotate: isMobileMenuOpen ? -45 : 0, y: isMobileMenuOpen ? -8 : 0 }}
+                        className="w-6 h-0.5 bg-slate-900"
+                    />
                 </div>
-            </div>
+            </button>
+
+            {/* Mobile Navigation Overlay */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed inset-0 bg-white z-[110] pt-32 px-8 flex flex-col"
+                    >
+                        <ul className="flex flex-col gap-6 text-2xl font-bold text-slate-900 tracking-tight">
+                            <li><Link href="/about" onClick={() => setIsMobileMenuOpen(false)}>ABOUT US</Link></li>
+                            <li><Link href="/technology" onClick={() => setIsMobileMenuOpen(false)}>TECHNOLOGY</Link></li>
+                            <li><Link href="#" className="opacity-50">NEWS</Link></li>
+                            <li><Link href="#" className="opacity-50">PROJECT</Link></li>
+                            <li><Link href="#" className="opacity-50">SUSTAINABILITY</Link></li>
+                        </ul>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.nav>
     );
 }
