@@ -5,7 +5,7 @@ import ReactECharts from "echarts-for-react";
 import { create, all } from 'mathjs';
 import { realHappinessData, HappinessData } from "@/data/happiness2019";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BrainCircuit, Info, CheckCircle2 } from "lucide-react";
+import { BrainCircuit, Info } from "lucide-react";
 
 // Initialize MathJS
 const math = create(all, {});

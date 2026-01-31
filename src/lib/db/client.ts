@@ -21,7 +21,7 @@ export const vectorStore = {
     },
 
     async saveEmbedding(userId: string, vector: number[], type: 'personality' | 'interest') {
-        console.log(`Saving ${type} vector for ${userId}`);
+        // console.log(`Saving ${type} vector for ${userId}`);
         // In production, this would execute the INSERT into user_embeddings with valid_from=NOW()
     }
 };

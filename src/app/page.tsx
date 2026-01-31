@@ -19,7 +19,7 @@ export default function Home() {
 
   const handleInputComplete = async (inputData: { fragments: string[], biases: number[], purpose: string }) => {
     // ... (Keep existing logic)
-    console.log("Input data:", inputData);
+    // console.log("Input data:", inputData);
     setView("analyzing");
 
     try {
