@@ -23,160 +23,137 @@ export default function PhilosophyPage() {
 
             {/* Navigation removed - moved to Global Layout */}
 
-            <div className="relative z-10 max-w-6xl mx-auto px-6 pt-24">
-                {/* Header - Editorial Style */}
+            <div className="relative z-10 max-w-4xl mx-auto px-6 pt-32">
+
+                {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1.0, ease: "easeOut" }}
-                    className="mb-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
+                    transition={{ duration: 1.0 }}
+                    className="mb-24 text-center"
                 >
-                    <div className="text-center md:text-left">
-                        <div className="inline-block px-4 py-1.5 mb-6 border border-zax-glow/30 rounded-full bg-zax-glow/10 text-[10px] tracking-[0.2em] text-zax-glow uppercase shadow-[0_0_20px_rgba(112,0,255,0.2)]">
-                            ZAX POLICY & PHILOSOPHY
-                        </div>
-                        <h1 className="text-5xl md:text-6xl font-bold leading-[1.1] mb-6 tracking-tight">
-                            人類を、<br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-zax-glow via-white to-zax-accent">
-                                一つの知性体へ。
-                            </span>
-                        </h1>
+                    <div className="inline-block px-4 py-1.5 mb-6 border border-zax-glow/30 rounded-full bg-zax-glow/10 text-[10px] tracking-[0.2em] text-zax-glow uppercase shadow-[0_0_20px_rgba(112,0,255,0.2)]">
+                        ZAX PHILOSOPHY
                     </div>
-                    <div>
-                        <p className="text-lg text-zax-muted leading-relaxed border-l-2 border-white/10 pl-6 ml-0 md:ml-6">
-                            属性の壁を壊し、魂の本質で接続する。<br />
-                            これは、孤独な「点」を、温かい「線」へと変える試みです。<br /><br />
-                            <span className="text-xs text-white/50 block mt-4">
-                                ZAX connects people not by their labels, but by their essence vectors. A challenge to transform isolated dots into warm, connecting lines.
-                            </span>
-                        </p>
-                    </div>
+                    <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-8">
+                        死ぬ時に「幸福だった」と<br />
+                        言い切るために
+                    </h1>
                 </motion.div>
 
-                {/* Section 1: The Bug - Glitch Aesthetic */}
-                {/* Section 1: The Bug - Glitch Aesthetic */}
-                {/* Section 1: The Bug - Glitch Aesthetic */}
+                {/* Section 1: My Original Experience */}
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mb-32 grid grid-cols-1 md:grid-cols-12 gap-12 pt-16 relative"
+                    className="mb-24 prose prose-invert prose-lg text-zax-muted leading-relaxed"
                 >
-                    {/* Glass Background for Section 1 */}
-                    <div className="absolute inset-x-[-20px] inset-y-[-20px] bg-white/[0.02] rounded-3xl -z-10 backdrop-blur-sm" />
-
-                    <div className="md:col-span-5 prose prose-invert prose-lg text-zax-muted leading-relaxed pt-8 pl-8">
-                        <span className="font-mono text-xs text-red-500 tracking-widest mb-4 block">01. 現状の課題</span>
-                        <h2 className="text-3xl font-bold text-white mb-6">既存社会の「属性」バグ</h2>
-                        <p className="mb-4 text-base">
-                            現在の社会は「大学名」「年収」「外見」といった<strong className="text-white">記号化された属性 (Attributes)</strong>によって支配されています。
-                        </p>
-                        <p className="text-base">
-                            しかし、これら低次元なデータに基づくマッチングは、私たちの本質的な孤独を癒やすどころか、むしろ「条件による分断」を加速させる<span className="text-red-400">社会システムの脆弱性</span>です。
-                        </p>
-                    </div>
-                    <div className="md:col-span-7 flex items-center justify-center bg-black/40 rounded-xl min-h-[300px] relative overflow-hidden group m-4">
-                        {/* Abstract Visual for "Bug" / "Noise" */}
-                        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay group-hover:opacity-40 transition-opacity" />
-                        <div className="text-center relative z-10 p-8">
-                            <div className="text-4xl font-bold text-white/10 tracking-tighter mb-2 blur-[2px]">MISMATCH</div>
-                            <div className="text-red-500/50 font-mono text-sm">接続エラー: 属性の壁</div>
-                        </div>
-                    </div>
+                    <span className="font-mono text-xs text-zax-glow/70 tracking-widest mb-4 block">01. 原体験</span>
+                    <h2 className="text-2xl font-bold text-white mb-6">構造的な機会損失</h2>
+                    <p>
+                        私個人の究極の目標は、人生の終わりに「この人生は幸福だった」と心から思えることです。しかし、現在の社会構造を見渡したとき、多くの人がその機会を構造的に奪われているのではないかと感じています。
+                    </p>
+                    <p>
+                        私たちは、無意識のうちに学歴、年収、外見といった「属性」というフィルターに思考を占領されています。その結果、本来であれば長期的に深い関係を築けたはずの「真に相性の良い相手」を見逃してしまったり、目先の記号的な条件で繋がりを選んでしまったりすることで、大きな機会損失が生まれていると考えています。
+                    </p>
                 </motion.section>
 
-                {/* Section 2: The Solution - Technology Aesthetic */}
+                {/* Section 2: Subconscious & Happiness Maximization */}
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mb-32 grid grid-cols-1 md:grid-cols-12 gap-12 pt-16 relative"
+                    className="mb-24"
                 >
-                    {/* Glass Background for Section 2 */}
-                    <div className="absolute inset-x-[-20px] inset-y-[-20px] bg-zax-glow/[0.02] rounded-3xl -z-10 backdrop-blur-sm" />
-
-                    <div className="md:col-span-7 order-2 md:order-1 relative m-4">
-                        {/* Interactive Visual */}
-                        <VectorClusterVisual />
-                        <div className="absolute -bottom-6 -right-6 w-48 text-[10px] text-zax-muted text-right font-mono opacity-50">
-                            * 6次元ベクトル空間 プロトタイプ
-                        </div>
+                    <span className="font-mono text-xs text-zax-glow/70 tracking-widest mb-4 block">02. 幸福の最大化</span>
+                    <h2 className="text-2xl font-bold text-white mb-6">潜在意識へのアクセス</h2>
+                    <div className="prose prose-invert prose-lg text-zax-muted leading-relaxed mb-8">
+                        <p>
+                            真の幸福は、自分が自覚している「条件」の先にある、自分でも気づいていない「潜在的な感情や意識」の中に眠っていると私は信じています。
+                            ZAXは、ユーザー一人ひとりの内面を高次元のベクトルとして捉え、長期的な視点での幸福値を最大化することを目的としたシステムです。
+                        </p>
+                        <ul className="list-none pl-0 space-y-2 mt-4">
+                            <li><strong className="text-white/80">・潜在意識の解析：</strong> ユーザー自身も言語化できていない「心地よさ」や「価値観」をデータとして抽出します。</li>
+                            <li><strong className="text-white/80">・長期目線での最適化：</strong> 一過性の盛り上がりではなく、人生単位で互いを高め合える「共鳴」を演算します。</li>
+                        </ul>
+                        <p className="mt-6">
+                            このシステムの目的関数は、単なるマッチングの成立ではなく、「ユーザー個人の長期的な幸福量（<span className="font-serif italic font-bold text-white">H<sub>long-term</sub></span>）の最大化」であると考えています。
+                        </p>
                     </div>
-                    <div className="md:col-span-5 order-1 md:order-2 prose prose-invert prose-lg text-zax-muted leading-relaxed pt-8 pr-8">
-                        <span className="font-mono text-xs text-zax-glow tracking-widest mb-4 block">02. 解決策</span>
-                        <h2 className="text-3xl font-bold text-white mb-6">高次元ベクトルによる抽出</h2>
-                        <p className="mb-4 text-base">
-                            ZAXは、人間の思考や感性を数千次元の<strong className="text-white">「本質ベクトル」</strong>として空間上にプロットする「接続OS」です。
-                        </p>
-                        <p className="text-base">
-                            表面的な条件ではなく、ベクトルの波長が重なり合う「共鳴（Resonance）」を解析し、魂レベルでのマッチングを実現します。
-                        </p>
-                        <div className="mt-6 flex gap-4">
-                            <div className="px-3 py-1 bg-zax-glow/10 border-none rounded text-xs text-zax-glow">
-                                AI推論エンジン
-                            </div>
-                            <div className="px-3 py-1 bg-white/5 border-none rounded text-xs text-white/50">
-                                Embedding-001
-                            </div>
+
+                    {/* Math Visual */}
+                    <div className="flex justify-center my-12">
+                        <div className="bg-black/40 border border-white/10 px-8 py-6 rounded-xl backdrop-blur-sm">
+                            <span className="font-serif text-2xl md:text-3xl text-zax-glow italic tracking-wider">
+                                Maximize <span className="mx-2 text-white">∑</span> H<sub className="text-sm">t</sub>(V<sub className="text-sm">subconscious</sub>)
+                            </span>
                         </div>
                     </div>
                 </motion.section>
 
-                {/* Section 3: Impact (Grid Layout with Chart) */}
+                {/* Section 3: Chain of Thought */}
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mb-32 pt-16"
+                    className="mb-24 prose prose-invert prose-lg text-zax-muted leading-relaxed"
                 >
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
-                        <div className="md:col-span-4">
-                            <span className="font-mono text-xs text-zax-accent tracking-widest mb-4 block">03. 経済的インパクト</span>
-                            <h2 className="text-3xl font-bold mb-6">構造的欠落 (Void) の<br />経済的解放</h2>
-                            <p className="text-zax-muted text-sm leading-relaxed mb-8">
-                                孤独・孤立は単なる心理的課題ではなく、医療費増大や労働生産性の低下を招く「見えない税金」です。
-                                ZAXは、この<strong className="text-white">「社会関係資本のミスマッチ」</strong>を解消し、横浜市立大学等の推計による<span className="text-zax-glow">約7.6兆円の経済損失（プレゼンティズム）</span>の回復を目指します。
-                            </p>
-
-                            <div className="space-y-4">
-                                <div className="p-4 bg-white/5 rounded">
-                                    <div className="text-xs text-white/50 mb-1">Target Metric</div>
-                                    <div className="text-xl font-bold text-white">メンタルヘルス不調・損失</div>
-                                    <div className="text-xs text-red-400 mt-1">構造的なGDP抑制要因 (1.1%)</div>
-                                </div>
-                                <div className="p-4 bg-zax-glow/10 rounded">
-                                    <div className="text-xs text-zax-glow mb-1">Projected Unlock</div>
-                                    <div className="text-xl font-bold text-white">7.6 兆円 / 年</div>
-                                    <div className="text-xs text-zax-glow mt-1">プレゼンティズム解消効果</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="md:col-span-8 h-full min-h-[400px]">
-                            <ImpactChart />
-                        </div>
+                    <span className="font-mono text-xs text-zax-glow/70 tracking-widest mb-4 block">03. 納得の共有</span>
+                    <h2 className="text-2xl font-bold text-white mb-6">Chain of Thought</h2>
+                    <p>
+                        また、ZAXにおいては「なぜこの人と響き合うのか」というプロセスも大切にしたいと考えています。
+                        AIがユーザーの潜在意識をどう解釈したのか、その思考の推論プロセス（Chain of Thought）を共有することで、ユーザーは自分自身の新しい一面に気づくことができます。
+                    </p>
+                    <div className="border-l-2 border-zax-glow/30 pl-6 my-6 italic text-white/70">
+                        「このCoTが生み出す『納得感』こそが、属性の壁を超えて深く繋がるための土台になると確信しています。」
                     </div>
                 </motion.section>
 
+                {/* Section 4: Innovation as Byproduct */}
                 <motion.section
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.6 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-white/10 pt-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mb-24"
                 >
-                    <div>
-                        <h3 className="text-xs font-bold text-white/50 mb-4 uppercase tracking-[0.2em]">Why Now? (なぜ今か)</h3>
-                        <p className="text-sm text-zax-muted leading-relaxed">
-                            2026年、AIの計算コストが劇的に下がり、高次元データのリアルタイム処理が個人でも可能になった今だからこそ、この「接続OS」は実現可能になりました。
+                    <span className="font-mono text-xs text-zax-glow/70 tracking-widest mb-4 block">04. 副産物としてのイノベーション</span>
+                    <h2 className="text-2xl font-bold text-white mb-6">個人の幸福が社会を変える</h2>
+                    <div className="prose prose-invert prose-lg text-zax-muted leading-relaxed mb-8">
+                        <p>
+                            個々人が自分にとって最適な場所、最適なパートナー、そして真の自己に繋がることができたとき、その社会は勝手に良くなっていくはずです。
+                        </p>
+                        <ul className="list-none pl-0 space-y-2 mt-4">
+                            <li><strong className="text-white/80">・イノベーションの加速：</strong> 魂のレベルで共鳴する個体が繋がることで、これまでにない創造的な火花が散ります。</li>
+                            <li><strong className="text-white/80">・経済への正の影響：</strong> 孤独による停滞やミスマッチによる損失が消え、個々の知性が最大出力で駆動するようになります。</li>
+                        </ul>
+                        <p className="mt-6">
+                            こうした社会の発展やイノベーションは、あくまで<strong className="text-white">「個人の幸福を追求した結果」</strong>として現れる副産物に過ぎないというのが私の考えです。
+                            ZAXが何よりも優先するのは、あなたという個人が、あなたの人生を肯定できる「接続」を提供することです。
                         </p>
                     </div>
-                    <div>
-                        <h3 className="text-xs font-bold text-white/50 mb-4 uppercase tracking-[0.2em]">Field (実証フィールド)</h3>
-                        <p className="text-sm text-zax-muted leading-relaxed">
-                            まずは「武蔵野大学」という、多様性と哲学が共存するコミュニティを最初の実験場（Sandbox）とし、ここから世界へ波及させます。
-                        </p>
+
+                    {/* Chart as "Evidence of Byproduct" */}
+                    <div className="mt-8 h-[400px] md:h-[500px] w-full">
+                        <ImpactChart />
                     </div>
+                </motion.section>
+
+                {/* Section 5: Future with BMI */}
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mb-32 prose prose-invert prose-lg text-zax-muted leading-relaxed"
+                >
+                    <span className="font-mono text-xs text-zax-glow/70 tracking-widest mb-4 block">05. 未来へ</span>
+                    <h2 className="text-2xl font-bold text-white mb-6">BMIが普及した世界に向けて</h2>
+                    <p>
+                        今はまだスマートフォンを通じたインターフェースですが、このZAXという構想は、将来的にBMI（脳マシンインタフェース）が普及した世の中で、さらに真価を発揮できると確信しています。
+                    </p>
+                    <p>
+                        言葉や属性といったフィルターを完全に脱ぎ捨て、心と心が直接響き合う。
+                        そんな、誰もが自分の人生を幸福だと思える未来を、私は作っていきたいと考えています。
+                    </p>
                 </motion.section>
 
                 <div className="mt-20 text-center pb-20">
