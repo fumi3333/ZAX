@@ -9,10 +9,8 @@
 
 body {
   color: var(--foreground);
-  background-color: var(--background);
-  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-  background-size: 40px 40px;
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  background-color: #ffffff;
+  font-family: var(--font-geist-sans), "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
   overflow-x: hidden;
 }
 
