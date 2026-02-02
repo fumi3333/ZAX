@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @default("guest") // For MVP, we might treat everyone as guest or allow login later. default guest for now to simplify
+  createdAt DateTime @default(now())
+  
+  vectors   EssenceVector[]
+  feedbacks Feedback[]
+}
+
+model EssenceVector {
+  id             String   @id @default(uuid())
+  vector         String   // JSON string of number[]
+  embedding      String?  // JSON string of large embedding (1536 dim) - optional for now
+  reasoning      String
+  resonanceScore Float
+  createdAt      DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Feedback {
+  id          String   @id @default(uuid())
+  content     String
+  deltaVector String   // JSON string of number[]
+  growthScore Float    @default(0)
+  createdAt   DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}

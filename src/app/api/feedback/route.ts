@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { calculateDeltaVector } from "@/lib/gemini";
+import { prisma } from "@/lib/db/client";
 
 export async function POST(request: Request) {
     try {
@@ -13,10 +14,25 @@ export async function POST(request: Request) {
         // Calculate Delta Vector based on feedback emotional shift
         const deltaResult = await calculateDeltaVector(feedback, currentVector, tags);
 
-        // In a real app with DB, we would:
-        // 1. Insert new row to user_embeddings with valid_from = NOW()
-        // 2. Update split "valid_to" of the previous record
-        // 3. Store the calculated delta_vector
+        // [DB] Persist Feedback & Delta (Prisma)
+        try {
+            const userId = "guest_demo_user"; // Fixed for MVP demo
+            await prisma.feedback.create({
+                data: {
+                    content: feedback,
+                    deltaVector: JSON.stringify(deltaResult.delta_vector),
+                    growthScore: deltaResult.growth_score,
+                    user: {
+                        connectOrCreate: {
+                            where: { id: userId },
+                            create: { id: userId, email: "guest@example.com" }
+                        }
+                    }
+                }
+            });
+        } catch (dbError) {
+            console.error("DB Save Error:", dbError);
+        }
 
         return NextResponse.json({
             success: true,

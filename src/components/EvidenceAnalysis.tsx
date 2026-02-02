@@ -78,92 +78,116 @@ export default function EvidenceAnalysis() {
     }, []);
 
 
-    // --- Chart Options ---
+    // --- Chart Options (Stitch Style) ---
 
-    // 1. Comparison Scatter (Legacy vs ZAX)
+    // 1. Comparison Scatter
     const getComparisonOption = () => ({
         backgroundColor: "transparent",
-        title: { text: "Accuracy Comparison: GDP vs ZAX", left: 'center', textStyle: { color: '#64748b', fontSize: 12 } },
-        legend: { top: 30, data: ['Legacy (GDP Only)', 'ZAX (Value-Based)'], textStyle: { color: '#64748b' } },
-        grid: { top: 60, right: 30, bottom: 30, left: 40, containLabel: true },
-        tooltip: { trigger: 'item', padding: 10, backgroundColor: 'rgba(255,255,255,0.95)', textStyle: { color: '#333' } },
-        xAxis: { name: 'Actual Happiness', min: 2, max: 8, axisLabel: { color: '#64748b' } },
-        yAxis: { name: 'Predicted', min: 2, max: 8, axisLabel: { color: '#64748b' }, splitLine: { lineStyle: { type: 'dashed' } } },
+        animationDuration: 2000,
+        title: { 
+            text: "MODEL PERFORMANCE COMPARISON", 
+            left: 10, top: 10,
+            textStyle: { color: '#94a3b8', fontSize: 10, fontFamily: 'monospace' } 
+        },
+        legend: { top: 10, right: 10, textStyle: { color: '#cbd5e1' }, icon: 'circle' },
+        grid: { top: 50, right: 30, bottom: 30, left: 50, containLabel: true, borderColor: '#334155', show: true },
+        tooltip: { 
+            trigger: 'item', 
+            backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+            borderColor: '#334155', 
+            textStyle: { color: '#f8fafc' } 
+        },
+        xAxis: { 
+            name: 'ACTUAL', 
+            nameTextStyle: { fontFamily: 'monospace', color:'#64748b' },
+            splitLine: { lineStyle: { color: '#334155', type: 'dashed' } },
+            axisLabel: { color: '#94a3b8', fontFamily: 'monospace' }
+        },
+        yAxis: { 
+            name: 'PREDICTED', 
+            nameTextStyle: { fontFamily: 'monospace', color:'#64748b' },
+            splitLine: { lineStyle: { color: '#334155', type: 'dashed' } },
+            axisLabel: { color: '#94a3b8', fontFamily: 'monospace' }
+        },
         series: [
             {
-                name: 'Legacy (GDP Only)',
+                name: 'Legacy (GDP)',
                 type: 'scatter',
                 data: legacyModel.predictions.map(p => [p.actual, p.predicted]),
-                itemStyle: { color: '#94a3b8', opacity: 0.5 }, // Grey, dull
+                itemStyle: { color: '#475569', opacity: 0.4 }, 
                 symbolSize: 6
             },
             {
-                name: 'ZAX (Value-Based)',
+                name: 'ZAX (Value)',
                 type: 'scatter',
                 data: zaxModel.predictions.map(p => [p.actual, p.predicted]),
-                itemStyle: { color: '#8b5cf6', opacity: 0.8 }, // Vivid Purple
-                symbolSize: 10
+                itemStyle: { 
+                    color: '#22d3ee', // Cyan
+                    shadowBlur: 10, 
+                    shadowColor: '#22d3ee' 
+                }, 
+                symbolSize: 8
             },
             {
                 type: 'line',
                 data: [[2, 2], [8, 8]],
-                lineStyle: { color: '#e2e8f0', width: 2, type: 'dashed' },
-                symbol: 'none',
-                silent: true
+                lineStyle: { color: '#f472b6', width: 2, type: 'dashed' }, // Pink Line
+                symbol: 'none'
             }
         ]
     });
 
-    // 2. The Gap Chart (Bar Comparison)
+    // 2. The Gap Chart
     const getGapOption = () => ({
         backgroundColor: "transparent",
-        title: { text: 'The "Invisible" Loss (Prediction Gap)', left: 'center', textStyle: { color: '#64748b', fontSize: 12 } },
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
         grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-        xAxis: { type: 'category', data: ['Legacy Metrics', 'ZAX Integration'] },
-        yAxis: { type: 'value', min: 0, max: 1.0, name: 'Accuracy (R²)' },
+        xAxis: { 
+            type: 'category', 
+            data: ['LEGACY', 'ZAX CORE'],
+            axisLabel: { color: '#cbd5e1', fontWeight: 'bold' } 
+        },
+        yAxis: { type: 'value', min: 0, max: 1.0, splitLine: { lineStyle: { color: '#334155' } } },
         series: [{
             data: [
                 {
                     value: legacyModel.rSquared,
-                    itemStyle: { color: '#94a3b8' },
-                    label: { show: true, position: 'top', formatter: 'R² = 0.64\n(Stagnation)' }
+                    itemStyle: { color: '#475569' },
+                    label: { show: true, position: 'top', color: '#94a3b8', formatter: 'R² 0.64' }
                 },
                 {
                     value: zaxModel.rSquared,
-                    itemStyle: { color: '#8b5cf6' },
-                    label: { show: true, position: 'top', formatter: 'R² = 0.94\n(Innovation)' }
+                    itemStyle: { color: '#f472b6' }, // Pink
+                    label: { show: true, position: 'top', color: '#f472b6', fontWeight: 'bold', formatter: 'R² 0.94' }
                 }
             ],
             type: 'bar',
-            barWidth: '40%',
-            label: { show: true, fontWeight: 'bold' },
-            markLine: {
-                data: [{ type: 'average', name: 'Avg' }],
-                lineStyle: { opacity: 0 }
-            }
+            barWidth: '50%'
         }]
     });
 
-    // 3. Feature Importance (ZAX Only)
+    // 3. Feature Importance
     const getImportanceOption = () => {
         const labels = ["Intercept", "GDP", "Social Spt", "Health", "Freedom", "GDP*Social", "Health*Free", "GDP*Free"];
         const data = zaxModel.coefs.map(c => Math.abs(c));
         return {
             backgroundColor: "transparent",
-            title: { text: 'What Fills the Gap? (Drivers)', left: 'center', textStyle: { color: '#64748b', fontSize: 12 } },
             tooltip: { trigger: 'axis' },
             grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
             xAxis: { type: 'value', splitLine: { show: false } },
-            yAxis: { type: 'category', data: labels },
+            yAxis: { 
+                type: 'category', 
+                data: labels,
+                axisLabel: { color: '#94a3b8', fontSize: 10 }
+            },
             series: [{
                 type: 'bar',
                 data: data,
                 itemStyle: {
                     color: (params: any) => {
                         const label = labels[params.dataIndex];
-                        if (label.includes("Social") || label.includes("Freedom")) return "#8b5cf6";
-                        return "#cbd5e1";
+                        if (label.includes("Social") || label.includes("Freedom")) return "#22d3ee"; // Cyan
+                        return "#334155";
                     }
                 }
             }]
@@ -171,79 +195,61 @@ export default function EvidenceAnalysis() {
     };
 
     return (
-        <div className="space-y-12">
-            {/* Header: The Narrative Setup */}
-            <Card className="border-slate-200 bg-white/50 backdrop-blur-sm shadow-xl shadow-blue-900/5">
-                <CardHeader>
-                    <div className="flex items-center gap-2 mb-2">
-                        <BrainCircuit className="w-5 h-5 text-purple-600" />
-                        <CardTitle className="text-xl">Evidence: The "Invisible" Gap</CardTitle>
+        <div className="space-y-8 font-sans">
+            {/* Header Panel */}
+            <div className="border-l-4 border-l-cyan-400 bg-slate-900/50 p-6 border-y border-r border-slate-800 backdrop-blur-md">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-2xl font-black text-white tracking-tight uppercase mb-2">Evidence Analysis</h2>
+                        <p className="text-sm text-slate-400 max-w-2xl">
+                            Why GDP alone fails to predict happiness (R²=0.64) vs. How ZAX fills the void (R²=0.94).
+                        </p>
                     </div>
-                    <CardDescription>
-                        Why GDP alone fails to predict happiness (R²=0.64) vs. How ZAX fills the void (R²=0.94).
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="h-[400px] w-full">
-                        <ReactECharts option={getComparisonOption()} style={{ height: '100%', width: '100%' }} />
+                    <div className="text-right hidden md:block">
+                        <div className="text-xs font-mono text-cyan-400 mb-1">DATA_SOURCE</div>
+                        <div className="text-sm font-bold text-white">WHR_2019_DATASET</div>
                     </div>
-                </CardContent>
-            </Card>
-
-            {/* Narrative Charts: The Gap & The Solution */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="border-slate-200">
-                    <CardHeader>
-                        <CardTitle className="text-sm font-bold text-slate-700">The Problem (Legacy Gap)</CardTitle>
-                        <CardDescription className="text-xs">
-                            30% of happiness is "unexplainable" by economy alone.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="h-[300px] w-full">
-                            <ReactECharts option={getGapOption()} style={{ height: '100%', width: '100%' }} />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-slate-200">
-                    <CardHeader>
-                        <CardTitle className="text-sm font-bold text-slate-700">The Solution (ZAX Drivers)</CardTitle>
-                        <CardDescription className="text-xs">
-                            <span className="text-purple-600 font-bold">Social & Freedom</span> fill the prediction gap.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="h-[300px] w-full">
-                            <ReactECharts option={getImportanceOption()} style={{ height: '100%', width: '100%' }} />
-                        </div>
-                    </CardContent>
-                </Card>
+                </div>
             </div>
 
-            {/* Citation Footer */}
-            <div className="p-4 border-t border-slate-200 bg-slate-50 text-[10px] text-slate-500 font-mono leading-relaxed rounded-lg">
-                <div className="flex items-start gap-2 mb-1">
-                    <Info className="w-3 h-3 text-slate-600 mt-0.5" />
-                    <span>References & Data Sources:</span>
-                </div>
-                <div className="pl-5 space-y-2">
-                    <div>
-                        <span className="font-bold text-slate-700">• World Happiness Report 2019</span>: <br />
-                        Core dataset used for regression training (N=156 Countries).
+            {/* Main Viz Panel */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Chart */}
+                <div className="lg:col-span-2 bg-slate-900 border border-slate-800 p-1 relative">
+                    <div className="absolute top-0 left-0 bg-slate-800 px-3 py-1 text-[10px] text-white font-mono z-10">
+                        FIG_01: REGRESSION_FIT
                     </div>
-                    <div>
-                        <a
-                            href="https://journals.lww.com/joem/fulltext/2025/09000/the_impact_of_productivity_loss_from_presenteeism.3.aspx"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block hover:text-purple-600 transition-colors underline decoration-slate-300 underline-offset-2"
-                        >
-                            <span className="font-bold text-slate-700">• The Impact of Productivity Loss from Presenteeism (2025)</span>: <br />
-                            Cited for Economic Loss Impact (7.3 Trillion JPY). Published in <i>Journal of Occup. & Environ. Med.</i>
-                        </a>
+                    <div className="h-[400px] w-full mt-4">
+                         <ReactECharts option={getComparisonOption()} style={{ height: '100%', width: '100%' }} />
                     </div>
                 </div>
+
+                {/* Side Metrics */}
+                <div className="space-y-6">
+                    {/* Metric 1 */}
+                    <div className="bg-slate-900 border border-slate-800 p-4 flex flex-col h-[200px] relative">
+                        <div className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-2">PREDICTION GAP</div>
+                        <div className="flex-1">
+                            <ReactECharts option={getGapOption()} style={{ height: '100%', width: '100%' }} />
+                        </div>
+                    </div>
+
+                    {/* Metric 2 */}
+                    <div className="bg-slate-900 border border-slate-800 p-4 flex flex-col h-[200px] relative">
+                         <div className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-2">KEY DRIVERS</div>
+                         <div className="flex-1">
+                             <ReactECharts option={getImportanceOption()} style={{ height: '100%', width: '100%' }} />
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Footer Citation */}
+            <div className="flex items-center gap-4 text-[10px] font-mono text-slate-600 border-t border-slate-800 pt-4 mt-8">
+                <Info className="w-3 h-3" />
+                <span>DATA VERIFICATION ID: 0x99283_ZAX_CORE</span>
+                <span className="flex-1 h-px bg-slate-800" />
+                <span>JOURNAL_REF: JOEM_2025_0900</span>
             </div>
         </div>
     );

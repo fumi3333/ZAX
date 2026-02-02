@@ -29,50 +29,50 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                 animate={{ opacity: 1, scale: 1 }}
                 className="max-w-2xl w-full mx-auto"
             >
-                <div className="glass-panel p-8 rounded-2xl text-center border border-zax-glow/30 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-zax-glow/5" />
-                    <CheckCircle size={64} className="text-zax-glow mx-auto mb-6" />
-                    <h2 className="text-3xl font-bold text-white mb-2">進化が記録されました</h2>
-                    <p className="text-zax-muted mb-8">あなたの本質ベクトルが更新されました。</p>
+                <div className="bg-white p-8 rounded-2xl text-center border border-[#E5E5E5] shadow-[8px_8px_0px_#E5E5E5] relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[#0022FF]/5" />
+                    <CheckCircle size={64} className="text-[#0022FF] mx-auto mb-6" />
+                    <h2 className="text-3xl font-black text-black mb-2 tracking-tight">進化が記録されました</h2>
+                    <p className="text-slate-500 mb-8">本質ベクトルの更新が完了しました。</p>
 
                     <div className="flex justify-center gap-8 mb-8">
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-white">論理思考</div>
-                            <div className="text-sm text-zax-muted">強化領域</div>
+                            <div className="text-2xl font-bold text-black">論理思考</div>
+                            <div className="text-sm text-slate-500">強化領域</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-zax-glow flex items-center gap-1 justify-center">
+                            <div className="text-2xl font-bold text-[#0022FF] flex items-center gap-1 justify-center">
                                 +5% <TrendingUp size={16} />
                             </div>
-                            <div className="text-sm text-zax-muted">受容性</div>
+                            <div className="text-sm text-slate-500">受容性</div>
                         </div>
                     </div>
 
-                    <div className="w-full h-48 bg-black/40 rounded-xl border border-white/10 flex items-center justify-center relative">
+                    <div className="w-full h-48 bg-[#F9F9F9] rounded-xl border border-[#E5E5E5] flex items-center justify-center relative">
                         {/* Simulated Graph */}
                         <svg viewBox="0 0 400 150" className="w-full h-full p-4">
                             <polyline
                                 points="0,100 50,90 100,110 150,60 200,70 250,40 300,50 350,20 400,30"
                                 fill="none"
-                                stroke="#7000FF"
+                                stroke="#0022FF"
                                 strokeWidth="2"
                             />
                             <polyline
                                 points="0,100 50,85 100,100 150,50 200,60 250,30 300,40 350,10 400,20"
                                 fill="none"
-                                stroke="#00F0FF"
+                                stroke="#94a3b8"
                                 strokeWidth="2"
                                 strokeDasharray="4 4"
                             />
                         </svg>
-                        <div className="absolute top-4 right-4 text-xs text-zax-glow">
-                            現在: V2.1 (Expanded)
+                        <div className="absolute top-4 right-4 text-xs text-[#0022FF] font-mono">
+                            VER: V2.1 (Expanded)
                         </div>
                     </div>
 
                     <button
                         onClick={onRestart}
-                        className="mt-8 text-sm text-white/50 hover:text-white transition-colors underline decoration-dotted block mx-auto"
+                        className="mt-8 text-sm text-slate-400 hover:text-[#0022FF] transition-colors underline decoration-dotted block mx-auto"
                     >
                         新しいシミュレーションを開始
                     </button>
@@ -86,16 +86,16 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="glass-panel p-8 rounded-2xl border border-white/10"
+                className="bg-white p-8 rounded-2xl border border-[#E5E5E5] shadow-[8px_8px_0px_#E5E5E5]"
             >
-                <h2 className="text-2xl font-bold text-white mb-6">内省と振り返り</h2>
-                <p className="text-gray-300 mb-4">
+                <h2 className="text-2xl font-bold text-black mb-6">内省と振り返り</h2>
+                <p className="text-slate-600 mb-4 text-sm leading-relaxed">
                     相手との対話を通じて、自分の中に新しく発見した感情や側面はありますか？
                 </p>
                 <textarea
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
-                    className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-zax-glow/50 mb-6"
+                    className="w-full h-32 bg-[#F9F9F9] border border-[#E5E5E5] rounded-xl p-4 text-black focus:outline-none focus:border-[#0022FF] mb-6 placeholder:text-slate-400"
                     placeholder="例：自分のこだわりが、実は他人にとっても価値があることに気づいた..."
                 />
 
@@ -106,8 +106,8 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                             key={tag}
                             onClick={() => toggleTag(tag)}
                             className={`px-3 py-1 rounded-full text-xs font-mono border transition-colors ${selectedTags.includes(tag)
-                                    ? "bg-zax-glow/20 border-zax-glow text-zax-glow"
-                                    : "border-white/20 text-zax-muted hover:text-zax-glow hover:border-zax-glow"
+                                    ? "bg-[#0022FF]/10 border-[#0022FF] text-[#0022FF]"
+                                    : "bg-white border-[#E5E5E5] text-slate-500 hover:text-[#0022FF] hover:border-[#0022FF]"
                                 }`}
                         >
                             {tag}
@@ -132,7 +132,7 @@ export default function EvolutionFeedback({ onRestart }: EvolutionFeedbackProps)
                         setSubmitted(true);
                     }}
                     disabled={!feedback}
-                    className="w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    className="w-full py-3 bg-black text-white font-bold rounded-xl hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     進化を確定する
                 </button>

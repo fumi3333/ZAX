@@ -1,94 +1,69 @@
-"use client";
-
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
 export default function VectorTransformationVisual() {
     return (
-        <div className="relative w-full h-[400px] flex items-center justify-center overflow-hidden my-12">
-            {/* Left Side: Attributes (Rigid Boxes) */}
-            <div className="absolute left-10 md:left-20 flex flex-col gap-4 z-10 w-32 md:w-40">
-                {["University", "Income", "Title"].map((label, i) => (
-                    <motion.div
-                        key={i}
-                        initial={{ opacity: 1, x: 0, scale: 1 }}
-                        whileInView={{
-                            opacity: [1, 1, 0],
-                            x: [0, 0, 100],
-                            scale: [1, 1, 0.5]
-                        }}
-                        transition={{
-                            duration: 2,
-                            times: [0, 0.5, 1],
-                            repeat: Infinity,
-                            repeatDelay: 3 + (i * 0.5),
-                            delay: i * 0.5
-                        }}
-                        className="bg-white/5 border border-white/10 p-3 rounded text-center"
+        <div className="relative w-full h-[300px] flex items-center justify-center overflow-hidden my-12 bg-white border border-[#E5E5E5]">
+            {/* Grid Background */}
+            <div className="absolute inset-0 z-0 opacity-40" 
+                style={{ backgroundImage: 'linear-gradient(#E5E5E5 1px, transparent 1px), linear-gradient(90deg, #E5E5E5 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
+            />
+
+            <div className="relative z-10 flex items-center gap-4 lg:gap-12 w-full max-w-4xl px-8">
+                
+                {/* 1. INPUT NODE */}
+                <div className="flex flex-col gap-2 items-center flex-1">
+                     <span className="text-[10px] font-mono text-[#0022FF] tracking-widest uppercase mb-2">INPUT_SIGNALS</span>
+                     <div className="flex flex-col gap-2 w-full">
+                        {["Universities", "Income", "Jobs"].map((label, i) => (
+                           <motion.div 
+                             key={i}
+                             initial={{x:-20, opacity:0}}
+                             whileInView={{x:0, opacity:1}}
+                             transition={{delay:i*0.2}}
+                             className="bg-[#F9F9F9] border border-[#E5E5E5] p-2 text-center text-xs text-black font-mono uppercase tracking-wider shadow-[2px_2px_0px_#E5E5E5]"
+                           >
+                             {label}
+                           </motion.div>
+                        ))}
+                     </div>
+                </div>
+
+                {/* 2. PROCESS NODE (Center) */}
+                <div className="relative flex items-center justify-center shrink-0">
+                    <motion.div 
+                       animate={{ rotate: 360 }}
+                       transition={{ duration: 10, ease: "linear", repeat: Infinity }}
+                       className="w-24 h-24 lg:w-32 lg:h-32 border border-[#E5E5E5] rounded-full border-dashed flex items-center justify-center relative bg-white"
                     >
-                        <span className="text-xs text-white/60 font-mono tracking-widest uppercase">{label}</span>
+                         <div className="absolute inset-0 border border-[#0022FF]/20 rounded-full scale-75" />
                     </motion.div>
-                ))}
+                    <ArrowRight className="absolute text-black w-6 h-6" />
+                </div>
+
+                {/* 3. OUTPUT NODE */}
+                 <div className="flex flex-col gap-2 items-center flex-1">
+                     <span className="text-[10px] font-mono text-[#0022FF] tracking-widest uppercase mb-2">ESSENCE_VECTOR</span>
+                     <div className="bg-white border border-[#0022FF] w-full h-32 relative overflow-hidden p-4 group shadow-[4px_4px_0px_#E5E5E5]">
+                        <div className="absolute inset-0 bg-[#0022FF]/5 group-hover:bg-[#0022FF]/10 transition-colors" />
+                        {/* Simulated Tensor Data */}
+                        <div className="grid grid-cols-3 gap-2 h-full content-center">
+                           {[...Array(9)].map((_,i) => (
+                               <motion.div 
+                                 key={i}
+                                 animate={{opacity: [0.3, 1, 0.3], height: ["2px", "4px", "2px"]}}
+                                 transition={{duration: 1.5, delay: i*0.1, repeat: Infinity}}
+                                 className="bg-[#0022FF] w-full rounded-full"
+                               />
+                           ))}
+                        </div>
+                     </div>
+                </div>
+
             </div>
-
-            {/* Center: Transformation Zone (The Filter) */}
-            <div className="absolute inset-0 flex items-center justify-center">
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="w-[300px] h-[300px] rounded-full border border-white/5 border-dashed relative"
-                >
-                    <div className="absolute inset-0 bg-zax-glow/5 rounded-full blur-[80px]" />
-                </motion.div>
-            </div>
-
-            {/* Right Side: Essence (Glowing Orbs / Vectors) */}
-            <div className="absolute right-10 md:right-20 z-10 w-32 md:w-40 h-[200px] relative">
-                {[0, 1, 2].map((i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute w-20 h-20"
-                        initial={{ opacity: 0, scale: 0, x: -100 }}
-                        whileInView={{
-                            opacity: [0, 1, 0],
-                            scale: [0.5, 1.2, 0.8],
-                            x: [-50, 0, 50],
-                            y: [0, (i - 1) * 50, (i - 1) * 20]
-                        }}
-                        transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            repeatDelay: 2,
-                            delay: 2 + (i * 0.5)
-                        }}
-                    >
-                        <div className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-zax-glow' : i === 1 ? 'bg-zax-accent' : 'bg-white'} shadow-[0_0_20px_currentColor]`} />
-                        <div className="w-[100px] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent transform rotate-45" />
-                    </motion.div>
-                ))}
-
-                {/* Connection Line */}
-                <motion.svg className="absolute inset-0 w-full h-full overflow-visible">
-                    <motion.path
-                        d="M -100 100 Q 50 100 100 50"
-                        fill="none"
-                        stroke="url(#gradient)"
-                        strokeWidth="1"
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: [0, 1, 1], opacity: [0, 1, 0] }}
-                        transition={{ duration: 3, repeat: Infinity, repeatDelay: 1, delay: 2.5 }}
-                    />
-                    <defs>
-                        <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor="transparent" />
-                            <stop offset="50%" stopColor="#7000FF" />
-                            <stop offset="100%" stopColor="transparent" />
-                        </linearGradient>
-                    </defs>
-                </motion.svg>
-            </div>
-
-            <div className="absolute bottom-10 text-xs text-zax-muted font-mono tracking-widest opacity-50">
-                PROCESSING: ATTRIBUTE_DECONSTRUCTION
+            
+            <div className="absolute bottom-2 right-4 text-[9px] font-mono text-slate-400">
+                PIPELINE_STATUS: ACTIVE
             </div>
         </div>
     );
