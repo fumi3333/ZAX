@@ -1,7 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+// import { PrismaClient } from '@prisma/client';
 
 // Singleton for Prisma Client (prevents multiple connections in dev)
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+// const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = global as unknown as { prisma: any };
 
 // export const prisma =
 //     globalForPrisma.prisma ||
