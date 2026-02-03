@@ -142,8 +142,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-15%" }}
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} // Custom bezier for smooth deceleration
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-[1400px] mx-auto px-8 py-32"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))' }}
+            className="grid grid-cols-1 gap-8 w-full max-w-[800px] mx-auto px-8 py-32"
           >
             {features.map((feature, i) => (
               <motion.div
