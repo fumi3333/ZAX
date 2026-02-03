@@ -138,36 +138,41 @@ export default function Home() {
 
           {/* 2. Feature Cards - Design 3.0: Smooth Slide-Up */}
           <motion.div 
-            initial={{ opacity: 0, y: 150 }} // Start lower for "suu-tte" feel
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15%" }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} // Custom bezier for smooth deceleration
-            className="grid grid-cols-1 gap-8 w-full max-w-[800px] mx-auto px-8 py-32"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-10%" }}
+            className="w-full max-w-[800px] mx-auto px-6 py-32 relative"
           >
+            {/* Connecting Line */}
+            <div className="absolute left-[50%] md:left-12 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#7C3AED]/20 to-transparent transform -translate-x-1/2 md:translate-x-0" />
+
             {features.map((feature, i) => (
               <motion.div
                 key={feature.title}
-                whileHover={{ y: -15, boxShadow: '0 30px 60px rgba(0,0,0,0.08)' }}
-                className="group relative p-12 rounded-[3rem] transition-all duration-700 hover:border-transparent"
-                style={{ 
-                  backgroundColor: 'white',
-                  border: '1px solid rgba(0,0,0,0.04)',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
-                }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.2 }}
+                className="relative mb-24 last:mb-0 md:pl-32"
               >
-                {/* Icon */}
+                {/* Timeline Node (Icon) */}
                 <div 
-                  className="w-24 h-24 rounded-[2rem] flex items-center justify-center mb-10 transition-transform duration-500 group-hover:scale-110"
+                  className="absolute left-[50%] md:left-0 top-0 w-24 h-24 rounded-full border-4 border-white shadow-xl flex items-center justify-center transform -translate-x-1/2 md:translate-x-0 z-10 bg-white"
                   style={{ 
-                    background: `linear-gradient(135deg, ${feature.color}10 0%, ${feature.color}05 100%)`,
+                    boxShadow: `0 10px 30px ${feature.color}30`,
                   }}
                 >
-                  <feature.icon className="w-12 h-12" style={{ color: feature.color }} strokeWidth={1.5} />
+                  <feature.icon className="w-10 h-10" style={{ color: feature.color }} strokeWidth={1.5} />
                 </div>
-                
-                {/* Content */}
-                <h3 className="text-3xl font-bold mb-6 tracking-tight" style={{ color: '#1A1A1A' }}>{feature.title}</h3>
-                <p className="text-lg leading-loose font-medium" style={{ color: '#888' }}>{feature.desc}</p>
+
+                {/* Card */}
+                <div className="mt-28 md:mt-0 p-8 md:p-10 rounded-[2rem] bg-white border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-500 text-center md:text-left relative z-0">
+                  <div className="inline-block px-3 py-1 rounded-full mb-4 text-xs font-bold tracking-widest bg-slate-50 text-slate-400">
+                    STEP 0{i + 1}
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight text-slate-900">{feature.title}</h3>
+                  <p className="text-base md:text-lg leading-loose font-medium text-slate-500">{feature.desc}</p>
+                </div>
               </motion.div>
             ))}
           </motion.div>
