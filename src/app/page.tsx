@@ -377,9 +377,7 @@ export default function Home() {
                   </button>
                 </nav>
 
-                <div className="absolute bottom-12 left-8 text-sm text-gray-400 font-mono tracking-widest opacity-60">
-                  ZAX PROTOCOL v2.0
-                </div>
+
               </motion.div>
             </>
           )}
