@@ -111,9 +111,9 @@ export default function ProductPage() {
                 </div>
 
                 <h3 className="relative z-10 text-2xl md:text-3xl font-bold mb-2 tracking-tight text-white">{step.title}</h3>
-                <h4 className="relative z-10 text-lg font-bold text-slate-500 mb-6">{step.subtitle}</h4>
+                <h4 className="relative z-10 text-lg font-bold text-slate-300 mb-6">{step.subtitle}</h4>
                 
-                <p className="relative z-10 text-base leading-loose text-slate-400 font-medium mb-6">
+                <p className="relative z-10 text-base leading-loose text-slate-200 font-medium mb-6">
                   {step.description}
                 </p>
 
@@ -121,8 +121,8 @@ export default function ProductPage() {
                   <div className="relative z-10 space-y-3 pt-6 border-t border-white/10">
                     {step.details.map((detail, idx) => (
                       <div key={idx} className={`text-sm ${i % 2 === 0 ? "md:flex-row-reverse" : ""}`}>
-                        <span className="font-bold text-xs uppercase tracking-wider text-slate-500 block mb-1">{detail.label}</span>
-                        <span className="block text-slate-300 font-medium">{detail.value}</span>
+                        <span className="font-bold text-xs uppercase tracking-wider text-slate-400 block mb-1">{detail.label}</span>
+                        <span className="block text-slate-100 font-medium">{detail.value}</span>
                       </div>
                     ))}
                   </div>

@@ -30,7 +30,7 @@ export default function AboutPage() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2, duration: 0.8 }}
-                        className="text-5xl md:text-8xl font-black leading-none tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/50"
+                        className="text-5xl md:text-8xl font-black leading-none tracking-tighter mb-8 text-white drop-shadow-2xl"
                     >
                         Restoring<br />
                         Human Resonance
@@ -39,7 +39,7 @@ export default function AboutPage() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
-                        className="text-slate-400 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-light"
+                        className="text-slate-200 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-light"
                     >
                         ZAX Research Initiativeは、人類の孤独を解決し、<br className="hidden md:block" />
                         本質的な繋がりを再構築するための研究機関です。
