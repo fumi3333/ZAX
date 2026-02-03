@@ -1,108 +1,179 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
 
 export default function CorporateHeader() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Menu Items based on User request
-  const menuItems = [
-    { label: "About Us", href: "/about", sub: "01" },
-    { label: "Philosophy", href: "/philosophy", sub: "02" },
-    { label: "Product", href: "/product", sub: "03" },
-    { label: "Contact", href: "#", sub: "04" }, 
-  ];
-
-  const toggleMenu = () => setIsOpen(!isOpen);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full mix-blend-difference text-white px-8 py-6 lg:px-24 lg:py-10 flex items-center justify-between pointer-events-none">
-        {/* Logo - Click to Home & Close Menu */}
-
-        <Link
-          href="/"
-          onClick={() => setIsOpen(false)}
-          className="pointer-events-auto relative z-50 hover:opacity-70 transition-opacity block h-12 w-32"
+      {/* Header - Robust Fixed Layout */}
+      <header 
+        style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          zIndex: 1000, 
+          padding: '20px 30px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          pointerEvents: 'none' // Let clicks pass through, enable on children
+        }}
+      >
+        {/* Logo Container */}
+        <div style={{ pointerEvents: 'auto' }}>
+           <Link href="/" className="block relative" style={{ width: '200px', height: '60px' }}>
+              <Image 
+                src="/zax-logo-network.jpg" 
+                alt="ZAX" 
+                fill
+                style={{ objectFit: 'contain', objectPosition: 'left center' }}
+                priority
+              />
+           </Link>
+        </div>
+          
+        {/* Hamburger Menu Button */}
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          style={{ 
+            pointerEvents: 'auto',
+            background: 'rgba(255,255,255,0.8)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '50%',
+            width: '64px',
+            height: '64px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          }}
+          aria-label="Menu"
         >
-          <Image 
-            src="/zax-logo-network.jpg" 
-            alt="ZAX" 
-            fill
-            className="object-contain object-left"
-          />
-        </Link>
-
-        {/* Big Hamburger Button */}
-        <button
-          onClick={toggleMenu}
-          className="pointer-events-auto relative z-50 group flex flex-col gap-[6px] items-end p-2 cursor-pointer"
-        >
-          <span className={`block w-10 h-[3px] bg-current transition-all duration-300 ${isOpen ? "rotate-45 translate-y-[9px] bg-white" : "bg-white"}`} />
-          <span className={`block w-8 h-[3px] bg-current transition-all duration-300 group-hover:w-10 ${isOpen ? "opacity-0" : "bg-white"}`} />
-          <span className={`block w-10 h-[3px] bg-current transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-[9px] bg-white" : "bg-white"}`} />
-          <span className="text-[10px] font-bold tracking-widest mt-1 opacity-0 group-hover:opacity-100 transition-opacity absolute top-full right-0 pt-2 whitespace-nowrap text-white">MENU</span>
+          {isMenuOpen ? (
+            <X size={32} color="#1A1A1A" strokeWidth={1.5} />
+          ) : (
+            <Menu size={32} color="#1A1A1A" strokeWidth={1.5} />
+          )}
         </button>
       </header>
 
-      {/* Full Screen Overlay Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, clipPath: "circle(0% at 95% 5%)" }}
-            animate={{ opacity: 1, clipPath: "circle(150% at 95% 5%)" }}
-            exit={{ opacity: 0, clipPath: "circle(0% at 95% 5%)" }}
-            transition={{ duration: 0.8, ease: [0.77, 0, 0.175, 1] }}
-            className="fixed inset-0 z-40 bg-black text-white flex items-center justify-center"
-          >
-            <div className="w-full max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      {/* Fullscreen Menu Overlay - Right Side Drawer */}
+      {mounted && createPortal(
+        <AnimatePresence>
+          {isMenuOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMenuOpen(false)}
+                style={{ 
+                  position: 'fixed', 
+                  top: 0, 
+                  left: 0, 
+                  right: 0, 
+                  bottom: 0, 
+                  zIndex: 2000,
+                  backgroundColor: 'rgba(0,0,0,0.4)',
+                  backdropFilter: 'blur(5px)'
+                }}
+              />
               
-              {/* Left Column: Context/Info */}
-              <div className="hidden lg:flex flex-col gap-8 text-neutral-400">
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-neutral-500">Address</h4>
-                  <p className="text-sm leading-relaxed">
-                    Musashino University<br />
-                    Tokyo, Japan
-                  </p>
-                </div>
-                <div className="space-y-2">
-                   <h4 className="text-xs font-bold tracking-[0.2em] uppercase text-neutral-500">Connect</h4>
-                    <p className="text-sm">info@zax.dev</p>
-                </div>
-              </div>
+              {/* Drawer */}
+              <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "100%" }}
+                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                style={{ 
+                  position: 'fixed', 
+                  top: 0, 
+                  right: 0, 
+                  bottom: 0, 
+                  zIndex: 9999,
+                  width: 'min(500px, 100vw)',
+                  background: '#FFFFFF',
+                  boxShadow: '-10px 0 30px rgba(0,0,0,0.1)',
+                  padding: '40px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center'
+                }}
+              >
+                {/* Close Button */}
+                <button 
+                  onClick={() => setIsMenuOpen(false)}
+                  style={{
+                    position: 'absolute',
+                    top: '30px',
+                    right: '30px',
+                    padding: '10px',
+                    borderRadius: '50%',
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <X size={40} color="#1A1A1A" strokeWidth={1.5} />
+                </button>
 
-              {/* Right Column: Massive Navigation */}
-              <nav className="flex flex-col gap-2">
-                {menuItems.map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, x: 40 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
+                <nav className="flex flex-col gap-10">
+                  <Link 
+                    href="/about" 
+                    className="text-5xl font-black text-[#1A1A1A] hover:text-[#7C3AED] transition-colors tracking-tighter"
+                    onClick={() => setIsMenuOpen(false)}
                   >
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className="group flex items-center gap-6"
-                    >
-                      <span className="text-xs lg:text-sm font-bold text-neutral-500 tracking-widest group-hover:text-[#0022FF] transition-colors">
-                        {item.sub}
-                      </span>
-                      <span className="text-6xl md:text-8xl font-black tracking-tight text-white group-hover:text-[#0022FF] group-hover:translate-x-4 transition-all duration-300">
-                        {item.label}
-                      </span>
-                    </Link>
-                  </motion.div>
-                ))}
-              </nav>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                    About Us
+                  </Link>
+                  <Link 
+                    href="/philosophy" 
+                    className="text-5xl font-black text-[#1A1A1A] hover:text-[#0EA5E9] transition-colors tracking-tighter"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Philosophy
+                  </Link>
+                  <Link 
+                    href="/product" 
+                    className="text-5xl font-black text-[#1A1A1A] hover:text-[#10B981] transition-colors tracking-tighter"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Product
+                  </Link>
+                  
+                  <div className="w-full h-px bg-gray-200 my-6" />
+                  
+                  <Link
+                    href="/"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="px-10 py-5 rounded-full font-bold text-xl text-white text-center w-fit shadow-lg block hover:opacity-90 transition-opacity"
+                    style={{ background: 'linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)' }}
+                  >
+                    今すぐ始める
+                  </Link>
+                </nav>
+
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }

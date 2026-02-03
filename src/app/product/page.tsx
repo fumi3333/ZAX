@@ -51,7 +51,7 @@ export default function ProductPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 font-sans text-[#1A1A1A] selection:bg-[#7C3AED] selection:text-white">
-      <CorporateHeader />
+
       
       <div className="pt-32 pb-24 px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto">
         <motion.div

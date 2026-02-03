@@ -30,6 +30,8 @@ export const metadata: Metadata = {
   },
 };
 
+import CorporateHeader from "@/components/CorporateHeader";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -41,6 +43,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        <CorporateHeader />
         {children}
       </body>
     </html>
