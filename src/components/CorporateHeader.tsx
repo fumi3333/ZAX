@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CorporateHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Menu Items based on User's image reference (Home, About, Feature, Contact)
+  // Menu Items based on User request
   const menuItems = [
-    { label: "Home", href: "/", sub: "01" },
-    { label: "About", href: "/about", sub: "02" },
-    { label: "Technology", href: "/technology", sub: "03" },
+    { label: "About Us", href: "/about", sub: "01" },
+    { label: "Philosophy", href: "/philosophy", sub: "02" },
+    { label: "Product", href: "/product", sub: "03" },
     { label: "Contact", href: "#", sub: "04" }, 
   ];
 
@@ -21,12 +22,18 @@ export default function CorporateHeader() {
     <>
       <header className="fixed top-0 left-0 right-0 z-50 w-full mix-blend-difference text-white px-8 py-6 lg:px-24 lg:py-10 flex items-center justify-between pointer-events-none">
         {/* Logo - Click to Home & Close Menu */}
+
         <Link
           href="/"
           onClick={() => setIsOpen(false)}
-          className="pointer-events-auto text-5xl font-black tracking-tighter uppercase relative z-50 hover:opacity-70 transition-opacity"
+          className="pointer-events-auto relative z-50 hover:opacity-70 transition-opacity block h-12 w-32"
         >
-          ZAX
+          <Image 
+            src="/zax-logo-network.jpg" 
+            alt="ZAX" 
+            fill
+            className="object-contain object-left"
+          />
         </Link>
 
         {/* Big Hamburger Button */}

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { calculateDeltaVector } from "@/lib/gemini";
 import { prisma } from "@/lib/db/client";
 
+export const runtime = "nodejs";
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
