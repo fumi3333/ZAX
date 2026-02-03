@@ -173,50 +173,7 @@ export default function Home() {
             ))}
           </motion.div>
 
-          {/* 3. Stats Section - Design 3.0: Deep Impact */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 50 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.0, ease: "easeOut" }}
-            className="flex flex-col md:flex-row items-center justify-center gap-16 md:gap-32 pb-40 px-6 text-center"
-          >
-            <div>
-              <div 
-                className="text-7xl md:text-8xl font-black mb-4 tracking-tighter"
-                style={{ 
-                  background: 'linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >94.2%</div>
-              <div className="text-xl font-bold tracking-widest" style={{ color: '#AAA' }}>共鳴精度</div>
-            </div>
-            <div className="w-full md:w-px h-px md:h-32" style={{ backgroundColor: 'rgba(0,0,0,0.08)' }} />
-            <div>
-              <div 
-                className="text-7xl md:text-8xl font-black mb-4 tracking-tighter"
-                style={{ 
-                  background: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >12,847</div>
-              <div className="text-xl font-bold tracking-widest" style={{ color: '#AAA' }}>アクティブユーザー</div>
-            </div>
-            <div className="w-full md:w-px h-px md:h-32" style={{ backgroundColor: 'rgba(0,0,0,0.08)' }} />
-            <div>
-              <div 
-                className="text-7xl md:text-8xl font-black mb-4 tracking-tighter"
-                style={{ 
-                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >3.2x</div>
-              <div className="text-xl font-bold tracking-widest" style={{ color: '#AAA' }}>従来比 継続率</div>
-            </div>
-          </motion.div>
+
         </section>
       )}
 
