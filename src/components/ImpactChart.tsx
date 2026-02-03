@@ -22,22 +22,23 @@ export default function ImpactChart() {
         backgroundColor: "transparent",
         tooltip: {
             trigger: "axis",
-            backgroundColor: "rgba(8, 8, 12, 0.9)",
-            borderColor: "rgba(0, 240, 255, 0.2)",
+            backgroundColor: "rgba(255, 255, 255, 0.95)",
+            borderColor: "#e2e8f0",
             textStyle: {
-                color: "#fff",
-                fontFamily: "monospace",
+                color: "#1e293b",
+                fontFamily: "sans-serif",
             },
+            extraCssText: "box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);",
             formatter: (params: any) => {
                 const p = params[0];
                 const item = chartData[p.dataIndex];
                 return `
-          <div style="font-family: monospace; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">
+          <div style="font-family: sans-serif; font-size: 12px; color: #64748b; margin-bottom: 4px;">
             会計年度 ${p.name}
           </div>
-          <div style="font-size: 14px; color: #fff; font-weight: bold;">
-            <span style="display:inline-block;margin-right:8px;border-radius:50%;width:8px;height:8px;background-color:#00f0ff;"></span>
-            推計経済効果: <span style="color: #00f0ff;">¥${p.value}兆</span>
+          <div style="font-size: 14px; color: #0f172a; font-weight: bold;">
+            <span style="display:inline-block;margin-right:8px;border-radius:50%;width:8px;height:8px;background-color:#2563eb;"></span>
+            推計経済効果: <span style="color: #2563eb;">¥${p.value}兆</span>
           </div>
           <div style="font-size: 10px; color: #64748b; margin-top: 4px;">
             フェーズ: ${item.label}
@@ -60,14 +61,14 @@ export default function ImpactChart() {
             axisTick: { show: false },
             axisLabel: {
                 color: "#64748b",
-                fontFamily: "monospace",
+                fontFamily: "sans-serif",
                 fontSize: 10,
                 margin: 12,
             },
             splitLine: {
                 show: true,
                 lineStyle: {
-                    color: "rgba(255,255,255,0.05)",
+                    color: "#e2e8f0",
                 },
             },
         },
@@ -77,13 +78,13 @@ export default function ImpactChart() {
             axisTick: { show: false },
             axisLabel: {
                 color: "#64748b",
-                fontFamily: "monospace",
+                fontFamily: "sans-serif",
                 fontSize: 10,
                 formatter: "¥{value}兆",
             },
             splitLine: {
                 lineStyle: {
-                    color: "rgba(255,255,255,0.05)",
+                    color: "#e2e8f0",
                     type: "dashed",
                 },
             },
@@ -97,13 +98,13 @@ export default function ImpactChart() {
                 symbolSize: 8,
                 showSymbol: false,
                 lineStyle: {
-                    color: "#00f0ff",
+                    color: "#2563eb", // Blue-600
                     width: 3,
-                    shadowColor: "rgba(0, 240, 255, 0.5)",
-                    shadowBlur: 20,
+                    shadowColor: "rgba(37, 99, 235, 0.2)",
+                    shadowBlur: 10,
                 },
                 itemStyle: {
-                    color: "#00f0ff",
+                    color: "#2563eb",
                     borderWidth: 2,
                     borderColor: "#fff",
                 },
@@ -115,8 +116,8 @@ export default function ImpactChart() {
                         x2: 0,
                         y2: 1,
                         colorStops: [
-                            { offset: 0, color: "rgba(0, 240, 255, 0.3)" },
-                            { offset: 1, color: "rgba(0, 240, 255, 0)" },
+                            { offset: 0, color: "rgba(37, 99, 235, 0.2)" },
+                            { offset: 1, color: "rgba(37, 99, 235, 0)" },
                         ],
                     },
                 },
@@ -130,7 +131,7 @@ export default function ImpactChart() {
                         fontSize: 10,
                     },
                     lineStyle: {
-                        color: "rgba(255, 255, 255, 0.3)",
+                        color: "#94a3b8",
                         type: "dashed",
                     },
                     data: [
@@ -145,25 +146,25 @@ export default function ImpactChart() {
     };
 
     return (
-        <Card className="bg-[#08080C] border-slate-800 w-full h-full min-h-[450px] flex flex-col overflow-hidden relative group shadow-xl">
-            <CardHeader className="pb-0 relative z-10 border-b border-slate-800/50">
+        <Card className="bg-white border-slate-200 w-full h-full min-h-[450px] flex flex-col overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader className="pb-0 relative z-10 border-b border-slate-100">
                 <div className="flex justify-between items-start">
                     <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-cyan-400" />
-                            <CardTitle className="text-sm font-light text-slate-400 tracking-widest uppercase font-mono">
+                            <TrendingUp className="w-4 h-4 text-blue-600" />
+                            <CardTitle className="text-sm font-bold text-slate-500 tracking-widest uppercase">
                                 メンタル不調による経済損失の解消
                             </CardTitle>
                         </div>
-                        <div className="text-3xl font-bold text-white tracking-tighter">
+                        <div className="text-3xl font-bold text-slate-900 tracking-tighter">
                             7.3 <span className="text-sm font-normal text-slate-500">兆円 / 年 (国内推計)</span>
                         </div>
                     </div>
                     <div className="flex flex-col items-end">
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-400/20 text-xs font-mono text-cyan-400 mb-2">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-xs font-medium text-blue-600 mb-2">
                             <span className="relative flex h-1.5 w-1.5">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-400"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
                             </span>
                             リアルタイム推計
                         </div>
@@ -177,21 +178,21 @@ export default function ImpactChart() {
                 </div>
             </CardContent>
 
-            <div className="p-4 border-t border-slate-800/50 bg-[#0A0A0F] text-[10px] text-slate-500 font-mono leading-relaxed relative z-10">
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50 text-[10px] text-slate-500 leading-relaxed relative z-10">
                 <div className="flex items-start gap-2 mb-1">
-                    <Info className="w-3 h-3 text-slate-600 mt-0.5" />
-                    <span>出典: <span className="text-slate-400">Journal of Occupational and Environmental Medicine (2025)</span>:</span>
+                    <Info className="w-3 h-3 text-slate-400 mt-0.5" />
+                    <span>出典: <span className="text-slate-600 font-medium">Journal of Occupational and Environmental Medicine (2025)</span>:</span>
                 </div>
                 <div className="pl-5 space-y-1">
                     <a
                         href="https://journals.lww.com/joem/fulltext/2025/09000/the_impact_of_productivity_loss_from_presenteeism.3.aspx"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block hover:text-cyan-400 transition-colors underline decoration-slate-700 underline-offset-2"
+                        className="block hover:text-blue-600 transition-colors underline decoration-slate-300 underline-offset-2"
                     >
                         • The Impact of Productivity Loss from Presenteeism (Sample: N=27,507)
                     </a>
-                    <div className="text-slate-600 mt-1">
+                    <div className="text-slate-500 mt-1">
                         • 総損失: $48.58B (約7.3兆円) | GDP比: 1.11%<br />
                         • 内訳: プレゼンティーイズム $46.73B vs アブセンティーイズム $1.85B
                     </div>
