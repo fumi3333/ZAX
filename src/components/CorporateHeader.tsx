@@ -39,7 +39,7 @@ export default function CorporateHeader() {
                 src="/zax-logo-network.jpg" 
                 alt="ZAX" 
                 fill
-                style={{ objectFit: 'contain', objectPosition: 'left center' }}
+                style={{ objectFit: 'contain', objectPosition: 'left center', mixBlendMode: 'multiply' }}
                 priority
               />
            </Link>
@@ -50,7 +50,7 @@ export default function CorporateHeader() {
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           style={{ 
             pointerEvents: 'auto',
-            background: 'rgba(255,255,255,0.8)',
+            background: 'rgba(255,255,255,0.9)',
             backdropFilter: 'blur(10px)',
             borderRadius: '50%',
             width: '64px',
@@ -58,9 +58,10 @@ export default function CorporateHeader() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            border: 'none',
+            border: '1px solid rgba(0,0,0,0.08)', // Added border for contrast
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            transition: 'all 0.3s ease'
           }}
           aria-label="Menu"
         >

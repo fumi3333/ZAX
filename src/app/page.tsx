@@ -147,10 +147,10 @@ export default function Home() {
                 transition={{ delay: i * 0.2, duration: 0.8 }}
                 className="group relative pl-0 md:pl-32 mb-40 last:mb-0"
               >
-                {/* Connecting Line (Subtle) */}
+                {/* Connecting Line (Subtle) - Visible on Mobile too with adjustment */}
                 {i !== features.length - 1 && (
                   <div 
-                    className="hidden md:block absolute left-[3.5rem] top-24 bottom-[-10rem] w-px bg-gradient-to-b from-slate-200 to-transparent" 
+                    className="absolute left-[1.5rem] md:left-[3.5rem] top-16 md:top-24 bottom-[-8rem] md:bottom-[-10rem] w-px bg-gradient-to-b from-slate-200 to-transparent z-0" 
                   />
                 )}
 
