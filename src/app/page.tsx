@@ -136,46 +136,56 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* 2. Feature Cards - Design 3.0: Smooth Slide-Up */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-10%" }}
-            className="w-full max-w-[800px] mx-auto px-6 py-32 relative"
-          >
-            {/* Connecting Line */}
-            <div className="absolute left-[50%] md:left-12 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#7C3AED]/20 to-transparent transform -translate-x-1/2 md:translate-x-0" />
-
+          {/* 2. Feature Cards - Design 4.0: Modern Process Flow */}
+          <div className="w-full max-w-[800px] mx-auto px-6 py-40">
             {features.map((feature, i) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-                className="relative mb-24 last:mb-0 md:pl-32"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-20%" }}
+                transition={{ delay: i * 0.2, duration: 0.8 }}
+                className="group relative pl-0 md:pl-32 mb-40 last:mb-0"
               >
-                {/* Timeline Node (Icon) */}
-                <div 
-                  className="absolute left-[50%] md:left-0 top-0 w-24 h-24 rounded-full border-4 border-white shadow-xl flex items-center justify-center transform -translate-x-1/2 md:translate-x-0 z-10 bg-white"
-                  style={{ 
-                    boxShadow: `0 10px 30px ${feature.color}30`,
-                  }}
-                >
-                  <feature.icon className="w-10 h-10" style={{ color: feature.color }} strokeWidth={1.5} />
+                {/* Connecting Line (Subtle) */}
+                {i !== features.length - 1 && (
+                  <div 
+                    className="hidden md:block absolute left-[3.5rem] top-24 bottom-[-10rem] w-px bg-gradient-to-b from-slate-200 to-transparent" 
+                  />
+                )}
+
+                {/* Step Indicator (Floating Left) */}
+                <div className="hidden md:flex absolute left-0 top-0 w-28 flex-col items-center">
+                   <div 
+                     className="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex items-center justify-center relative z-10 group-hover:-translate-y-1 transition-transform duration-500"
+                   >
+                      <feature.icon className="w-6 h-6" style={{ color: feature.color }} strokeWidth={2} />
+                   </div>
+                   <div className="mt-4 text-[10px] font-bold tracking-widest text-slate-400 font-mono">
+                      0{i + 1}
+                   </div>
                 </div>
 
-                {/* Card */}
-                <div className="mt-28 md:mt-0 p-8 md:p-10 rounded-[2rem] bg-white border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-500 text-center md:text-left relative z-0">
-                  <div className="inline-block px-3 py-1 rounded-full mb-4 text-xs font-bold tracking-widest bg-slate-50 text-slate-400">
-                    STEP 0{i + 1}
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight text-slate-900">{feature.title}</h3>
-                  <p className="text-base md:text-lg leading-loose font-medium text-slate-500">{feature.desc}</p>
+                {/* Mobile Icon (Inline) */}
+                <div className="md:hidden flex items-center gap-4 mb-6">
+                   <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center">
+                      <feature.icon className="w-5 h-5" style={{ color: feature.color }} strokeWidth={2} />
+                   </div>
+                   <span className="text-xs font-bold tracking-widest text-slate-400 font-mono">STEP 0{i + 1}</span>
+                </div>
+
+                {/* Content */}
+                <div className="relative">
+                  <h3 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900 tracking-tight leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-slate-900 group-hover:to-slate-600 transition-all duration-300">
+                    {feature.title}
+                  </h3>
+                  <p className="text-lg text-slate-500 leading-relaxed md:leading-loose font-medium">
+                    {feature.desc}
+                  </p>
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
 
 
         </section>

@@ -125,7 +125,7 @@ export default function PhilosophyPage() {
                     </div>
 
                     {/* Chart as "Evidence of Byproduct" */}
-                    <div className="mt-8 h-[400px] md:h-[500px] w-full bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+                    <div className="mt-8 w-full bg-white rounded-2xl border border-slate-100 p-4 shadow-sm min-h-[500px]">
                         <ImpactChart />
                     </div>
                 </motion.section>
