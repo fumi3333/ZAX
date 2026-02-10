@@ -1,23 +1,28 @@
+// REAL PRISMA FOR PRODUCTION (DISABLED DUE TO ENV ERROR)
 // import { PrismaClient } from '@prisma/client';
 
-// Singleton for Prisma Client (prevents multiple connections in dev)
 // const globalForPrisma = global as unknown as { prisma: PrismaClient };
-const globalForPrisma = global as unknown as { prisma: any };
 
-// export const prisma =
-//     globalForPrisma.prisma ||
-//     new PrismaClient({
-//         log: ['query', 'error', 'warn'],
-//     });
+// export const prisma = globalForPrisma.prisma || new PrismaClient();
 
-// MOCK PRISMA FOR DEPLOYMENT (Bypass Edge/Env issues)
-export const prisma = globalForPrisma.prisma || {
-    user: { upsert: async () => {}, findUnique: async () => null, create: async () => {} },
-    essenceVector: { create: async () => {}, findMany: async () => [] },
-    feedback: { create: async () => {} }
-} as any;
+// if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+// MOCK PRISMA (For Design/UI Work without DB)
+const mockPrisma = {
+    user: {
+        findUnique: async () => null,
+        create: async (data: any) => ({ ...data, id: "mock-user-id" }),
+    },
+    essenceVector: {
+        create: async () => {},
+        findMany: async () => [],
+    },
+    feedback: {
+        create: async () => {},
+    }
+};
+
+export const prisma = mockPrisma as any;
 
 // --- Vector Logic (MVP: In-Memory / JSON) ---
 
@@ -31,28 +36,31 @@ function cosineSimilarity(vecA: number[], vecB: number[]): number {
 
 export const vectorStore = {
     // Save a new vector (e.g. Analysis Result)
-    async saveEmbedding(userId: string, vector: number[], type: 'personality' | 'interest' | 'feedback') {
+    async saveEmbedding(userId: string, data: { vector: number[], reasoning?: string, resonance_score?: number }, type: 'personality' | 'interest' | 'feedback') {
         try {
             // Ensure user exists (create generic guest if needed)
             // For MVP, if userId is new, we might fail or auto-create.
             // Let's assume userId is managed or we upsert.
-            /* 
+           
+            /*
+            // TODO: Enable this when logic is ready
             await prisma.user.upsert({
                 where: { id: userId },
                 update: {},
-                create: { id: userId, email: `guest_${userId.substring(0,8)}` }
+                create: { id: userId, email: `guest_${userId.substring(0,8)}` } // fallback
             });
+            */
 
             await prisma.essenceVector.create({
                 data: {
                     userId: userId,
-                    vector: JSON.stringify(vector),
-                    reasoning: "Stored via Logic Engine",
-                    resonanceScore: 0, // Default or passed in?
+                    vector: JSON.stringify(data.vector),
+                    reasoning: data.reasoning || "Stored via Logic Engine",
+                    resonanceScore: data.resonance_score || 0, 
                 }
             });
-            */
-            console.log(`[DB] Saved vector for ${userId} (MOCKED)`);
+            
+            console.log(`[DB] Saved vector for ${userId}`);
         } catch (e) {
             console.error("[DB] Failed to save embedding", e);
         }

@@ -37,11 +37,22 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
         setMessages(prev => [...prev, newMsg]);
         setInputText("");
 
-        // Simulate reply
+        // Simulate reply with random responses to feel "alive"
         setTimeout(() => {
+            const responses = [
+                "なるほど、その視点は面白いですね。",
+                "確かに。でも、逆にこういう見方もできませんか？",
+                "すごく共感します。僕も同じことを考えていました。",
+                "それは深いですね...もう少し詳しく教えてもらえますか？",
+                "ふむ、あなたの価値観が少し見えてきた気がします。",
+                "意外です。そういう一面もお持ちなんですね。",
+                "そう言われると、確かにそうかもしれません。",
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
-                text: "なるほど、その視点は面白いですね。僕も近い感覚があります。",
+                text: randomResponse,
                 sender: "them"
             }]);
             setResonance(prev => Math.min(100, prev + 15)); // Boost resonance on reply
@@ -49,32 +60,45 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
     };
 
     return (
-        <div className="w-full max-w-2xl h-[80vh] flex flex-col glass-panel rounded-2xl overflow-hidden border border-white/10 relative">
+        <div className="w-full h-[80vh] flex flex-col bg-white/70 backdrop-blur-xl rounded-[32px] overflow-hidden border border-white/40 relative shadow-xl shadow-slate-200/50">
             {/* Header with Resonance Metter */}
-            <div className="p-4 border-b border-white/10 flex justify-between items-center bg-black/40">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-zax-accent to-blue-600 animate-pulse" />
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50 backdrop-blur-md z-20">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-100 to-indigo-50 flex items-center justify-center relative">
+                        <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />
+                        <div className="absolute inset-0 rounded-full border border-blue-200 opacity-50" />
+                    </div>
                     <div>
-                        <div className="text-xs text-zax-muted tracking-widest">CONNECTED TO</div>
-                        <div className="text-sm font-bold text-white">#88X-29</div>
+                        <div className="text-[10px] text-slate-400 tracking-widest uppercase mb-0.5 font-bold">Connected to</div>
+                        <div className="text-base font-bold text-slate-800 font-mono tracking-tight">#88X-29</div>
                     </div>
                 </div>
-                <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1 text-zax-glow text-sm font-mono mb-1">
-                        <Zap size={14} fill="currentColor" />
-                        RESONANCE: {Math.round(resonance)}%
+                
+                <div className="flex items-center gap-6">
+                    <div className="flex flex-col items-end">
+                        <div className="flex items-center gap-1 text-blue-600 text-xs font-mono mb-1 tracking-wider font-bold">
+                            <Zap size={12} fill="currentColor" />
+                            RESONANCE: {Math.round(resonance)}%
+                        </div>
+                        <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <motion.div
+                                className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                                animate={{ width: `${resonance}%` }}
+                            />
+                        </div>
                     </div>
-                    <div className="w-32 h-1 bg-white/20 rounded-full overflow-hidden">
-                        <motion.div
-                            className="h-full bg-zax-glow shadow-[0_0_10px_#00F0FF]"
-                            animate={{ width: `${resonance}%` }}
-                        />
-                    </div>
+                    
+                    <button
+                        onClick={onEndChat}
+                        className="text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors border-l border-slate-200 pl-6 py-1 font-bold"
+                    >
+                        End Sim
+                    </button>
                 </div>
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
+            <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide bg-slate-50/50" ref={scrollRef}>
                 {messages.map((msg) => (
                     <motion.div
                         key={msg.id}
@@ -82,9 +106,9 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
                         animate={{ opacity: 1, y: 0 }}
                         className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}
                     >
-                        <div className={`max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed ${msg.sender === "me"
-                                ? "bg-zax-accent/20 border border-zax-accent/50 text-white rounded-br-none"
-                                : "bg-white/5 border border-white/10 text-gray-200 rounded-bl-none"
+                        <div className={`max-w-[80%] p-5 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.sender === "me"
+                                ? "bg-white border border-blue-100 text-slate-700 rounded-br-none shadow-blue-100/50"
+                                : "bg-white border border-slate-100 text-slate-600 rounded-bl-none"
                             }`}>
                             {msg.text}
                         </div>
@@ -97,37 +121,34 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
                         animate={{ opacity: 1 }}
                         className="flex justify-center my-4"
                     >
-                        <span className="px-3 py-1 rounded-full bg-zax-glow/10 border border-zax-glow/30 text-zax-glow text-xs tracking-widest animate-pulse">
+                        <span className="px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-bold tracking-[0.2em] animate-pulse shadow-sm">
                             SYNERGY SPIKE DETECTED
                         </span>
                     </motion.div>
                 )}
             </div>
 
-            {/* Input Area */}
-            <div className="p-4 bg-black/40 border-t border-white/10 flex gap-2">
-                <input
-                    type="text"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                    placeholder="Type your message..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-zax-accent/50 transition-colors"
-                />
-                <button
-                    onClick={handleSend}
-                    className="p-3 bg-zax-accent rounded-xl text-white hover:opacity-90 transition-opacity"
-                >
-                    <Send size={20} />
-                </button>
+            {/* Floating Input Area (The "Floor") */}
+            <div className="p-8 bg-gradient-to-t from-white via-white/80 to-transparent z-20">
+                <div className="relative flex items-center gap-3 bg-white border border-slate-200 rounded-full px-2 py-2 shadow-2xl shadow-slate-200/50 ring-4 ring-slate-50 group focus-within:ring-blue-50 transition-all">
+                    <input
+                        type="text"
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                        placeholder="Type to resonate..."
+                        className="flex-1 bg-transparent border-none px-6 text-slate-800 placeholder-slate-400 focus:outline-none text-sm font-medium tracking-wide"
+                    />
+                    <motion.button
+                        whileHover={{ scale: 1.05, backgroundColor: "rgba(37, 99, 235, 1)" }} // Blue-600
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleSend}
+                        className="p-3 bg-slate-900 rounded-full text-white shadow-lg shadow-slate-200 transition-all"
+                    >
+                        <Send size={18} />
+                    </motion.button>
+                </div>
             </div>
-
-            <button
-                onClick={onEndChat}
-                className="absolute top-20 right-4 text-xs text-white/30 hover:text-white"
-            >
-                [End Simulation]
-            </button>
         </div>
     );
 }

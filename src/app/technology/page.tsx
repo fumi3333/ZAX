@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Cpu, Network, Database, Layers, Code, ShieldCheck } from "lucide-react";
+import VectorTransformationVisual from "@/components/VectorTransformationVisual";
 
 export default function TechnologyPage() {
     return (
@@ -32,41 +33,56 @@ export default function TechnologyPage() {
                     </p>
                 </motion.div>
 
-                {/* Tech Grid */}
+                {/* Tech Grid - Google Cloud Native Narrative */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-32">
-                    {/* 1. AI Core */}
+                    {/* 1. Cognitive Architecture (The "Brain") */}
                     <motion.div
                         whileHover={{ y: -5 }}
-                        className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 relative overflow-hidden group"
+                        className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 relative overflow-hidden group md:col-span-2"
                     >
                         <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                             <Cpu size={120} />
                         </div>
-                        <div className="relative z-10">
-                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6 text-blue-600">
-                                <Cpu size={24} />
+                        <div className="relative z-10 grid md:grid-cols-2 gap-10">
+                            <div>
+                                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6 text-blue-600">
+                                    <Cpu size={24} />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-4">Cognitive Architecture</h3>
+                                <p className="text-slate-500 leading-relaxed mb-6">
+                                    人間の「直感（System 1）」と「論理（System 2）」を模倣したハイブリッド推論モデル。
+                                    Google Cloud Vertex AI 上で稼働する Gemini 1.5 Pro が、断片的な言葉からユーザーの深層心理を言語化します。
+                                </p>
+                                <ul className="space-y-3">
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                        <span className="font-bold text-slate-700 text-sm">System 2 (Logic):</span>
+                                        <span className="font-mono text-sm text-slate-500">Vertex AI / Gemini 1.5 Pro</span>
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                        <span className="font-bold text-slate-700 text-sm">System 1 (Intuition):</span>
+                                        <span className="font-mono text-sm text-slate-500">768-dim Vector Space</span>
+                                    </li>
+                                </ul>
                             </div>
-                            <h3 className="text-2xl font-bold mb-4">AI Core Intelligence</h3>
-                            <ul className="space-y-4">
-                                <li className="flex flex-col">
-                                    <span className="text-xs uppercase tracking-widest text-slate-400 mb-1">Reasoning Model</span>
-                                    <span className="font-mono font-bold text-lg">Google Gemini 1.5 Pro</span>
-                                    <p className="text-sm text-slate-500 mt-1">
-                                        ユーザーの断片的な入力から「本質（Essence）」を抽出し、CoT（思考の連鎖）を用いて推論プロセスを生成。
-                                    </p>
-                                </li>
-                                <li className="flex flex-col border-t border-slate-100 pt-4">
-                                    <span className="text-xs uppercase tracking-widest text-slate-400 mb-1">Vectorization</span>
-                                    <span className="font-mono font-bold text-lg">Hugging Face / Embedding-001</span>
-                                    <p className="text-sm text-slate-500 mt-1">
-                                        言語化された本質データを768次元のベクトル空間へマッピング。
-                                    </p>
-                                </li>
-                            </ul>
+                            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-center">
+                                <div className="space-y-4">
+                                    <div>
+                                        <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">Context Window</div>
+                                        <div className="font-mono text-xl text-slate-900">1,000,000+ Tokens</div>
+                                    </div>
+                                    <div className="w-full h-px bg-slate-200" />
+                                    <div>
+                                        <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">Reasoning Method</div>
+                                        <div className="font-mono text-sm text-slate-900">Chain-of-Thought (CoT) + Zero-shot</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
 
-                    {/* 2. Mathematical Logic */}
+                    {/* 2. Mathematical Foundation */}
                     <motion.div
                         whileHover={{ y: -5 }}
                         className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-purple-900/5 relative overflow-hidden group"
@@ -78,80 +94,41 @@ export default function TechnologyPage() {
                             <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-6 text-purple-600">
                                 <Network size={24} />
                             </div>
-                            <h3 className="text-2xl font-bold mb-4">Mathematical Logic</h3>
-                            <div className="space-y-6">
-                                <div>
-                                    <span className="text-xs uppercase tracking-widest text-slate-400 mb-1 block">Algorithm</span>
-                                    <span className="font-bold text-lg block mb-2">Cosine Similarity (余弦類似度)</span>
-                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 font-mono text-xs text-slate-600">
-                                        similarity = (A · B) / (||A|| ||B||)
-                                    </div>
-                                </div>
-                                <div>
-                                    <span className="text-xs uppercase tracking-widest text-slate-400 mb-1 block">Feature Space</span>
-                                    <span className="font-bold text-lg block mb-2">Dual-Vector Architecture</span>
-                                    <p className="text-sm text-slate-500">
-                                        <b className="text-slate-900">Display Vector (6d):</b> 可視化・UI用（直感、論理、共感等）<br />
-                                        <b className="text-slate-900">Essence Vector (768d):</b> 深層マッチング計算用（隠れ層）
-                                    </p>
-                                </div>
+                            <h3 className="text-2xl font-bold mb-4">Vector Resonance</h3>
+                            <p className="text-slate-500 text-sm mb-6">
+                                言語化された「本質」を高次元ベクトルへ変換し、ユークリッド距離や余弦類似度を用いて「共鳴率」を算出します。
+                            </p>
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 font-mono text-xs text-slate-600">
+                                similarity = (A · B) / (||A|| ||B||)
                             </div>
                         </div>
                     </motion.div>
 
-                    {/* 3. Infrastructure */}
+                    {/* 3. Scalable Infrastructure (Google Cloud) */}
                     <motion.div
                         whileHover={{ y: -5 }}
-                        className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-emerald-900/5 relative overflow-hidden group md:col-span-2"
+                        className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-emerald-900/5 relative overflow-hidden group"
                     >
                         <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                             <Database size={120} />
                         </div>
-                        <div className="relative z-10 flex flex-col md:flex-row gap-8">
-                            <div className="flex-1">
-                                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6 text-emerald-600">
-                                    <Database size={24} />
-                                </div>
-                                <h3 className="text-2xl font-bold mb-4">Infrastructure & Data</h3>
-                                <p className="text-slate-500 mb-6">
-                                    大規模なベクトル検索とセキュアなデータ管理を実現する、モダンなデータスタックを採用しています。
-                                </p>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Database size={16} className="text-slate-400" />
-                                            <span className="font-bold text-sm">PostgreSQL + pgvector</span>
-                                        </div>
-                                        <div className="text-xs text-slate-400">Vector Storage</div>
-                                    </div>
-                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <ShieldCheck size={16} className="text-slate-400" />
-                                            <span className="font-bold text-sm">RLS Policies</span>
-                                        </div>
-                                        <div className="text-xs text-slate-400">Row Level Security</div>
-                                    </div>
-                                </div>
+                        <div className="relative z-10">
+                            <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-6 text-emerald-600">
+                                <Database size={24} />
                             </div>
-                            <div className="flex-1 border-t md:border-t-0 md:border-l border-slate-100 pt-8 md:pt-0 md:pl-8">
-                                <h4 className="font-bold text-slate-900 mb-4 text-sm uppercase tracking-wider">Frontend Stack</h4>
-                                <ul className="space-y-3">
-                                    <li className="flex items-center gap-3">
-                                        <Layers size={18} className="text-slate-400" />
-                                        <span className="font-mono text-sm">Next.js 14 (App Router)</span>
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <Code size={18} className="text-slate-400" />
-                                        <span className="font-mono text-sm">React Server Components</span>
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <div className="w-4 h-4 rounded-full bg-blue-400/20 flex items-center justify-center">
-                                            <span className="w-2 h-2 rounded-full bg-blue-500" />
-                                        </div>
-                                        <span className="font-mono text-sm">Tailwind CSS + Framer Motion</span>
-                                    </li>
-                                </ul>
-                            </div>
+                            <h3 className="text-2xl font-bold mb-4">Hyper-Scalable Infra</h3>
+                            <ul className="space-y-4">
+                                <div>
+                                    <span className="text-xs uppercase tracking-widest text-slate-400 mb-1 block">Compute</span>
+                                    <span className="font-bold text-sm block mb-1">Google Cloud Run (Serverless)</span>
+                                    <p className="text-xs text-slate-500">Auto-scaling containers, zero maintenance.</p>
+                                </div>
+                                <div className="border-t border-slate-100 pt-4">
+                                    <span className="text-xs uppercase tracking-widest text-slate-400 mb-1 block">Database</span>
+                                    <span className="font-bold text-sm block mb-1">PostgreSQL + pgvector</span>
+                                    <p className="text-xs text-slate-500">Hybrid Search (Vector + Keyword) enabled.</p>
+                                </div>
+                            </ul>
                         </div>
                     </motion.div>
                 </div>

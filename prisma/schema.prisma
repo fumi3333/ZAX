@@ -4,16 +4,21 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = "file:c:/ZAX/prisma/dev.db"
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @default("guest") // For MVP, we might treat everyone as guest or allow login later. default guest for now to simplify
-  createdAt DateTime @default(now())
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String // Hashed password
+  createdAt     DateTime  @default(now())
+
+  // Optional: Future-proof for OAuth or Profile
+  name          String?
+  image         String?
   
-  vectors   EssenceVector[]
-  feedbacks Feedback[]
+  vectors       EssenceVector[]
+  feedbacks     Feedback[]
 }
 
 model EssenceVector {

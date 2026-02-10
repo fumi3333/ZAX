@@ -28,7 +28,8 @@ export async function POST(request: Request) {
         const { inputs, biases } = validation.data;
 
         // 2. AI Analysis
-        const result = await analyzeEssence(inputs, biases);
+        const numericBiases = biases?.map((b) => Number(b));
+        const result = await analyzeEssence(inputs, numericBiases);
 
         // [DB] Persist the analysis result
         // For MVP, we generate a session-based ID or random guest ID

@@ -15,17 +15,11 @@ export default function AboutPage() {
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
             </div>
 
-            <div className="relative z-10 max-w-6xl mx-auto px-6 pt-40">
+            <div className="relative z-10 max-w-6xl mx-auto px-6" style={{ paddingTop: '200px' }}>
+                <div className="h-12" /> {/* Extra Spacer */}
                 {/* Hero Section */}
                 <div className="text-center mb-32">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6 }}
-                        className="inline-block px-4 py-1.5 mb-8 border border-slate-200 rounded-full bg-white/50 backdrop-blur-md text-[10px] tracking-[0.3em] font-medium text-slate-500"
-                    >
-                        WHO WE ARE
-                    </motion.div>
+
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
