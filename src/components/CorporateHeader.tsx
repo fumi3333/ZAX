@@ -169,23 +169,21 @@ export default function CorporateHeader() {
             variant="classic"
           />
 
-          {/* VAR 2: Neon Ghost (Border -> Glow) */}
           <NavigationItem 
             item={{ href: 'https://note.com', label: 'Insights', desc: '開発ログ (note)', num: '03', external: true }} 
             setIsMenuOpen={setIsMenuOpen} 
-            variant="neon"
+            variant="classic"
           />
 
-          {/* VAR 3: Minimal Ghost (No Border -> Reveal) */}
           <NavigationItem 
             item={{ href: '/trust', label: 'Trust & Safety', desc: '安心・安全', num: '04' }} 
             setIsMenuOpen={setIsMenuOpen} 
-            variant="minimal"
+            variant="classic"
           />
           <NavigationItem 
-            item={{ href: '/feedback', label: 'Feedback', desc: '共創・お問い合わせ', num: '05' }}
+            item={{ href: '/feedback', label: 'Feedback', desc: 'お問い合わせ', num: '05' }}
             setIsMenuOpen={setIsMenuOpen} 
-            variant="minimal"
+            variant="classic"
           />
           
           <motion.div 

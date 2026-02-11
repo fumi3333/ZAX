@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, BrainCircuit, Sparkles, Users, TrendingUp } from "lucide-react";
 import HeroVisual from "@/components/HeroVisual";
+import EssenceVisualizer from "@/components/EssenceVisualizer";
 
 interface LandingPageProps {
   onEnter: () => void;
@@ -230,16 +231,8 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
               viewport={{ once: true }}
               className="relative h-80 lg:h-96 bg-white rounded-2xl shadow-lg shadow-slate-200/60 border border-slate-100 overflow-hidden flex items-center justify-center"
             >
-              <svg viewBox="0 0 200 200" className="w-full h-full opacity-60 p-10">
-                <circle cx="100" cy="100" r="80" stroke="#3b82f6" strokeWidth="1" fill="none" />
-                <circle cx="100" cy="100" r="50" stroke="#8b5cf6" strokeWidth="1" fill="none" />
-                <line x1="100" y1="20" x2="100" y2="180" stroke="#94a3b8" strokeWidth="0.5" />
-                <line x1="20" y1="100" x2="180" y2="100" stroke="#94a3b8" strokeWidth="0.5" />
-                <circle cx="140" cy="70" r="4" fill="#3b82f6" />
-                <circle cx="60" cy="130" r="4" fill="#8b5cf6" />
-              </svg>
-              <div className="absolute bottom-4 right-4 text-[10px] text-slate-400 font-mono">
-                FIG.1 VECTOR SPACE
+              <div className="w-full h-full flex items-center justify-center">
+                 <EssenceVisualizer interactive={true} />
               </div>
             </motion.div>
           </motion.div>
