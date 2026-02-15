@@ -19,8 +19,10 @@ export default function DiagnosticWizard() {
   const totalQuestions = questions.length;
   // Progress based on current question index (0-indexed, so +1 for display)
   const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-  // Check if all questions answered (more lenient)
-  const allAnswered = Object.keys(answers).length >= totalQuestions * 0.9; // 90%以上回答済み
+  // Check if all questions answered (more lenient: 80% or at last question)
+  const answeredCount = Object.keys(answers).length;
+  const allAnswered = answeredCount >= totalQuestions * 0.8 || 
+                      (currentQuestionIndex === totalQuestions - 1 && answeredCount >= totalQuestions * 0.7);
 
   const handleAnswer = (value: number) => {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
@@ -97,7 +99,7 @@ export default function DiagnosticWizard() {
       <div className="mb-8 space-y-2">
         <div className="flex justify-between text-xs font-semibold text-slate-500 tracking-wider">
           <span>PROGRESS</span>
-          <span>{Math.round(progress)}%</span>
+          <span>{answeredCount} / {totalQuestions} 回答済み</span>
         </div>
         <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
           <div 
