@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  url        = env("DATABASE_URL", default: "postgresql://localhost:5432/dummy")
+  url        = env("DATABASE_URL")
   extensions = [vector] // pgvector拡張
 }
 
