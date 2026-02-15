@@ -80,7 +80,7 @@ export default function LandingPage() {
               href="/diagnostic"
               className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-all shadow-sm hover:shadow-md"
             >
-              無料で診断を開始
+              診断を開始
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
@@ -198,7 +198,7 @@ export default function LandingPage() {
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm"
             >
               <Sparkles className="w-4 h-4" />
-              無料で診断を開始
+              診断を開始
             </Link>
           </div>
         </motion.div>
