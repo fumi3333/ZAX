@@ -7,9 +7,9 @@ import { ArrowRight, BrainCircuit, Users, TrendingUp, Sparkles } from "lucide-re
 const features = [
   {
     icon: BrainCircuit,
-    label: "本質分析",
+    label: "性格分析",
     title: "思考の6次元を可視化",
-    desc: "思考特性を6次元ベクトルとして分析し、あなたの内面を可視化。属性ではなく、本質から相手を見つけます。",
+    desc: "思考特性を6次元ベクトルとして分析し、あなたの内面を可視化。属性ではなく、価値観から相手を見つけます。",
     iconBg: "bg-blue-50",
     iconColor: "text-blue-600",
   },
@@ -67,7 +67,7 @@ export default function LandingPage() {
             transition={{ delay: 0.18, duration: 0.5 }}
             className="text-sm text-slate-500 mb-12 max-w-md"
           >
-            50の質問から、あなたの「本質」を可視化します。
+            50の質問から、あなたの価値観を可視化します。
           </motion.p>
 
           <motion.div
@@ -188,7 +188,7 @@ export default function LandingPage() {
         >
           <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-12 lg:p-20">
             <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-              あなたの本質を、可視化する。
+              あなたの価値観を、可視化する。
             </h3>
             <p className="text-slate-600 mb-8 max-w-md mx-auto">
               属性ではなく価値観でつながる、新しいマッチングプロトコル。

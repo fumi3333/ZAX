@@ -9,7 +9,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "ZAX | Value-Based Connection",
-  description: "表面的な属性ではなく、あなたの「本質」と「価値観」で繋がる、新しいマッチングプラットフォーム。",
+  description: "表面的な属性ではなく、価値観と性格特性で繋がる、新しいマッチングプラットフォーム。",
   openGraph: {
     title: "ZAX | Value-Based Connection",
     description: "Connect through values, not just attributes.",

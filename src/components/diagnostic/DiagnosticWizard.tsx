@@ -17,8 +17,10 @@ export default function DiagnosticWizard() {
 
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
-  // Progress based on answered count, not just index (allowing back-tracking without losing progress visual)
-  const progress = (Object.keys(answers).length / totalQuestions) * 100;
+  // Progress based on current question index (0-indexed, so +1 for display)
+  const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+  // Check if all questions answered (more lenient)
+  const allAnswered = Object.keys(answers).length >= totalQuestions * 0.9; // 90%以上回答済み
 
   const handleAnswer = (value: number) => {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
@@ -180,8 +182,8 @@ export default function DiagnosticWizard() {
         {currentQuestionIndex === totalQuestions - 1 && (
              <Button 
                 onClick={handleSubmit} 
-                disabled={isSubmitting || Object.keys(answers).length < totalQuestions}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-6 rounded-full font-bold shadow-lg hover:shadow-indigo-500/30 transition-all"
+                disabled={isSubmitting || !allAnswered}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-6 rounded-full font-bold shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
              >
                 {isSubmitting ? '分析中...' : '診断結果を見る'}
              </Button>

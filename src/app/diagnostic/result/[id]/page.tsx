@@ -96,7 +96,7 @@ export default async function DiagnosticResultPage({
           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
             あなたの
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">
-              本質的特性
+              性格特性
             </span>
           </h1>
           <p className="text-slate-500 max-w-2xl mx-auto">
