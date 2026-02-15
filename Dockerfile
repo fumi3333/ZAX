@@ -5,9 +5,10 @@ FROM node:20-alpine AS base
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# 1. 依存関係
+# 1. 依存関係（prisma generate 用に schema を先にコピー）
 FROM base AS deps
 COPY package.json package-lock.json ./
+COPY prisma ./prisma/
 RUN npm ci
 
 # 2. ビルド
