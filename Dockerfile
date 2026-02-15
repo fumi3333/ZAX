@@ -1,14 +1,15 @@
 # Next.js on Cloud Run (Google Cloud)
 # マルチステージビルドでイメージサイズを最適化
 
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
 # 1. 依存関係のインストール
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
 # 2. ビルド
@@ -26,13 +27,14 @@ RUN npm run build
 
 # 3. 本番ランタイム
 FROM base AS runner
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
