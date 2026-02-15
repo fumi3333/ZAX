@@ -18,8 +18,10 @@ export default function DiagnosticWizard() {
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
   const answeredCount = Object.keys(answers).length;
+  const lastQuestionAnswered = currentQuestion && answers[currentQuestion.id] !== undefined;
+  // 最終問では「今の質問に回答済み」または70%以上回答で送信可能
   const allAnswered = answeredCount >= totalQuestions * 0.8 ||
-                      (currentQuestionIndex === totalQuestions - 1 && answeredCount >= totalQuestions * 0.7);
+                      (currentQuestionIndex === totalQuestions - 1 && (lastQuestionAnswered || answeredCount >= totalQuestions * 0.7));
 
   const handleAnswer = (value: number) => {
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import ImpactChart from "@/components/ImpactChart";
 
@@ -12,7 +12,6 @@ export default function PhilosophyPage() {
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-[-20%] right-[-10%] w-[1000px] h-[1000px] bg-blue-100/50 rounded-full blur-[180px] mix-blend-multiply" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-purple-100/50 rounded-full blur-[150px] mix-blend-multiply" />
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
             </div>
 
             <div className="relative z-10 max-w-4xl mx-auto px-6 pt-32">

@@ -10,7 +10,8 @@ export const runtime = "nodejs";
 // Input Validation Schema
 const AnalyzeRequestSchema = z.object({
     inputs: z.array(z.string().min(1, "Input cannot be empty")).min(1, "At least one input is required"),
-    biases: z.array(z.string()).optional(),
+    biases: z.array(z.union([z.string(), z.number()])).optional(),
+    purpose: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -26,11 +27,11 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
-        const { inputs, biases } = validation.data;
+        const { inputs, biases, purpose } = validation.data;
 
         // 2. AI Analysis
         const numericBiases = biases?.map((b) => Number(b));
-        const result = await analyzeEssence(inputs, numericBiases);
+        const result = await analyzeEssence(inputs, numericBiases, purpose || "general");
 
         // [DB] Persist the analysis result
         const cookieStore = await cookies();

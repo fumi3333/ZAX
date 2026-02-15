@@ -4,6 +4,10 @@
 
 **Live**: [https://zax.fumiproject.dev](https://zax.fumiproject.dev)
 
+> **📋 コードレビュー・構成確認**  
+> - **全コード一覧**: [ZAX_FULL_CODE.md](./ZAX_FULL_CODE.md) — ソースコードを1ファイルにまとめたもの（Gemini等向け）  
+> - **構成・フロー**: [CODE_SUMMARY.md](./CODE_SUMMARY.md) — ディレクトリ構成・API一覧
+
 ---
 
 ## 概要
