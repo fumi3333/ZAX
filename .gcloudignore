@@ -1,0 +1,9 @@
+# .gcloudignore - gcloud run deploy --source 用
+.git
+.gitignore
+node_modules
+.next
+.env*
+!.env.build
+*.md
+.vercel
