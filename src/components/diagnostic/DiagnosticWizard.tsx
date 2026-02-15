@@ -51,23 +51,27 @@ export default function DiagnosticWizard() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      console.log('Submitting diagnostic with answers:', answers);
       const response = await fetch('/api/diagnostic/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answers }),
       });
       
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (response.ok && data.success) {
+        console.log('Redirecting to:', `/diagnostic/result/${data.id}`);
         window.location.href = `/diagnostic/result/${data.id}`;
       } else {
         console.error('Failed to submit:', data.error);
-        alert('エラーが発生しました: ' + data.error);
+        alert('エラーが発生しました: ' + (data.error || '不明なエラー'));
       }
     } catch (error) {
       console.error('Error submitting diagnostic:', error);
-      alert('通信エラーが発生しました。');
+      alert('通信エラーが発生しました。ブラウザのコンソールを確認してください。');
     } finally {
       setIsSubmitting(false);
     }

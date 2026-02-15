@@ -12,12 +12,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'No answers provided' }, { status: 400 });
     }
 
-    // 1. Authenticate User
+    // 1. Authenticate User (or create guest session)
     const cookieStore = await cookies();
-    const sessionId = cookieStore.get('zax-session')?.value;
+    let sessionId = cookieStore.get('zax-session')?.value;
 
+    // Auto-create session if not exists
     if (!sessionId) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      sessionId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+      cookieStore.set('zax-session', sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 365, // 1 year
+      });
     }
 
     let userId = sessionId;
