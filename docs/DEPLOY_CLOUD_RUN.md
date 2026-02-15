@@ -72,5 +72,6 @@ gcloud run deploy zax \
 
 ## トラブルシュート
 
+- **ビルド失敗**: [Cloud Build ログ](https://console.cloud.google.com/cloud-build/builds)で詳細を確認
 - **Prisma エラー**: `DATABASE_URL` がビルド・実行時に設定されているか確認
 - **Gemini が動かない**: `GOOGLE_API_KEY` が正しく設定されているか確認（個人プロジェクト推奨）
