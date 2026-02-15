@@ -4,7 +4,20 @@
 let prisma: any;
 let vectorStore: any;
 
+// DATABASE_URL が無い場合はモックのみ使用（Vercel等で未設定時）
+const useRealDb = !!(
+    process.env.DATABASE_URL &&
+    !process.env.DATABASE_URL.includes("localhost:5432/dummy")
+);
+
+if (!useRealDb) {
+    if (!process.env.DATABASE_URL) {
+        process.env.DATABASE_URL = "postgresql://localhost:5432/dummy";
+    }
+}
+
 try {
+    if (!useRealDb) throw new Error("Using mock DB");
     const { PrismaClient } = require("@prisma/client");
     const globalForPrisma = global as unknown as { prisma: any };
     prisma = globalForPrisma.prisma || new PrismaClient({ log: ["warn", "error"] });
