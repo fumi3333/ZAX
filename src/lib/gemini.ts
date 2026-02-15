@@ -172,3 +172,24 @@ export async function calculateDeltaVector(feedback: string, currentVector: numb
         };
     }
 }
+
+/** インタビュー回答から「あなたの変化」サマリーを生成 */
+export async function generateReflectionSummary(interviewText: string): Promise<string> {
+    if (!API_KEY) return "あなたの振り返りが記録されました。";
+    const prompt = `
+以下の振り返り回答をもとに、「あなたがどう変わったか」を50文字以内の日本語で要約してください。
+温かく、前向きな表現で。
+
+【振り返り】
+${interviewText.slice(0, 500)}
+
+50文字以内、1文で。JSON不要、テキストのみ。
+`;
+    try {
+        const result = await model.generateContent(prompt);
+        return (await result.response).text().trim().slice(0, 80) || "あなたの振り返りが記録されました。";
+    } catch (e) {
+        console.warn("Reflection summary error:", e);
+        return "あなたの振り返りが記録されました。";
+    }
+}
