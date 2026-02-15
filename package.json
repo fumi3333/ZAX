@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "DATABASE_URL=postgresql://localhost:5432/dummy prisma generate && next build",
-    "postinstall": "DATABASE_URL=postgresql://localhost:5432/dummy prisma generate",
+    "build": "cross-env DATABASE_URL=postgresql://localhost:5432/dummy prisma generate && next build",
+    "postinstall": "cross-env DATABASE_URL=postgresql://localhost:5432/dummy prisma generate",
     "start": "next start",
     "lint": "eslint"
   },
@@ -48,6 +48,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.24",
+    "cross-env": "^7.0.3",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",

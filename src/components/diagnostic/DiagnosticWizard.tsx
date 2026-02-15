@@ -65,7 +65,8 @@ export default function DiagnosticWizard() {
       console.log('Response data:', data);
       
       if (response.ok && data.success) {
-        console.log('Redirecting to:', `/diagnostic/result/${data.id}`);
+        const resultData = { id: data.id, synthesis: data.synthesis, answers: data.answers };
+        sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify(resultData));
         window.location.href = `/diagnostic/result/${data.id}`;
       } else {
         console.error('Failed to submit:', data.error);

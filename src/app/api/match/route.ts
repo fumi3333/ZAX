@@ -4,7 +4,7 @@ import { findTopMatches } from "@/lib/rec/engine";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { vector, topN = 5 } = body;
+    const { vector, topN = 5, synthesis } = body;
 
     if (!vector || !Array.isArray(vector) || vector.length !== 6) {
       return NextResponse.json(
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const matches = await findTopMatches(vector, topN);
+    const matches = await findTopMatches(vector, topN, synthesis);
 
     return NextResponse.json({
       success: true,

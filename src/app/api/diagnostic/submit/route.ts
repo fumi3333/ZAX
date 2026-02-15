@@ -142,7 +142,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ 
         success: true, 
         id: diagnosticResult.id,
-        synthesis: synthesis 
+        synthesis: synthesis,
+        answers: answers,
     });
 
   } catch (error: any) {

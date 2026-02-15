@@ -91,6 +91,42 @@ export async function analyzeEssence(inputs: string[], biases: number[] = [50, 5
     }
 }
 
+/** RAG風: ユーザー分析＋相手プロフィールから相性の理由を生成 */
+export async function generateMatchReasoning(
+    userSynthesis: string,
+    partnerName: string,
+    partnerBio: string,
+    partnerTags: string[],
+    similarityPercent: number,
+    growthScore: number
+): Promise<string> {
+    if (!API_KEY) return `${partnerName}さんは${partnerBio} 共鳴度${similarityPercent}%、成長ポテンシャル${growthScore}%です。`;
+    const prompt = `
+あなたはマッチングアドバイザーです。以下の情報をもとに、なぜこの2人が相性が良いか、50文字以内の日本語で簡潔に説明してください。
+
+【ユーザーの性格分析】
+${userSynthesis.slice(0, 500)}
+
+【相性の良い相手】
+名前: ${partnerName}
+プロフィール: ${partnerBio}
+タグ: ${partnerTags.join(", ")}
+
+【数値】
+共鳴度: ${similarityPercent}%
+成長ポテンシャル: ${growthScore}%
+
+50文字以内で、具体的で温かい推薦理由を1文で出力してください。JSONは不要、テキストのみ。
+`;
+    try {
+        const result = await model.generateContent(prompt);
+        return (await result.response).text().trim().slice(0, 120) || `${partnerName}さんとの相性が良いです。`;
+    } catch (e) {
+        console.warn("Gemini match reasoning error:", e);
+        return `${partnerName}さんは${partnerBio} 共鳴度${similarityPercent}%。`;
+    }
+}
+
 export interface DeltaResult {
     delta_vector: number[];
     new_vector: number[];

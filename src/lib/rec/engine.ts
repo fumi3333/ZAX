@@ -1,4 +1,5 @@
 import { vectorStore } from "../db/client";
+import { generateMatchReasoning } from "../gemini";
 
 // ─── 50 Archetype Personas (Demo Seed) ───
 // 性格パターンを反映した6次元ベクトル [Logic, Intuition, Empathy, Determination, Creativity, Flexibility]
@@ -133,7 +134,11 @@ function generateReasoning(userVec: number[], targetVec: number[], sim: number):
 }
 
 // ─── Top N マッチング検索 ───
-export async function findTopMatches(userVector: number[], topN: number = 5): Promise<MatchResult[]> {
+export async function findTopMatches(
+  userVector: number[],
+  topN: number = 5,
+  userSynthesis?: string
+): Promise<MatchResult[]> {
 
   // 1. DB検索を試みる
   try {
@@ -150,6 +155,21 @@ export async function findTopMatches(userVector: number[], topN: number = 5): Pr
         const sim = cosineSimilarity(userVector, candidateVector);
         const score = calculateComplementarityScore(userVector, candidateVector);
 
+        let reasoning = generateReasoning(userVector, candidateVector, sim);
+        if (userSynthesis) {
+          try {
+            reasoning = await generateMatchReasoning(
+              userSynthesis,
+              "Resonant Soul",
+              candidate.reasoning || "ベクトル空間上で共鳴する存在。",
+              [],
+              Math.round(sim * 100),
+              Math.round(score)
+            );
+          } catch {
+            /* fallback */
+          }
+        }
         results.push({
           matchUser: {
             id: candidate.userId,
@@ -160,7 +180,7 @@ export async function findTopMatches(userVector: number[], topN: number = 5): Pr
           },
           similarity: sim,
           growthScore: Math.round(score),
-          reasoning: generateReasoning(userVector, candidateVector, sim),
+          reasoning,
         });
       }
 
@@ -175,20 +195,39 @@ export async function findTopMatches(userVector: number[], topN: number = 5): Pr
   }
 
   // 2. アーキタイプ（50人）をフォールバック
-  const results: MatchResult[] = ARCHETYPE_USERS.map((arch) => {
+  const scored = ARCHETYPE_USERS.map((arch) => {
     const sim = cosineSimilarity(userVector, arch.vector);
     const score = calculateComplementarityScore(userVector, arch.vector);
-    return {
+    return { arch, sim, score };
+  })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topN);
+
+  const results: MatchResult[] = [];
+  for (const { arch, sim, score } of scored) {
+    let reasoning = generateReasoning(userVector, arch.vector, sim);
+    if (userSynthesis) {
+      try {
+        reasoning = await generateMatchReasoning(
+          userSynthesis,
+          arch.name,
+          arch.bio,
+          arch.tags,
+          Math.round(sim * 100),
+          Math.round(score)
+        );
+      } catch {
+        // フォールバックは既に reasoning に設定済み
+      }
+    }
+    results.push({
       matchUser: arch,
       similarity: sim,
       growthScore: Math.round(score),
-      reasoning: generateReasoning(userVector, arch.vector, sim),
-    };
-  });
-
-  return results
-    .sort((a, b) => b.growthScore - a.growthScore)
-    .slice(0, topN);
+      reasoning,
+    });
+  }
+  return results;
 }
 
 // 後方互換

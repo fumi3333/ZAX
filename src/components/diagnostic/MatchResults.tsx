@@ -23,9 +23,10 @@ interface Match {
 
 interface MatchResultsProps {
   userVector: number[];
+  synthesis?: string;
 }
 
-export default function MatchResults({ userVector }: MatchResultsProps) {
+export default function MatchResults({ userVector, synthesis }: MatchResultsProps) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [feedbackTarget, setFeedbackTarget] = useState<Match | null>(null);
@@ -36,7 +37,7 @@ export default function MatchResults({ userVector }: MatchResultsProps) {
         const res = await fetch("/api/match", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ vector: userVector, topN: 5 }),
+          body: JSON.stringify({ vector: userVector, topN: 5, synthesis }),
         });
         const data = await res.json();
         if (data.success) {
@@ -53,7 +54,7 @@ export default function MatchResults({ userVector }: MatchResultsProps) {
     } else {
       setLoading(false);
     }
-  }, [userVector]);
+  }, [userVector, synthesis]);
 
   if (loading) {
     return (
