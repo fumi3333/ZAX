@@ -1,14 +1,12 @@
 # Next.js on Cloud Run (Google Cloud)
-# マルチステージビルドでイメージサイズを最適化
+# Based on https://github.com/vercel/next.js/tree/canary/examples/with-docker
 
-FROM node:20-slim AS base
-
-# 1. 依存関係のインストール
-FROM base AS deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+# 1. 依存関係
+FROM base AS deps
 COPY package.json package-lock.json ./
 RUN npm ci
 
@@ -18,23 +16,20 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Prisma generate 用（ビルド時のみダミーURLでOK）
 ENV DATABASE_URL="postgresql://localhost:5432/dummy"
-RUN npx prisma generate
-
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
 
-# 3. 本番ランタイム
+RUN npx prisma generate && npm run build
+
+# 3. 本番
 FROM base AS runner
-RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN groupadd --system --gid 1001 nodejs
-RUN useradd --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
@@ -43,8 +38,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 EXPOSE 3000
-
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-
 CMD ["node", "server.js"]
