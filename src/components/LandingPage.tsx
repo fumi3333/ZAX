@@ -57,8 +57,8 @@ export default function LandingPage() {
             transition={{ delay: 0.12, duration: 0.5 }}
             className="text-lg md:text-xl text-slate-600 leading-relaxed mb-4 max-w-xl"
           >
-            価値観でつながる、
-            <span className="font-semibold text-slate-900"> 新しい知性体コミュニケーション</span>
+            人とのつながりをサポートし、
+            <span className="font-semibold text-slate-900"> 自分の変化を可視化する</span>
           </motion.p>
 
           <motion.p
@@ -67,7 +67,7 @@ export default function LandingPage() {
             transition={{ delay: 0.18, duration: 0.5 }}
             className="text-sm text-slate-500 mb-12 max-w-md"
           >
-            50の質問から、あなたの価値観を可視化します。
+            50の質問から、価値観とつながり方を可視化します。
           </motion.p>
 
           <motion.div
