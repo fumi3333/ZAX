@@ -13,7 +13,7 @@ const navLinks = [
 ];
 
 export default function CorporateHeader() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <>
@@ -28,70 +28,87 @@ export default function CorporateHeader() {
               ZAX
             </Link>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-[13px] font-medium text-slate-500 hover:text-slate-900 tracking-wide transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <Link
-                href="/diagnostic"
-                className="px-5 py-2 bg-slate-900 text-white text-[13px] font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm hover:shadow-md"
-              >
-                無料で始める
-              </Link>
-            </nav>
-
-            {/* Mobile */}
+            {/* Hamburger Button — always visible */}
             <button
-              className="md:hidden p-2 text-slate-700"
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="メニュー"
+              className="p-2 text-slate-700 hover:text-slate-900 transition-colors"
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="メニューを開く"
             >
-              <Menu size={22} />
+              <Menu size={22} strokeWidth={2} />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Overlay */}
+      {/* Fullscreen Menu Overlay */}
       <AnimatePresence>
-        {isMobileMenuOpen && (
+        {isMenuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white z-[100] flex flex-col md:hidden"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-white z-[100] flex flex-col"
           >
-            <div className="flex items-center justify-between px-6 h-16 border-b border-slate-100">
-              <span className="text-xl font-bold text-slate-900">ZAX</span>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-slate-700">
-                <X size={22} />
+            {/* Header row */}
+            <div className="flex items-center justify-between px-6 lg:px-10 h-16 border-b border-slate-100">
+              <Link
+                href="/"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-xl font-bold text-slate-900"
+              >
+                ZAX
+              </Link>
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="p-2 text-slate-700 hover:text-slate-900 transition-colors"
+                aria-label="メニューを閉じる"
+              >
+                <X size={22} strokeWidth={2} />
               </button>
             </div>
-            <div className="flex flex-col px-6 pt-8 gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="py-4 text-lg font-medium text-slate-800 border-b border-slate-100"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <Link
-                href="/diagnostic"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="mt-8 py-3 text-center bg-slate-900 text-white font-semibold rounded-lg"
+
+            {/* Navigation Links */}
+            <nav className="flex-1 flex flex-col justify-center px-10 md:px-20 lg:px-32">
+              <div className="space-y-2">
+                {navLinks.map((link, i) => (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 + i * 0.06, duration: 0.3 }}
+                  >
+                    <Link
+                      href={link.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block py-5 text-3xl md:text-5xl font-bold text-slate-900 hover:text-slate-500 tracking-tight transition-colors border-b border-slate-100"
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* CTA Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 + navLinks.length * 0.06, duration: 0.3 }}
+                className="mt-12"
               >
-                無料で始める
-              </Link>
+                <Link
+                  href="/diagnostic"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white text-base font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm hover:shadow-md"
+                >
+                  無料で診断を開始
+                </Link>
+              </motion.div>
+            </nav>
+
+            {/* Footer */}
+            <div className="px-10 md:px-20 lg:px-32 pb-10 text-xs text-slate-400 tracking-wider">
+              &copy; 2026 ZAX — Value-Based Connection
             </div>
           </motion.div>
         )}

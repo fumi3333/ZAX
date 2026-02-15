@@ -42,15 +42,6 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 w-full max-w-3xl px-6 flex flex-col items-center text-center">
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-block px-4 py-1.5 mb-10 rounded-full bg-white text-slate-500 text-xs font-medium tracking-wider border border-slate-200/60 shadow-sm"
-          >
-            VALUE-BASED CONNECTION
-          </motion.span>
-
           <motion.h1
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}

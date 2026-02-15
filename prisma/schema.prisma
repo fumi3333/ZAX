@@ -54,6 +54,29 @@ model Feedback {
   @@map("feedbacks")
 }
 
+model Interaction {
+  id String @id @default(uuid())
+
+  userAId String
+  userBId String
+
+  // マッチング時点のベクトル（スナップショット）
+  vectorA String // JSON: [80,60,90,45,70,85]
+  vectorB String
+
+  // フィードバック（ユーザーAから見たB）
+  fulfillmentScore Int?  // 充足感 (1-10)
+  willMeetAgain    Int?  // また会いたい (1-10)
+  partnerSeemed    Int?  // 相手は楽しそう (1-10)
+  growthPotential  Int?  // 成長できそう (1-10)
+  feedbackText     String? // 自由記述
+
+  createdAt DateTime @default(now())
+
+  @@map("interactions")
+  @@index([userAId, createdAt(sort: Desc)])
+}
+
 model DiagnosticResult {
   id        String   @id @default(uuid())
   userId    String
