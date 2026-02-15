@@ -80,7 +80,54 @@ export interface MatchResult {
     reasoning: string;
 }
 
-export function findBestMatch(userVector: number[]): MatchResult {
+import { vectorStore } from "../db/client";
+
+// ... (keep ARCHETYPE_USERS and math utils)
+
+export async function findBestMatch(userVector: number[]): Promise<MatchResult> {
+    
+    // 1. Try DB Search (Real Users)
+    try {
+        const dbCandidates = await vectorStore.searchSimilar(userVector, 20);
+        
+        if (dbCandidates.length > 0) {
+            let bestDbMatch: MatchResult | null = null;
+            let maxScore = -1;
+
+            for (const candidate of dbCandidates) {
+                // Parse 6-dim vector (stored as string like "[1,2,3]")
+                let candidateVector: number[] = [];
+                try {
+                    candidateVector = JSON.parse(candidate.vector);
+                } catch (e) { continue; }
+
+                // Calculate Resonance
+                const score = calculateComplementarityScore(userVector, candidateVector);
+                const sim = cosineSimilarity(userVector, candidateVector);
+
+                if (score > maxScore) {
+                     maxScore = score;
+                     bestDbMatch = {
+                        matchUser: {
+                            id: candidate.userId,
+                            name: "Resonant Soul", 
+                            vector: candidateVector,
+                            bio: candidate.reasoning || "A mysterious connection.",
+                            tags: []
+                        },
+                        similarity: sim,
+                        growthScore: Math.round(score),
+                        reasoning: generateMathReasoning(userVector, candidateVector, sim)
+                     };
+                }
+            }
+            if (bestDbMatch) return bestDbMatch;
+        }
+    } catch (e) {
+        console.warn("DB Match failed, falling back to Archetypes", e);
+    }
+
+    // 2. Fallback to Archetype (Original Logic)
     let bestMatch: MatchResult | null = null;
     let maxScore = -1;
 

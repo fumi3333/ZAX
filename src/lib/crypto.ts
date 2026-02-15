@@ -1,7 +1,16 @@
 import crypto from 'crypto';
 
 // Use a secure key from environment variables or fallback to a hardcoded one for dev (WARNING: Change this in production!)
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'zax-development-secret-key-256bit'; // Must be 32 chars
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'zax_dev_key_32chars_placeholder!'; 
+
+if (process.env.NODE_ENV === 'production' && !process.env.ENCRYPTION_KEY) {
+    console.warn("WARNING: ENCRYPTION_KEY is not defined. Using fallback for build.");
+}
+
+if (ENCRYPTION_KEY.length !== 32) {
+    // console.warn("WARNING: ENCRYPTION_KEY should be 32 characters for AES-256.");
+    // We allow it to pass here but the hash below ensures we get a 32-byte key anyway.
+}
 const IV_LENGTH = 16; // For AES, this is always 16
 
 /**

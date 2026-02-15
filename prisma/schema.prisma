@@ -1,45 +1,67 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"] // 拡張機能を有効化
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:c:/ZAX/prisma/dev.db"
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector] // pgvector拡張
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  password      String // Hashed password
-  createdAt     DateTime  @default(now())
-
-  // Optional: Future-proof for OAuth or Profile
-  name          String?
-  image         String?
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // bcryptでハッシュ化されたパスワード
+  createdAt DateTime @default(now())
   
-  vectors       EssenceVector[]
-  feedbacks     Feedback[]
+  // Relations
+  vectors    EssenceVector[]
+  feedbacks  Feedback[]
+  diagnostics DiagnosticResult[]
+
+  @@map("users")
 }
 
 model EssenceVector {
   id             String   @id @default(uuid())
-  vector         String   // JSON string of number[]
-  embedding      String?  // JSON string of large embedding (1536 dim) - optional for now
-  reasoning      String
-  resonanceScore Float
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 6次元のエッセンスベクトル (検索用)
+  // Unsupported型を使用してDBのvector型に直接マッピング
+  vector         Unsupported("vector(6)") 
+  
+  // JSON文字列表現 (フロントエンド表示用バックアップ)
+  vectorJson     String   
+
+  reasoning      String   
+  resonanceScore Float    @default(0.0)
   createdAt      DateTime @default(now())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  @@map("essence_vectors")
 }
 
 model Feedback {
   id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
   content     String
-  deltaVector String   // JSON string of number[]
-  growthScore Float    @default(0)
+  deltaVector String   // JSON string
+  growthScore Float
   createdAt   DateTime @default(now())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  @@map("feedbacks")
+}
+
+model DiagnosticResult {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  answers   String   // JSON
+  synthesis String   
+  vector    String   // JSON
+  createdAt DateTime @default(now())
+
+  @@map("diagnostic_results")
 }

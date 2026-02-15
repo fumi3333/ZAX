@@ -5,7 +5,7 @@ import { manualLogin } from '@/lib/actions/manual-auth';
 import Link from 'next/link';
 
 export default function LoginPage() {
-  const [errorMessage, formAction, isPending] = useActionState(manualLogin, undefined);
+  const [state, formAction, isPending] = useActionState(manualLogin, { message: "" });
 
   return (
     <main className="flex items-center justify-center md:h-screen bg-slate-50">
@@ -17,7 +17,7 @@ export default function LoginPage() {
         <form action={formAction} className="space-y-3">
           <div className="flex-1 rounded-lg bg-white px-6 pb-4 pt-8 shadow-sm border border-slate-200">
             <h1 className="mb-3 text-2xl font-bold text-slate-900">
-              Please log in
+              ログイン
             </h1>
             <div className="w-full">
               <div>
@@ -25,7 +25,7 @@ export default function LoginPage() {
                   className="mb-3 mt-5 block text-xs font-medium text-slate-900"
                   htmlFor="email"
                 >
-                  Email
+                  メールアドレス
                 </label>
                 <div className="relative">
                   <input
@@ -33,7 +33,7 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     name="email"
-                    placeholder="Enter your university email address"
+                    placeholder="大学のメールアドレスを入力"
                     required
                   />
                 </div>
@@ -43,7 +43,7 @@ export default function LoginPage() {
                   className="mb-3 mt-5 block text-xs font-medium text-slate-900"
                   htmlFor="password"
                 >
-                  Password
+                  パスワード
                 </label>
                 <div className="relative">
                   <input
@@ -51,7 +51,7 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     name="password"
-                    placeholder="Enter password (mock: any)"
+                    placeholder="パスワードを入力"
                     required
                     minLength={1}
                   />
@@ -64,17 +64,17 @@ export default function LoginPage() {
               aria-live="polite"
               aria-atomic="true"
             >
-              {errorMessage && (
-                <p className="text-sm text-red-500">{errorMessage}</p>
+              {state.message && (
+                <p className="text-sm text-red-500">{state.message}</p>
               )}
             </div>
           </div>
         </form>
         
         <div className="text-center text-sm">
-          Don't have an account?{' '}
+          アカウントをお持ちでないですか？{' '}
           <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
-            Register here
+            新規登録はこちら
           </Link>
         </div>
       </div>
@@ -89,7 +89,7 @@ function LoginButton({ pending }: { pending: boolean }) {
       aria-disabled={pending}
       disabled={pending}
     >
-      {pending ? 'Logging in...' : 'Log in'}
+      {pending ? 'ログイン中...' : 'ログイン'}
     </button>
   );
 }

@@ -2,9 +2,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = process.env.GOOGLE_API_KEY || "";
 
-const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-const embeddingModel = genAI.getGenerativeModel({ model: "embedding-001" }); // High-Dim Core
+export const genAI = new GoogleGenerativeAI(API_KEY);
+export const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+export const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" }); // Updated to latest stable embedding model
 
 export interface AnalysisResult {
     vector: number[]; // 6-dim radar chart stats (0-100) -> V_display
@@ -24,19 +24,24 @@ export async function analyzeEssence(inputs: string[], biases: number[] = [50, 5
     }
 
     // 1. Generate V_display (6-dim) via LLM
+    // Sanitize function to prevent simple injection
+    const sanitize = (str: string) => str.replace(/`/g, "'").replace(/\$/g, "");
+    
+    const safeInputs = inputs.map(sanitize);
+
     const prompt = `
     Analyze the following three personal fragments to construct a 6-dimensional "Essence Vector".
     
-    User Goal/Purpose: "${purpose}"
-    * Important: The user is seeking "${purpose}" functionality to maximize their life happiness. 
+    User Goal/Purpose: "${sanitize(purpose)}"
+    * Important: The user is seeking "${sanitize(purpose)}" functionality to maximize their life happiness. 
     * If purpose is "romance", prioritize Empathy and Chemistry cues.
     * If "happiness" (growth), prioritize Determination and Creativity.
     * If "friendship", prioritize Flexibility and Intuition.
 
     Fragments:
-    1. ${inputs[0]}
-    2. ${inputs[1]}
-    3. ${inputs[2]}
+    1. ${safeInputs[0]}
+    2. ${safeInputs[1]}
+    3. ${safeInputs[2]}
 
     User Self-Reported Bias (0=Intuition, 100=Logic):
     1. ${biases[0]}

@@ -3,6 +3,7 @@ import { analyzeEssence } from "@/lib/gemini";
 import { vectorStore } from "@/lib/db/client";
 import { z } from "zod";
 import { encrypt } from "@/lib/crypto";
+import { cookies } from "next/headers";
 
 export const runtime = "nodejs";
 
@@ -32,18 +33,21 @@ export async function POST(request: Request) {
         const result = await analyzeEssence(inputs, numericBiases);
 
         // [DB] Persist the analysis result
-        // For MVP, we generate a session-based ID or random guest ID
-        const guestId = "guest_demo_" + new Date().getTime();
+        const cookieStore = await cookies();
+
+        const sessionId = cookieStore.get('zax-session')?.value;
+        const userId = sessionId || "guest_" + new Date().getTime();
         
         // 3. Data Encryption (Encrypt sensitive reasoning before saving)
-        // We clone the vector data to avoid mutating the response sent back to client (optional, but safer)
         const encryptedReasoning = encrypt(result.reasoning);
 
         // Save with encrypted reasoning
-        await vectorStore.saveEmbedding(guestId, {
-            ...result,
-            reasoning: encryptedReasoning
-        }, 'personality');
+        await vectorStore.saveEmbedding(
+            userId,
+            result.vector,
+            encryptedReasoning,
+            result.resonance_score || 0
+        );
 
         // Return PLAIN text to the user (they need to see their own result immediately)
         return NextResponse.json(result);

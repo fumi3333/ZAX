@@ -5,8 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Check, Activity, Sparkles, X, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+export interface EssenceInputData {
+    fragments: string[];
+    biases: number[];
+    purpose: string;
+}
+
 interface EssenceInputProps {
-    onComplete: (data: { fragments: string[], biases: number[], purpose: string }) => void;
+    onComplete: (data: EssenceInputData) => void;
 }
 
 export default function EssenceInput({ onComplete }: EssenceInputProps) {

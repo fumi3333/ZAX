@@ -1,18 +1,15 @@
 'use client';
 
-import EssenceInput from '@/components/EssenceInput';
+import EssenceInput, { EssenceInputData } from '@/components/EssenceInput';
 import VectorTransformationVisual from '@/components/VectorTransformationVisual';
 import { useRouter } from 'next/navigation';
-import { saveAnalysisResult } from '@/lib/actions/manual-auth';
-
 export default function InputClient() {
   const router = useRouter();
 
-  const handleComplete = async (data: any) => {
+  const handleComplete = async (data: EssenceInputData) => {
       console.log("Input Complete:", data);
       
-      // Save Mock Analysys Result
-      await saveAnalysisResult(data);
+      // TODO: Save analysis result when backend is ready
       
       // Redirect to Chat
       router.push('/chat');

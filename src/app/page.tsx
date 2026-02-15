@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Sparkles, Brain, Zap, Shield, Menu, X } from "lucide-react";
 import EssenceInput from "@/components/EssenceInput";
@@ -108,27 +107,29 @@ export default function Home() {
               </h1>
 
               {/* Huge CTA Button */}
-              <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 30px 60px rgba(124, 58, 237, 0.4)" }}
-                whileTap={{ scale: 0.98 }}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                onClick={() => setView("input")}
-                className="group relative px-24 py-12 rounded-full font-black text-4xl overflow-hidden tracking-widest"
-                style={{
-                  background: 'linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)',
-                  color: 'white',
-                  boxShadow: '0 20px 50px rgba(124, 58, 237, 0.3)',
-                }}
-              >
-                <span className="relative z-10 flex items-center justify-center gap-6">
-                  診断を開始
-                  <ArrowRight className="w-10 h-10 group-hover:translate-x-3 transition-transform duration-300" strokeWidth={3} />
-                </span>
-                {/* Shine effect */}
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
-              </motion.button>
+              {/* Huge CTA Button */}
+              <Link href="/diagnostic" legacyBehavior>
+                <motion.a
+                  whileHover={{ scale: 1.02, boxShadow: "0 30px 60px rgba(124, 58, 237, 0.4)" }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                  className="group relative px-24 py-12 rounded-full font-black text-4xl overflow-hidden tracking-widest inline-flex items-center justify-center cursor-pointer"
+                  style={{
+                    background: 'linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)',
+                    color: 'white',
+                    boxShadow: '0 20px 50px rgba(124, 58, 237, 0.3)',
+                  }}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-6">
+                    診断を開始
+                    <ArrowRight className="w-10 h-10 group-hover:translate-x-3 transition-transform duration-300" strokeWidth={3} />
+                  </span>
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
+                </motion.a>
+              </Link>
               
               <div className="mt-24 text-sm text-gray-400 font-mono tracking-[0.3em] opacity-50 animate-pulse">
                 SCROLL TO DISCOVER

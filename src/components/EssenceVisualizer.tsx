@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 interface EssenceVisualizerProps {
     vector?: number[];
@@ -15,16 +15,9 @@ export default function EssenceVisualizer({ vector, interactive = true }: Essenc
 
     useEffect(() => {
         if (vector && vector.length === 6) {
-            // If vector is provided, animate to it
             setPoints(vector);
-        } else if (!interactive) {
-            // Simulate data analysis updating the vector points if no vector yet AND not interactive
-            const interval = setInterval(() => {
-                setPoints(points.map(() => Math.random() * 80 + 20));
-            }, 800);
-            return () => clearInterval(interval);
         }
-    }, [vector, interactive]);
+    }, [vector]);
 
     const handleSliderChange = (index: number, value: number) => {
         const newPoints = [...points];
@@ -32,12 +25,14 @@ export default function EssenceVisualizer({ vector, interactive = true }: Essenc
         setPoints(newPoints);
     };
 
-    const polyPoints = points.map((val, i) => {
-        const angle = (Math.PI * 2 * i) / 6; // 6 dimensions
-        const x = 100 + val * Math.cos(angle);
-        const y = 100 + val * Math.sin(angle);
-        return `${x},${y}`;
-    }).join(" ");
+    const polyPoints = useMemo(() => {
+        return points.map((val, i) => {
+            const angle = (Math.PI * 2 * i) / 6; // 6 dimensions
+            const x = 100 + val * Math.cos(angle);
+            const y = 100 + val * Math.sin(angle);
+            return `${x},${y}`;
+        }).join(" ");
+    }, [points]);
 
     const labels = ["Logic", "Intuition", "Empathy", "Ethics", "Passion", "Resilience"];
 

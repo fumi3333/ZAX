@@ -10,7 +10,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid vector format" }, { status: 400 });
         }
 
-        const matchResult = findBestMatch(vector);
+        const matchResult = await findBestMatch(vector);
 
         return NextResponse.json({
             success: true,

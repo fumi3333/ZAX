@@ -27,16 +27,13 @@ export default function AboutPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-none tracking-tighter mb-8 text-slate-900">
+                    <div className="text-xs font-mono font-bold tracking-[0.3em] text-indigo-500 mb-8 uppercase">Vision</div>
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-none tracking-tighter text-slate-900">
                         Restoring<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
                             Human Resonance
                         </span>
                     </h1>
-                    <p className="text-slate-600 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-light">
-                        属性ではなく「本質」で繋がる世界を、<br className="hidden md:block" />
-                        テクノロジーの力でつくる。
-                    </p>
                 </motion.section>
 
                 {/* ───────────────────────────────────────────── */}
