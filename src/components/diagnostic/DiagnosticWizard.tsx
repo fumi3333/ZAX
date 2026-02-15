@@ -17,10 +17,8 @@ export default function DiagnosticWizard() {
 
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
-  // Progress based on current question index (0-indexed, so +1 for display)
-  const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-  // Check if all questions answered (more lenient: 80% or at last question)
   const answeredCount = Object.keys(answers).length;
+  const progress = (answeredCount / totalQuestions) * 100;
   const allAnswered = answeredCount >= totalQuestions * 0.8 || 
                       (currentQuestionIndex === totalQuestions - 1 && answeredCount >= totalQuestions * 0.7);
 
