@@ -160,7 +160,7 @@ export async function findTopMatches(
           try {
             reasoning = await generateMatchReasoning(
               userSynthesis,
-              "Resonant Soul",
+              "共鳴する魂",
               candidate.reasoning || "ベクトル空間上で共鳴する存在。",
               [],
               Math.round(sim * 100),
@@ -173,7 +173,7 @@ export async function findTopMatches(
         results.push({
           matchUser: {
             id: candidate.userId,
-            name: "Resonant Soul",
+            name: "共鳴する魂",
             vector: candidateVector,
             bio: candidate.reasoning || "ベクトル空間上で共鳴する存在。",
             tags: [],

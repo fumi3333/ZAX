@@ -27,7 +27,7 @@ export default function ResultRadarChart({ data }: ResultRadarChartProps) {
             dataKey="subject" 
             tick={{ fill: '#4b5563', fontSize: 12, fontWeight: 600 }}
           />
-          <PolarRadiusAxis angle={30} domain={[0, 5]} tick={false} axisLine={false} />
+          <PolarRadiusAxis angle={30} domain={[0, data[0]?.fullMark ?? 100]} tick={false} axisLine={false} />
           <Radar
             name="Personality"
             dataKey="A"

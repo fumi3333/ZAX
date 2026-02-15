@@ -1,13 +1,14 @@
 'use client';
 
 import BlindChat from '@/components/BlindChat';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function ChatClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const partnerName = searchParams.get('partner') || undefined;
 
   const handleEndChat = () => {
-    // Navigate back to home or dashboard
     router.push('/');
   };
 
@@ -21,7 +22,7 @@ export default function ChatClient() {
         </div>
 
        <div className="relative z-10 w-full max-w-2xl">
-            <BlindChat onEndChat={handleEndChat} />
+            <BlindChat partnerName={partnerName} onEndChat={handleEndChat} />
        </div>
     </div>
   );

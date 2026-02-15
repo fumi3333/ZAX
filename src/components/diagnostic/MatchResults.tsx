@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Users, Zap, TrendingUp, MessageCircle } from "lucide-react";
+import Link from "next/link";
 import CompareRadarChart from "./CompareRadarChart";
-import FeedbackDialog from "./FeedbackDialog";
 
 interface MatchUser {
   id: string;
@@ -29,7 +29,6 @@ interface MatchResultsProps {
 export default function MatchResults({ userVector, synthesis }: MatchResultsProps) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [feedbackTarget, setFeedbackTarget] = useState<Match | null>(null);
 
   useEffect(() => {
     async function fetchMatches() {
@@ -84,7 +83,7 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
       >
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-50 text-rose-600 font-bold text-sm">
           <Users className="w-4 h-4" />
-          RESONANCE MATCH
+          共鳴マッチ
         </div>
         <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900">
           あなたと<span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-indigo-600">共鳴する</span>パートナー
@@ -160,32 +159,26 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
                   partnerVector={match.matchUser.vector}
                 />
 
-                {/* AI Reasoning */}
+                {/* 相性の理由 */}
                 <div className="bg-slate-50 rounded-xl p-3">
                   <p className="text-xs text-slate-600 leading-relaxed">
                     {match.reasoning}
                   </p>
                 </div>
 
-                {/* Feedback Button */}
-                <button
-                  onClick={() => setFeedbackTarget(match)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+                {/* チャット → 会う フロー */}
+                <Link
+                  href={`/chat?partner=${encodeURIComponent(match.matchUser.name)}`}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  フィードバックを送る
-                </button>
+                  チャットを始める
+                </Link>
               </div>
             </div>
           </motion.div>
         ))}
       </div>
-
-      {/* Feedback Dialog */}
-      <FeedbackDialog
-        match={feedbackTarget}
-        onClose={() => setFeedbackTarget(null)}
-      />
     </section>
   );
 }

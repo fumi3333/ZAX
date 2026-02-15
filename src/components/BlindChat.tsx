@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Send, Zap } from "lucide-react";
+import { Send, Zap, Coffee } from "lucide-react";
 
 interface BlindChatProps {
+    partnerName?: string;
     onEndChat: () => void;
 }
 
-export default function BlindChat({ onEndChat }: BlindChatProps) {
+export default function BlindChat({ partnerName, onEndChat }: BlindChatProps) {
     const [messages, setMessages] = useState<{ id: number; text: string; sender: "me" | "them" }[]>([
         { id: 1, text: "はじめまして。", sender: "them" },
     ]);
@@ -69,8 +70,8 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
                         <div className="absolute inset-0 rounded-full border border-blue-200 opacity-50" />
                     </div>
                     <div>
-                        <div className="text-[10px] text-slate-400 tracking-widest uppercase mb-0.5 font-bold">Connected to</div>
-                        <div className="text-base font-bold text-slate-800 font-mono tracking-tight">#88X-29</div>
+                        <div className="text-[10px] text-slate-400 tracking-widest uppercase mb-0.5 font-bold">相手</div>
+                        <div className="text-base font-bold text-slate-800 tracking-tight">{partnerName || '共鳴する相手'}</div>
                     </div>
                 </div>
                 
@@ -78,7 +79,7 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
                     <div className="flex flex-col items-end">
                         <div className="flex items-center gap-1 text-blue-600 text-xs font-mono mb-1 tracking-wider font-bold">
                             <Zap size={12} fill="currentColor" />
-                            RESONANCE: {Math.round(resonance)}%
+                            共鳴度: {Math.round(resonance)}%
                         </div>
                         <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                             <motion.div
@@ -92,7 +93,7 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
                         onClick={onEndChat}
                         className="text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors border-l border-slate-200 pl-6 py-1 font-bold"
                     >
-                        End Sim
+                        終了
                     </button>
                 </div>
             </div>
@@ -119,11 +120,15 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="flex justify-center my-4"
+                        className="flex flex-col items-center gap-3 my-4"
                     >
-                        <span className="px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-bold tracking-[0.2em] animate-pulse shadow-sm">
-                            SYNERGY SPIKE DETECTED
+                        <span className="px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-bold tracking-wider shadow-sm">
+                            共鳴度高
                         </span>
+                        <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-full transition-colors">
+                            <Coffee className="w-4 h-4" />
+                            会う約束をする
+                        </button>
                     </motion.div>
                 )}
             </div>
@@ -136,7 +141,7 @@ export default function BlindChat({ onEndChat }: BlindChatProps) {
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                        placeholder="Type to resonate..."
+                        placeholder="メッセージを入力..."
                         className="flex-1 bg-transparent border-none px-6 text-slate-800 placeholder-slate-400 focus:outline-none text-sm font-medium tracking-wide"
                     />
                     <motion.button

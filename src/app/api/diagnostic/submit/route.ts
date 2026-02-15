@@ -91,10 +91,10 @@ export async function POST(req: Request) {
         }
     }
 
-    profileText += "\n\n指示: この人物の強み、弱み、コミュニケーションスタイル、適した環境について、プロの心理分析官としてレポートを作成してください。あなたは高度な心理分析AIです。";
+    profileText += "\n\n指示: この人物の強み、弱み、コミュニケーションスタイル、適した環境について、プロの心理分析官としてレポートを作成してください。出力に「AI」という語は含めないでください。";
 
     // 3. Call Gemini for Synthesis
-    let synthesis = "AI分析サービスに一時的な制限がかかっているため、簡易分析を表示します。\n\nあなたは非常にバランスの取れた性格で、周囲との調和を大切にしながらも、自分の芯をしっかり持っています。";
+    let synthesis = "分析サービスに一時的な制限がかかっているため、簡易分析を表示します。\n\nあなたは非常にバランスの取れた性格で、周囲との調和を大切にしながらも、自分の芯をしっかり持っています。";
     try {
         const result = await model.generateContent(profileText);
         const response = await result.response;
@@ -135,7 +135,7 @@ export async function POST(req: Request) {
     await vectorStore.saveEmbedding(
         userId,
         vector,
-        "Personality Diagnostic Result",
+        "性格診断結果",
         1.0 // Self-declared resonance score
     );
 

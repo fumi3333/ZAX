@@ -18,8 +18,7 @@ export default function DiagnosticWizard() {
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
   const answeredCount = Object.keys(answers).length;
-  const progress = (answeredCount / totalQuestions) * 100;
-  const allAnswered = answeredCount >= totalQuestions * 0.8 || 
+  const allAnswered = answeredCount >= totalQuestions * 0.8 ||
                       (currentQuestionIndex === totalQuestions - 1 && answeredCount >= totalQuestions * 0.7);
 
   const handleAnswer = (value: number) => {
@@ -53,17 +52,12 @@ export default function DiagnosticWizard() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      console.log('Submitting diagnostic with answers:', answers);
       const response = await fetch('/api/diagnostic/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answers }),
       });
-      
-      console.log('Response status:', response.status);
       const data = await response.json();
-      console.log('Response data:', data);
-      
       if (response.ok && data.success) {
         const resultData = { id: data.id, synthesis: data.synthesis, answers: data.answers };
         sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify(resultData));
@@ -94,20 +88,6 @@ export default function DiagnosticWizard() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 min-h-[600px] flex flex-col justify-center">
-      {/* Progress Bar */}
-      <div className="mb-8 space-y-2">
-        <div className="flex justify-between text-xs font-semibold text-slate-500 tracking-wider">
-          <span>PROGRESS</span>
-          <span>{answeredCount} / {totalQuestions} 回答済み</span>
-        </div>
-        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-indigo-600 transition-all duration-500 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
       <div className="relative perspective-1000">
           <Card 
             ref={cardRef}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { questions } from "@/data/questions";
+import { DIMENSION_LABELS } from "@/lib/rec/engine";
 import ResultRadarChart from "./ResultRadarChart";
 import MatchResults from "./MatchResults";
 import Link from "next/link";
@@ -71,38 +72,47 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
   const answers = data.answers;
 
-  const categoryScores: Record<string, { sum: number; count: number; label: string }> = {};
-  questions.forEach((q) => {
-    if (!categoryScores[q.category]) {
-      categoryScores[q.category] = { sum: 0, count: 0, label: q.categoryJa };
-    }
-  });
+  // 5カテゴリ（質問ベース）のスコア計算
+  const CATEGORY_ORDER = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
+  const categoryScores: Record<string, { sum: number; count: number }> = {};
+  CATEGORY_ORDER.forEach((c) => { categoryScores[c] = { sum: 0, count: 0 }; });
 
   Object.entries(answers).forEach(([qId, score]) => {
     const q = questions.find((q) => q.id === Number(qId));
-    if (q) {
+    if (q && categoryScores[q.category]) {
       categoryScores[q.category].sum += score;
       categoryScores[q.category].count += 1;
     }
   });
 
-  const chartData = Object.keys(categoryScores).map((key) => ({
-    subject: categoryScores[key].label,
-    A: parseFloat((categoryScores[key].sum / categoryScores[key].count).toFixed(1)),
-    fullMark: 5,
-  }));
-
-  const rawScores = Object.keys(categoryScores).map((key) => {
-    const avg = categoryScores[key].sum / categoryScores[key].count;
+  // 0-100スケールの生スコア（カテゴリ順: Social, Empathy, Discipline, Openness, Emotional）
+  const rawByCat = CATEGORY_ORDER.map((c) => {
+    const d = categoryScores[c];
+    const avg = d.count > 0 ? d.sum / d.count : 4;
     return Math.round(((avg - 1) / 6) * 100);
   });
+  const [social, empathy, discipline, openness, emotional] = rawByCat;
 
-  const avgAll =
-    rawScores.length > 0 ? Math.round(rawScores.reduce((a, b) => a + b, 0) / rawScores.length) : 50;
-  const userVector6d =
-    rawScores.length >= 5 ? [...rawScores.slice(0, 5), avgAll] : [50, 50, 50, 50, 50, 50];
+  // マッチングと同じ6次元にマッピング: 論理性, 直感力, 共感性, 意志力, 創造性, 柔軟性
+  const userVector6d: number[] = [
+    discipline,   // 論理性 ← 誠実性
+    openness,     // 直感力 ← 開放性
+    empathy,      // 共感性 ← 協調性
+    discipline,   // 意志力 ← 誠実性
+    openness,     // 創造性 ← 開放性
+    Math.round((emotional + social) / 2),  // 柔軟性 ← 情緒安定性・外向性
+  ];
 
-  const synthesisParagraphs = data.synthesis.split("\n").filter((p: string) => p.trim() !== "");
+  const chartData = DIMENSION_LABELS.map((label, i) => ({
+    subject: label,
+    A: userVector6d[i] ?? 50,
+    fullMark: 100,
+  }));
+
+  const synthesisParagraphs = data.synthesis
+    .split("\n")
+    .filter((p: string) => p.trim() !== "")
+    .map((p: string) => p.replace(/AI・?/g, "").replace(/AI分析/g, "分析"));
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
@@ -112,7 +122,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         <section className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-100 text-violet-700 font-bold text-sm">
             <Sparkles className="w-4 h-4" />
-            ANALYSIS COMPLETE
+            分析完了
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
             あなたの
@@ -132,7 +142,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
               <ResultRadarChart data={chartData} />
             </div>
           </div>
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
             {chartData.map((item) => (
               <div key={item.subject} className="p-3 bg-slate-50 rounded-xl">
                 <div className="text-xs text-slate-500 font-bold mb-1">{item.subject}</div>
@@ -146,7 +156,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 relative z-10">
             <Sparkles className="w-6 h-6 text-yellow-400" />
-            AI・心理分析レポート
+            心理分析レポート
           </h2>
           <div className="space-y-6 text-lg leading-relaxed text-slate-300 relative z-10 font-medium">
             {synthesisParagraphs.map((para: string, i: number) =>
