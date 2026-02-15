@@ -9,6 +9,7 @@ const navLinks = [
   { label: "ABOUT US", href: "/about" },
   { label: "VISION", href: "/philosophy" },
   { label: "PRODUCT", href: "/technology" },
+  { label: "DIAGNOSTIC", href: "/diagnostic" },
 ];
 
 export default function CorporateHeader() {
@@ -39,8 +40,8 @@ export default function CorporateHeader() {
                 </Link>
               ))}
               <Link
-                href="/"
-                className="px-5 py-2 bg-slate-900 text-white text-[13px] font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+                href="/diagnostic"
+                className="px-5 py-2 bg-slate-900 text-white text-[13px] font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm hover:shadow-md"
               >
                 無料で始める
               </Link>
@@ -85,7 +86,7 @@ export default function CorporateHeader() {
                 </Link>
               ))}
               <Link
-                href="/"
+                href="/diagnostic"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="mt-8 py-3 text-center bg-slate-900 text-white font-semibold rounded-lg"
               >
