@@ -1,8 +1,8 @@
 import 'dotenv/config';
 
 async function main() {
-  const apiKey = "AIzaSyDxbZpz9eXIm6etTNVupJsugZaDGAy4M2I";
-  console.log("Testing API Key: AIzaSyD...y4M2I");
+  const apiKey = process.env.GOOGLE_API_KEY || "";
+  console.log("Testing API Key...");
 
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);

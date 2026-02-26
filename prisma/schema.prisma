@@ -90,3 +90,14 @@ model DiagnosticResult {
 
   @@map("diagnostic_results")
 }
+
+model GeminiLog {
+  id        String   @id @default(uuid())
+  type      String   // "synthesis", "matching", "error" etc.
+  prompt    String   @db.Text
+  response  String   @db.Text
+  metadata  String?  // JSON string
+  createdAt DateTime @default(now())
+
+  @@map("gemini_logs")
+}

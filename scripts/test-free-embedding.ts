@@ -2,8 +2,8 @@ import 'dotenv/config';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 async function main() {
-  const freeApiKey = "AIzaSyDxbZpz9eXIm6etTNVupJsugZaDGAy4M2I"; // User provided this earlier as the free key
-  console.log("Testing Embedding with FREE Key:", freeApiKey.slice(0, 10) + "...");
+  const freeApiKey = process.env.GOOGLE_API_KEY || ""; // User provided this earlier as the free key
+  console.log("Testing Embedding with Key...");
 
   const genAI = new GoogleGenerativeAI(freeApiKey);
   const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
