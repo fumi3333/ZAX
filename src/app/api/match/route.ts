@@ -4,7 +4,7 @@ import { findTopMatches } from "@/lib/rec/engine";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { vector, topN = 5, synthesis, optimalSimilarity } = body;
+    const { vector, topN = 5, synthesis } = body;
 
     if (!vector || !Array.isArray(vector) || vector.length !== 6) {
       return NextResponse.json(
@@ -13,11 +13,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const opt = typeof optimalSimilarity === 'number' && optimalSimilarity >= 0.1 && optimalSimilarity <= 0.9
-      ? optimalSimilarity
-      : undefined;
-
-    const matches = await findTopMatches(vector, topN, synthesis, opt);
+    const matches = await findTopMatches(vector, topN, synthesis);
 
     return NextResponse.json({
       success: true,

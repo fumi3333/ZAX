@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Building2, Sparkles, Lightbulb, Database } from "lucide-react";
+import { Globe, Building2, Sparkles, Lightbulb, BarChart3, Database } from "lucide-react";
 import EvidenceAnalysis from "@/components/EvidenceAnalysis";
 import ImpactChart from "@/components/ImpactChart";
 
@@ -12,6 +12,7 @@ export default function AboutPage() {
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-[-20%] right-[-10%] w-[1000px] h-[1000px] bg-blue-100/50 rounded-full blur-[120px] mix-blend-multiply" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-purple-100/50 rounded-full blur-[100px] mix-blend-multiply" />
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
             </div>
 
             {/* 縦スクロールレイアウト */}

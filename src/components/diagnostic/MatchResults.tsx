@@ -21,14 +21,6 @@ interface Match {
   reasoning: string;
 }
 
-/** マッチング意図ごとの最適類似度（恋愛=刺激的 / ビジネス=バランス / 友人=深い共感） */
-const PURPOSE_OPTIMAL_SIMILARITY: Record<string, number> = {
-  default: 0.5,
-  romance: 0.4,
-  business: 0.5,
-  friendship: 0.6,
-};
-
 interface MatchResultsProps {
   userVector: number[];
   synthesis?: string;
@@ -37,22 +29,14 @@ interface MatchResultsProps {
 export default function MatchResults({ userVector, synthesis }: MatchResultsProps) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [purpose, setPurpose] = useState<keyof typeof PURPOSE_OPTIMAL_SIMILARITY>("default");
 
   useEffect(() => {
-    setLoading(true);
     async function fetchMatches() {
       try {
-        const optimalSimilarity = PURPOSE_OPTIMAL_SIMILARITY[purpose] ?? 0.5;
         const res = await fetch("/api/match", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            vector: userVector,
-            topN: 5,
-            synthesis,
-            optimalSimilarity,
-          }),
+          body: JSON.stringify({ vector: userVector, topN: 5, synthesis }),
         });
         const data = await res.json();
         if (data.success) {
@@ -69,7 +53,7 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
     } else {
       setLoading(false);
     }
-  }, [userVector, synthesis, purpose]);
+  }, [userVector, synthesis]);
 
   if (loading) {
     return (
@@ -100,18 +84,6 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-50 text-rose-600 font-bold text-sm">
           <Users className="w-4 h-4" />
           共鳴マッチ
-        </div>
-        <div className="flex justify-center">
-          <select
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value as keyof typeof PURPOSE_OPTIMAL_SIMILARITY)}
-            className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 bg-white/80 text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          >
-            <option value="default">目的を選ぶ（バランス）</option>
-            <option value="romance">恋愛・刺激的な出会い</option>
-            <option value="business">ビジネス・協業パートナー</option>
-            <option value="friendship">友人・深い共感</option>
-          </select>
         </div>
         <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900">
           あなたと<span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-indigo-600">共鳴する</span>パートナー

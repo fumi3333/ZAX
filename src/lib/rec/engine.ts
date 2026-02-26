@@ -84,15 +84,11 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   return magA === 0 || magB === 0 ? 0 : dotProduct(a, b) / (magA * magB);
 }
 
-/** 補完性スコア: 類似度 optimalSimilarity をピークとするベルカーブ。ユーザー意図で調整可能。 */
-export const DEFAULT_OPTIMAL_SIMILARITY = 0.5; // 恋愛: 0.4, ビジネス: 0.5, 深い共感: 0.6 等
-export function calculateComplementarityScore(
-  userVec: number[],
-  targetVec: number[],
-  optimalSimilarity: number = DEFAULT_OPTIMAL_SIMILARITY
-): number {
+// 補完性スコア: 類似度0.5をピークとするベルカーブ
+export function calculateComplementarityScore(userVec: number[], targetVec: number[]): number {
   const sim = cosineSimilarity(userVec, targetVec);
-  const growthPotential = Math.exp(-Math.pow(sim - optimalSimilarity, 2) / 0.1);
+  const optimalDistance = 0.5;
+  const growthPotential = Math.exp(-Math.pow(sim - optimalDistance, 2) / 0.1);
   return growthPotential * 100;
 }
 
@@ -141,10 +137,8 @@ function generateReasoning(userVec: number[], targetVec: number[], sim: number):
 export async function findTopMatches(
   userVector: number[],
   topN: number = 5,
-  userSynthesis?: string,
-  optimalSimilarity: number = DEFAULT_OPTIMAL_SIMILARITY
+  userSynthesis?: string
 ): Promise<MatchResult[]> {
-  const scoreFn = (a: number[], b: number[]) => calculateComplementarityScore(a, b, optimalSimilarity);
 
   // 1. DB検索を試みる
   try {
@@ -159,7 +153,7 @@ export async function findTopMatches(
         } catch { continue; }
 
         const sim = cosineSimilarity(userVector, candidateVector);
-        const score = scoreFn(userVector, candidateVector);
+        const score = calculateComplementarityScore(userVector, candidateVector);
 
         let reasoning = generateReasoning(userVector, candidateVector, sim);
         if (userSynthesis) {
@@ -203,7 +197,7 @@ export async function findTopMatches(
   // 2. アーキタイプ（50人）をフォールバック
   const scored = ARCHETYPE_USERS.map((arch) => {
     const sim = cosineSimilarity(userVector, arch.vector);
-    const score = scoreFn(userVector, arch.vector);
+    const score = calculateComplementarityScore(userVector, arch.vector);
     return { arch, sim, score };
   })
     .sort((a, b) => b.score - a.score)

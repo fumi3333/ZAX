@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma, vectorStore } from '@/lib/db/client';
-import { questions, effectiveScore } from '@/data/questions';
-import { model } from '@/lib/gemini';
+import { questions } from '@/data/questions';
+import { model, embeddingModel } from '@/lib/gemini'; // Import shared instances
 import { cookies } from 'next/headers';
 
 export async function POST(req: Request) {
@@ -66,12 +66,12 @@ export async function POST(req: Request) {
     
     for (const id of sortedAnswerIds) {
       const q = questions.find(q => q.id === id);
-      const rawScore = answers[id];
-      if (q && typeof rawScore === 'number') {
+      const score = answers[id];
+      if (q) {
         if (!categoryScores[q.categoryJa]) {
             categoryScores[q.categoryJa] = { sum: 0, count: 0 };
         }
-        categoryScores[q.categoryJa].sum += effectiveScore(q, rawScore);
+        categoryScores[q.categoryJa].sum += score;
         categoryScores[q.categoryJa].count += 1;
       }
     }
@@ -103,23 +103,22 @@ export async function POST(req: Request) {
         console.warn("Gemini API Error (Synthesis), using mock:", e);
     }
 
-    // 4. 6次元ベクトルをカテゴリスコアから算出（論理性, 直感力, 共感性, 意志力, 創造性, 柔軟性）
-    const CATEGORY_ORDER = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
-    const CATEGORY_JA: Record<string, string> = { Social: '外向性', Empathy: '協調性', Discipline: '誠実性', Openness: '開放性', Emotional: '情緒安定性' };
-    const rawByCat = CATEGORY_ORDER.map((c) => {
-        const d = categoryScores[CATEGORY_JA[c]] || { sum: 0, count: 0 };
-        const avg = d.count > 0 ? d.sum / d.count : 4;
-        return Math.round(((avg - 1) / 6) * 100);
-    });
-    const [social, empathy, discipline, openness, emotional] = rawByCat;
-    const vector: number[] = [
-        discipline,                          // 論理性 ← 誠実性
-        openness,                            // 直感力 ← 開放性
-        empathy,                             // 共感性 ← 協調性
-        discipline,                          // 意志力 ← 誠実性
-        openness,                            // 創造性 ← 開放性
-        Math.round((emotional + social) / 2), // 柔軟性 ← 情緒安定性・外向性
-    ];
+    // 4. Call Gemini for Embedding (Vectorization)
+    let vector: number[] = new Array(768).fill(0).map(() => Math.random()); // Mock 768-dim vector
+    try {
+        const textToEmbed = `
+        Personality Profile:
+        ${synthesis}
+        
+        Category Scores:
+        ${Object.entries(categoryScores).map(([k,v]) => `${k}: ${(v.sum/v.count).toFixed(1)}`).join(', ')}
+        `.trim();
+
+        const embeddingResult = await embeddingModel.embedContent(textToEmbed);
+        vector = embeddingResult.embedding.values;
+    } catch (e) {
+        console.warn("Gemini API Error (Embedding), using mock:", e);
+    }
 
     // 5. Save to Database
     const diagnosticResult = await prisma.diagnosticResult.create({

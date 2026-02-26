@@ -23,9 +23,6 @@ try {
     prisma = globalForPrisma.prisma || new PrismaClient({ log: ["warn", "error"] });
     if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-    // Expected dimension for essence_vectors (vector(6) in DB). 768-dim embeddings are NOT stored here.
-    const EXPECTED_VECTOR_DIM = 6;
-
     // Real Vector Store (pgvector)
     vectorStore = {
         async saveEmbedding(
@@ -34,34 +31,14 @@ try {
             reasoning: string,
             resonanceScore: number
         ) {
-            if (!Array.isArray(vector) || vector.length !== EXPECTED_VECTOR_DIM) {
-                throw new Error(
-                    `Vector dimension mismatch: expected ${EXPECTED_VECTOR_DIM}, got ${vector?.length ?? "non-array"}. ` +
-                    "EssenceVector stores 6-dim display vectors only. 768-dim embeddings are not persisted here."
-                );
-            }
-            const safeValues = vector.map((v) => {
-                const n = Number(v);
-                if (!Number.isFinite(n)) throw new Error("Vector contains non-finite value");
-                return Math.max(0, Math.min(100, n));
-            });
-            const vectorString = `[${safeValues.join(",")}]`;
+            const vectorString = `[${vector.join(",")}]`;
             await prisma.$executeRaw`
                 INSERT INTO "essence_vectors" ("id", "userId", "vector", "vectorJson", "reasoning", "resonanceScore", "createdAt")
                 VALUES (gen_random_uuid(), ${userId}, ${vectorString}::vector, ${vectorString}, ${reasoning}, ${resonanceScore}, NOW())
             `;
         },
         async searchSimilar(targetVector: number[], limit: number = 5) {
-            if (!Array.isArray(targetVector) || targetVector.length !== EXPECTED_VECTOR_DIM) {
-                throw new Error(
-                    `Target vector dimension mismatch: expected ${EXPECTED_VECTOR_DIM}, got ${targetVector?.length ?? "non-array"}`
-                );
-            }
-            const safeValues = targetVector.map((v) => {
-                const n = Number(v);
-                return Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 50;
-            });
-            const vectorString = `[${safeValues.join(",")}]`;
+            const vectorString = `[${targetVector.join(",")}]`;
             return await prisma.$queryRaw`
                 SELECT ev.id, ev."userId", ev."vectorJson", ev.reasoning, ev."resonanceScore",
                        (ev.vector <=> ${vectorString}::vector) as distance

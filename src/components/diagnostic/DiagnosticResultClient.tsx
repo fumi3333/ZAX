@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { questions, effectiveScore } from "@/data/questions";
+import { questions } from "@/data/questions";
 import { DIMENSION_LABELS } from "@/lib/rec/engine";
 import ResultRadarChart from "./ResultRadarChart";
 import MatchResults from "./MatchResults";
@@ -79,9 +79,8 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
   Object.entries(answers).forEach(([qId, score]) => {
     const q = questions.find((q) => q.id === Number(qId));
-    const rawScore = Number(score);
-    if (q && categoryScores[q.category] && !isNaN(rawScore)) {
-      categoryScores[q.category].sum += effectiveScore(q, rawScore);
+    if (q && categoryScores[q.category]) {
+      categoryScores[q.category].sum += score;
       categoryScores[q.category].count += 1;
     }
   });
