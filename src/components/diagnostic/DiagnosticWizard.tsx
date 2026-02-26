@@ -16,6 +16,27 @@ export default function DiagnosticWizard() {
   const cardRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // 1. 初回ロード: localStorageからデータを復旧
+  useEffect(() => {
+    const saved = localStorage.getItem('zax_diagnostic_draft');
+    if (saved) {
+      try {
+        const { answers: sAnswers, freetext: sFreetext, index: sIndex } = JSON.parse(saved);
+        if (sAnswers) setAnswers(sAnswers);
+        if (sFreetext) setFreetext(sFreetext);
+        if (typeof sIndex === 'number') setCurrentQuestionIndex(sIndex);
+      } catch (e) {
+        console.warn('Failed to parse diagnostic draft:', e);
+      }
+    }
+  }, []);
+
+  // 2. 変更時に自動保存
+  useEffect(() => {
+    const data = { answers, freetext, index: currentQuestionIndex };
+    localStorage.setItem('zax_diagnostic_draft', JSON.stringify(data));
+  }, [answers, freetext, currentQuestionIndex]);
+
   const totalQuestions = questions.length;
   const isFinalStep = currentQuestionIndex === totalQuestions;
   const currentQuestion = !isFinalStep ? questions[currentQuestionIndex] : null;
@@ -70,6 +91,7 @@ export default function DiagnosticWizard() {
       });
       const data = await response.json();
       if (response.ok && data.success) {
+        localStorage.removeItem('zax_diagnostic_draft'); // 成功したら下書きを消去
         const resultData = { id: data.id, synthesis: data.synthesis, answers: data.answers };
         sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify(resultData));
         window.location.href = `/diagnostic/result/${data.id}`;
