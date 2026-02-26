@@ -173,41 +173,15 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
         <MatchResults userVector={userVector6d} synthesis={data.synthesis} />
 
-        {/* 登録誘導セクション */}
-        <section className="bg-white rounded-3xl p-8 md:p-12 text-center space-y-8 border-2 border-indigo-100 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500" />
-          <div className="space-y-3">
-            <h2 className="text-3xl font-black text-slate-900">マッチングを開始しますか？</h2>
-            <p className="text-slate-600 max-w-xl mx-auto">
-              大学のメールアドレスを登録すると、今回の診断結果に基づいて、あなたの価値観と深く響き合う相手をAIが自動でマッチングします。
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-             <Link
-                href="/register"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 hover:-translate-y-1"
-             >
-                大学メアドで登録して開始
-                <ArrowRight className="w-6 h-6" />
-             </Link>
-             <Link
-                href="/"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 bg-white text-slate-500 border-2 border-slate-100 rounded-2xl font-bold hover:bg-slate-50 transition-all"
-             >
-                今は登録しない
-             </Link>
-          </div>
-          <p className="text-xs text-slate-400">※登録しなくても、この診断結果はブラウザに一時的に保存されます。</p>
-        </section>
-
         <section className="text-center pt-8">
           <Link
             href="/diagnostic"
-            className="text-slate-400 text-sm font-bold hover:text-indigo-500 transition-colors uppercase tracking-widest"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-lg font-bold text-sm hover:bg-slate-800 transition-colors shadow-sm hover:shadow-md"
           >
-            診断をやり直す
+            もう一度診断する
+            <ArrowRight className="w-4 h-4" />
           </Link>
+          <p className="mt-4 text-xs text-slate-400">ベクトルは出会いごとに更新されます。</p>
         </section>
       </main>
     </div>

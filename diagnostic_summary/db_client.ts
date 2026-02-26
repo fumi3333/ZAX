@@ -29,23 +29,13 @@ try {
             userId: string,
             vector: number[],
             reasoning: string,
-            resonanceScore: number,
-            embedding?: number[]
+            resonanceScore: number
         ) {
             const vectorString = `[${vector.join(",")}]`;
-            const embeddingString = embedding ? `[${embedding.join(",")}]` : null;
-
-            if (embeddingString) {
-                await prisma.$executeRaw`
-                    INSERT INTO "essence_vectors" ("id", "userId", "vector", "embedding", "vectorJson", "reasoning", "resonanceScore", "createdAt")
-                    VALUES (gen_random_uuid(), ${userId}, ${vectorString}::vector, ${embeddingString}::vector, ${vectorString}, ${reasoning}, ${resonanceScore}, NOW())
-                `;
-            } else {
-                await prisma.$executeRaw`
-                    INSERT INTO "essence_vectors" ("id", "userId", "vector", "vectorJson", "reasoning", "resonanceScore", "createdAt")
-                    VALUES (gen_random_uuid(), ${userId}, ${vectorString}::vector, ${vectorString}, ${reasoning}, ${resonanceScore}, NOW())
-                `;
-            }
+            await prisma.$executeRaw`
+                INSERT INTO "essence_vectors" ("id", "userId", "vector", "vectorJson", "reasoning", "resonanceScore", "createdAt")
+                VALUES (gen_random_uuid(), ${userId}, ${vectorString}::vector, ${vectorString}, ${reasoning}, ${resonanceScore}, NOW())
+            `;
         },
         async searchSimilar(targetVector: number[], limit: number = 5) {
             const vectorString = `[${targetVector.join(",")}]`;
@@ -114,11 +104,10 @@ try {
             userId: string,
             vector: number[],
             reasoning: string,
-            resonanceScore: number,
-            embedding?: number[]
+            resonanceScore: number
         ) {
-            console.log("Mock saveEmbedding:", userId, `[${vector.length}dim]`, embedding ? `[${embedding.length}dim]` : "");
-            mockVectors.push({ userId, vector, reasoning, resonanceScore, embedding });
+            console.log("Mock saveEmbedding:", userId, `[${vector.length}dim]`);
+            mockVectors.push({ userId, vector, reasoning, resonanceScore });
         },
         async searchSimilar(targetVector: number[], limit: number = 5) {
             // モックでも最低限のコサイン類似度検索を実行

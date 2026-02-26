@@ -9,34 +9,32 @@ import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
 export default function DiagnosticWizard() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [freetext, setFreetext] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
 
-  // For auto-scroll or focus effects
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
+  const isFinalStep = currentQuestionIndex === totalQuestions;
+  const currentQuestion = !isFinalStep ? questions[currentQuestionIndex] : null;
+  
   const answeredCount = Object.keys(answers).length;
-  const allAnswered = answeredCount >= totalQuestions * 0.8 ||
-                      (currentQuestionIndex === totalQuestions - 1 && answeredCount >= totalQuestions * 0.7);
+  const allAnswered = answeredCount === totalQuestions && freetext.trim().length > 5;
 
   const handleAnswer = (value: number) => {
+    if (!currentQuestion) return;
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
     
-    // Auto-advance with a slight delay for visual feedback
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setTimeout(() => {
-        setDirection('next');
-        setCurrentQuestionIndex((prev) => prev + 1);
-      }, 300);
-    } else {
-        // Scroll to submit button or highlight it if it's the last question
-    }
+    // Auto-advance
+    setTimeout(() => {
+      setDirection('next');
+      setCurrentQuestionIndex((prev) => prev + 1);
+    }, 300);
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex < totalQuestions - 1) {
+    if (currentQuestionIndex < totalQuestions) {
       setDirection('next');
       setCurrentQuestionIndex((prev) => prev + 1);
     }
@@ -50,12 +48,13 @@ export default function DiagnosticWizard() {
   };
 
   const handleSubmit = async () => {
+    if (!allAnswered) return;
     setIsSubmitting(true);
     try {
       const response = await fetch('/api/diagnostic/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers, freetext }),
       });
       const data = await response.json();
       if (response.ok && data.success) {
@@ -74,8 +73,6 @@ export default function DiagnosticWizard() {
     }
   };
 
-  // 1-7 Scale Configuration
-  // 1: Big Disagree, 2: Med Disagree, 3: Small Disagree, 4: Neutral, 5: Small Agree, 6: Med Agree, 7: Big Agree
   const options = [
     { value: 1, label: '同意しない', color: 'bg-red-500', size: 'w-16 h-16', border: 'border-red-500' },
     { value: 2, label: '', color: 'bg-red-400', size: 'w-12 h-12', border: 'border-red-400' },
@@ -95,50 +92,64 @@ export default function DiagnosticWizard() {
           >
             <CardContent className="p-8 sm:p-12 text-center space-y-10">
               
-              {/* Question Text */}
-              {currentQuestion && (
-              <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300 key={currentQuestionIndex}">
-                <span className="text-sm font-bold text-indigo-500 tracking-widest uppercase">
-                    質問 {currentQuestion.id} / {totalQuestions}
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 leading-tight">
-                  {currentQuestion.text}
-                </h2>
-              </div>
+              {!isFinalStep && currentQuestion ? (
+                <>
+                  <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300" key={currentQuestionIndex}>
+                    <span className="text-sm font-bold text-indigo-500 tracking-widest uppercase">
+                        質問 {currentQuestion.id} / {totalQuestions}
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 leading-tight">
+                      {currentQuestion.text}
+                    </h2>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-3 sm:gap-6 py-4">
+                    <div className="hidden sm:block text-xs font-bold text-red-500/80 mr-2">同意しない</div>
+                    {options.map((opt) => {
+                      const isSelected = answers[currentQuestion.id] === opt.value;
+                      const isAnswered = answers[currentQuestion.id] !== undefined;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => handleAnswer(opt.value)}
+                          className={`
+                            rounded-full transition-all duration-300 flex items-center justify-center
+                            ${opt.size}
+                            ${isSelected 
+                              ? `${opt.color} ring-4 ring-offset-2 ring-indigo-100 scale-110` 
+                              : `bg-transparent border-2 ${opt.border} hover:bg-slate-50`
+                            }
+                            ${!isSelected && isAnswered ? 'opacity-40 hover:opacity-100' : 'opacity-100'}
+                          `}
+                          aria-label={`Select option ${opt.value}`}
+                        >
+                          {isSelected && <Check className="text-white w-5 h-5 stroke-[3px]" />}
+                        </button>
+                      );
+                    })}
+                    <div className="hidden sm:block text-xs font-bold text-green-600/80 ml-2">同意する</div>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-bold text-slate-800">最後に、教えてください</h2>
+                    <p className="text-sm text-slate-500">
+                      最近の悩みや、これから挑戦したいこと、大切にしている価値観などを自由に入力してください（詳細なほど分析が正確になります）。
+                    </p>
+                  </div>
+                  <textarea
+                    value={freetext}
+                    onChange={(e) => setFreetext(e.target.value)}
+                    placeholder="例：もっと論理的な思考を身につけたい。自分の直感をもっと信じて動けるようになりたい。"
+                    className="w-full min-h-[150px] p-4 rounded-xl border-2 border-slate-100 focus:border-indigo-500 focus:ring-0 transition-all resize-none bg-white text-slate-700 font-medium"
+                  />
+                  {!allAnswered && answeredCount === totalQuestions && (
+                    <p className="text-xs text-amber-500 font-bold">分析を開始するには、自由記述を入力してください（5文字以上）。</p>
+                  )}
+                </div>
               )}
 
-              {/* Options (Bubbles) */}
-              <div className="flex items-center justify-center gap-3 sm:gap-6 py-4">
-                <div className="hidden sm:block text-xs font-bold text-red-500/80 mr-2">同意しない</div>
-                
-                    {options.map((opt) => {
-                    const isSelected = currentQuestion && answers[currentQuestion.id] === opt.value;
-                    const isAnswered = currentQuestion && answers[currentQuestion.id] !== undefined;
-                    
-                    return (
-                        <button
-                            key={opt.value}
-                            onClick={() => currentQuestion && handleAnswer(opt.value)}
-                            className={`
-                                rounded-full transition-all duration-300 flex items-center justify-center
-                                ${opt.size}
-                                ${isSelected 
-                                    ? `${opt.color} ring-4 ring-offset-2 ring-indigo-100 scale-110` 
-                                    : `bg-transparent border-2 ${opt.border} hover:bg-slate-50`
-                                }
-                                ${!isSelected && isAnswered ? 'opacity-40 hover:opacity-100' : 'opacity-100'}
-                            `}
-                            aria-label={`Select option ${opt.value}`}
-                        >
-                            {isSelected && <Check className="text-white w-5 h-5 stroke-[3px]" />}
-                        </button>
-                    );
-                })}
-
-                <div className="hidden sm:block text-xs font-bold text-green-600/80 ml-2">同意する</div>
-              </div>
-
-              {/* Mobile Labels */}
               <div className="flex sm:hidden justify-between text-xs font-bold text-slate-400 px-2">
                 <span className="text-red-500">同意しない</span>
                 <span className="text-green-600">同意する</span>
@@ -148,7 +159,6 @@ export default function DiagnosticWizard() {
           </Card>
       </div>
 
-      {/* Navigation Buttons */}
       <div className="mt-8 flex justify-between items-center">
         <Button
           variant="ghost"
@@ -160,20 +170,23 @@ export default function DiagnosticWizard() {
           前へ
         </Button>
 
-        {currentQuestionIndex === totalQuestions - 1 && (
-             <Button 
-                onClick={handleSubmit} 
-                disabled={isSubmitting || !allAnswered}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-6 rounded-full font-bold shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-             >
-                {isSubmitting ? '分析中...' : '診断結果を見る'}
-             </Button>
-        )}
-        
-        {currentQuestionIndex < totalQuestions - 1 && (
-            <div className="text-xs text-slate-300">
-                回答すると自動で進みます
-            </div>
+        {isFinalStep ? (
+          <Button 
+            onClick={handleSubmit} 
+            disabled={isSubmitting || !allAnswered}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-6 rounded-full font-bold shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+          >
+            {isSubmitting ? '分析中...' : (
+              <>
+                診断結果を見る
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
+          </Button>
+        ) : (
+          <div className="text-xs text-slate-300">
+            {answeredCount} / {totalQuestions} 問回答済み
+          </div>
         )}
       </div>
     </div>

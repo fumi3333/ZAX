@@ -28,11 +28,9 @@ model EssenceVector {
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // 6次元のエッセンスベクトル (検索・表示用)
+  // 6次元のエッセンスベクトル (検索用)
+  // Unsupported型を使用してDBのvector型に直接マッピング
   vector         Unsupported("vector(6)") 
-  
-  // 768次元のセマンティック埋め込み (深い分析・履歴検索用)
-  embedding      Unsupported("vector(768)")? 
   
   // JSON文字列表現 (フロントエンド表示用バックアップ)
   vectorJson     String   
