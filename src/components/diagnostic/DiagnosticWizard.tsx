@@ -14,6 +14,7 @@ export default function DiagnosticWizard() {
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
 
   const cardRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const totalQuestions = questions.length;
   const isFinalStep = currentQuestionIndex === totalQuestions;
@@ -26,11 +27,22 @@ export default function DiagnosticWizard() {
     if (!currentQuestion) return;
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
     
+    // 連打による複数回スキップを防止
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    
     // Auto-advance
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setDirection('next');
-      setCurrentQuestionIndex((prev) => prev + 1);
+      setCurrentQuestionIndex((prev) => Math.min(prev + 1, totalQuestions));
     }, 300);
+  };
+
+  const handleJumpToUnanswered = () => {
+    const firstUnansweredIndex = questions.findIndex(q => answers[q.id] === undefined);
+    if (firstUnansweredIndex !== -1) {
+      setDirection('prev');
+      setCurrentQuestionIndex(firstUnansweredIndex);
+    }
   };
 
   const handleNext = () => {
@@ -144,9 +156,18 @@ export default function DiagnosticWizard() {
                     placeholder="例：もっと論理的な思考を身につけたい。自分の直感をもっと信じて動けるようになりたい。"
                     className="w-full min-h-[150px] p-4 rounded-xl border-2 border-slate-100 focus:border-indigo-500 focus:ring-0 transition-all resize-none bg-white text-slate-700 font-medium"
                   />
-                  {!allAnswered && answeredCount === totalQuestions && (
+                  {answeredCount < totalQuestions ? (
+                    <div className="flex flex-col items-center gap-2 mt-4 p-4 bg-red-50 rounded-lg">
+                      <p className="text-sm text-red-600 font-bold">
+                        ⚠️ 未回答の質問が {totalQuestions - answeredCount} 問あります
+                      </p>
+                      <Button variant="outline" onClick={handleJumpToUnanswered} className="text-red-500 border-red-200 hover:bg-red-100">
+                        未回答の質問に戻る
+                      </Button>
+                    </div>
+                  ) : !allAnswered ? (
                     <p className="text-xs text-amber-500 font-bold">分析を開始するには、自由記述を入力してください（5文字以上）。</p>
-                  )}
+                  ) : null}
                 </div>
               )}
 
