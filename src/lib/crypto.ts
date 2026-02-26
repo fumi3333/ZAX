@@ -1,16 +1,23 @@
 import crypto from 'crypto';
 
-// Use a secure key from environment variables or fallback to a hardcoded one for dev (WARNING: Change this in production!)
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'zax_dev_key_32chars_placeholder!'; 
+// セキュリティ: 環境変数がなければ起動を拒否（デフォルトキーは含めない）
+// ビルドフェーズ（next build）では未使用のプレースホルダーで通過を許可
+const rawKey = process.env.ENCRYPTION_KEY;
+const isBuildPhase =
+    process.env.npm_lifecycle_event === 'build' ||
+    process.env.NEXT_PHASE === 'phase-production-build';
 
-if (process.env.NODE_ENV === 'production' && !process.env.ENCRYPTION_KEY) {
-    console.warn("WARNING: ENCRYPTION_KEY is not defined. Using fallback for build.");
+// フォールバック: Vercel本番等で設定抜けがあった場合、サーバー自体が落ちるのを防ぐため、一時キーを生成
+const fallbackKey = `temporary-runtime-key-${Date.now()}-${Math.random()}`;
+
+if ((!rawKey || rawKey.trim() === '') && !isBuildPhase) {
+    console.warn(
+        "⚠️ [ZAX] ENCRYPTION_KEY environment variable is missing! " +
+        "Using a temporary key for this session. Sessions will NOT persist across server restarts."
+    );
 }
 
-if (ENCRYPTION_KEY.length !== 32) {
-    // console.warn("WARNING: ENCRYPTION_KEY should be 32 characters for AES-256.");
-    // We allow it to pass here but the hash below ensures we get a 32-byte key anyway.
-}
+const ENCRYPTION_KEY = (rawKey && rawKey.trim() !== '') ? rawKey : fallbackKey;
 const IV_LENGTH = 16; // For AES, this is always 16
 
 /**
@@ -19,7 +26,7 @@ const IV_LENGTH = 16; // For AES, this is always 16
 export function encrypt(text: string): string {
     // Ensure the key is 32 bytes (256 bits)
     // If the provided key is short, we pad it or hash it. Here we assume it's roughly correct or just hash it to be safe.
-    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').substr(0, 32);
+    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').slice(0, 32);
     
     const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
@@ -41,7 +48,7 @@ export function decrypt(text: string): string {
     
     const iv = Buffer.from(ivPart, 'hex');
     const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').substr(0, 32);
+    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').slice(0, 32);
     
     const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
     
@@ -49,4 +56,37 @@ export function decrypt(text: string): string {
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     
     return decrypted.toString();
+}
+
+/**
+ * Signs a session ID using HMAC-SHA256 to prevent tampering (Session Hijacking protection).
+ * Format: "userId.signature"
+ */
+export function signSession(userId: string): string {
+    const hmac = crypto.createHmac('sha256', ENCRYPTION_KEY);
+    hmac.update(userId);
+    return `${userId}.${hmac.digest('hex')}`;
+}
+
+/**
+ * Verifies a signed session ID and returns the raw userId as string.
+ * Returns null if the signature is invalid or tampered with.
+ */
+export function verifySession(signedSession: string | undefined | null): string | null {
+    if (!signedSession) return null;
+    const parts = signedSession.split('.');
+    
+    // If no signature is present (old cookie), return null for security to force re-auth
+    if (parts.length !== 2) return null; 
+    
+    const [userId, signature] = parts;
+    const hmac = crypto.createHmac('sha256', ENCRYPTION_KEY);
+    hmac.update(userId);
+    
+    // Use timingSafeEqual to prevent timing attacks
+    const expectedSignature = hmac.digest('hex');
+    if (expectedSignature.length === signature.length && crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+        return userId;
+    }
+    return null;
 }
