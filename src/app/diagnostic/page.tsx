@@ -14,7 +14,7 @@ export default function DiagnosticPage() {
             ZAX 性格・価値観診断
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            50の質問から、あなたの価値観を可視化します。<br/>
+            59の質問から、あなたの価値観を可視化します。<br/>
             直感で回答してください。正解はありません。
           </p>
         </div>

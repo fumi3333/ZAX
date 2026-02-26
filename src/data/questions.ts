@@ -3,6 +3,7 @@ export type Question = {
   text: string;
   category: 'Social' | 'Empathy' | 'Discipline' | 'Openness' | 'Emotional';
   categoryJa: string;
+  reverse?: boolean;
 };
 
 export const questions: Question[] = [
@@ -65,4 +66,21 @@ export const questions: Question[] = [
   { id: 48, text: "自分の弱みを見せることに抵抗がない。", category: 'Emotional', categoryJa: '情緒安定性' },
   { id: 49, text: "予期せぬトラブルが起きてもパニックにならずに対応できる。", category: 'Emotional', categoryJa: '情緒安定性' },
   { id: 50, text: "自分自身に対して自信を持っており、自己肯定感が高い。", category: 'Emotional', categoryJa: '情緒安定性' },
+
+  // -- 追加質問 --
+  { id: 51, text: "自分と異なる意見を持つ相手とも、深い信頼関係を築ける。", category: 'Openness', categoryJa: '開放性' },
+  { id: 52, text: "ストレスが溜まったときは、誰かに話すより一人で静かに過ごしたい。", category: 'Social', categoryJa: '外向性', reverse: true },
+  { id: 53, text: "人生において安定よりも刺激や挑戦を常に求めていたい。", category: 'Openness', categoryJa: '開放性' },
+  { id: 54, text: "自分の志や目的のためなら、周囲の環境が変わることも厭わない。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 55, text: "広く浅い人脈よりも、深く狭い信頼関係の方が価値がある。", category: 'Social', categoryJa: '外向性', reverse: true },
+  { id: 56, text: "物事を判断する基準は、社会的な常識よりも自分の信念に基づいている。", category: 'Discipline', categoryJa: '誠実性', reverse: true },
+  { id: 57, text: "何か問題が起きたとき、感情に寄り添うよりも先に解決策を提示してほしい。", category: 'Empathy', categoryJa: '協調性', reverse: true },
+  { id: 58, text: "自分に自信がある方だ。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 59, text: "どんなに親しい間柄でも、踏み込ませないパーソナルスペースが必要だ。", category: 'Social', categoryJa: '外向性', reverse: true },
 ];
+
+/** 1-7スケールで逆転項目の場合は 8 - score を返す */
+export function effectiveScore(question: Question, rawScore: number): number {
+  if (question.reverse) return 8 - rawScore;
+  return rawScore;
+}

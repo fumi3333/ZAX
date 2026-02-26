@@ -50,3 +50,34 @@ export function decrypt(text: string): string {
     
     return decrypted.toString();
 }
+
+/**
+ * セッションIDをHMAC-SHA256で署名し、改ざん防止する
+ * フォーマット: "userId.signature"
+ */
+export function signSession(userId: string): string {
+    const hmac = crypto.createHmac('sha256', ENCRYPTION_KEY);
+    hmac.update(userId);
+    return `${userId}.${hmac.digest('hex')}`;
+}
+
+/**
+ * 署名付きセッションIDを検証し、元のuserIdを返す
+ * 署名が無効な場合はnullを返す
+ */
+export function verifySession(signedSession: string | undefined | null): string | null {
+    if (!signedSession) return null;
+    const parts = signedSession.split('.');
+
+    if (parts.length !== 2) return null;
+
+    const [userId, signature] = parts;
+    const hmac = crypto.createHmac('sha256', ENCRYPTION_KEY);
+    hmac.update(userId);
+
+    const expectedSignature = hmac.digest('hex');
+    if (expectedSignature.length === signature.length && crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+        return userId;
+    }
+    return null;
+}

@@ -4,7 +4,7 @@ const API_KEY = process.env.GOOGLE_API_KEY || "";
 
 export const genAI = new GoogleGenerativeAI(API_KEY);
 export const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-export const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" }); // Updated to latest stable embedding model
+export const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
 
 export interface AnalysisResult {
     vector: number[]; // 6-dim radar chart stats (0-100) -> V_display
