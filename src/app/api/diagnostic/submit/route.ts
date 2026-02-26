@@ -103,22 +103,33 @@ export async function POST(req: Request) {
         console.warn("Gemini API Error (Synthesis), using mock:", e);
     }
 
-    // 4. Call Gemini for Embedding (Vectorization)
-    let vector: number[] = new Array(768).fill(0).map(() => Math.random()); // Mock 768-dim vector
-    try {
-        const textToEmbed = `
-        Personality Profile:
-        ${synthesis}
-        
-        Category Scores:
-        ${Object.entries(categoryScores).map(([k,v]) => `${k}: ${(v.sum/v.count).toFixed(1)}`).join(', ')}
-        `.trim();
+    // 4. 6次元ベクトルを算出（DBの vector(6) に合わせるため）
+    // カテゴリ: Social, Empathy, Discipline, openness, Emotional
+    // マッピング先: 論理性, 直感力, 共感性, 意志力, 創造性, 柔軟性
+    const categoryOrder = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
+    const jaMap: Record<string, string> = { 
+        'Social': '外向性', 
+        'Empathy': '協調性', 
+        'Discipline': '誠実性', 
+        'Openness': '開放性', 
+        'Emotional': '情緒安定性' 
+    };
 
-        const embeddingResult = await embeddingModel.embedContent(textToEmbed);
-        vector = embeddingResult.embedding.values;
-    } catch (e) {
-        console.warn("Gemini API Error (Embedding), using mock:", e);
-    }
+    const rawByCat = categoryOrder.map(c => {
+        const d = categoryScores[jaMap[c]];
+        const avg = d && d.count > 0 ? d.sum / d.count : 4;
+        return Math.round(((avg - 1) / 6) * 100);
+    });
+    
+    const [social, empathy, discipline, openness, emotional] = rawByCat;
+    const vector6d = [
+        discipline,                          // 論理性 (誠実性ベース)
+        openness,                            // 直感力 (開放性ベース)
+        empathy,                             // 共感性 (協調性ベース)
+        discipline,                          // 意志力 (誠実性ベース)
+        openness,                            // 創造性 (開放性ベース)
+        Math.round((emotional + social) / 2) // 柔軟性 (情緒安定性 + 外向性の平均)
+    ];
 
     // 5. Save to Database
     const diagnosticResult = await prisma.diagnosticResult.create({
@@ -126,17 +137,16 @@ export async function POST(req: Request) {
         userId: userId,
         answers: JSON.stringify(answers),
         synthesis: synthesis,
-        vector: JSON.stringify(vector),
+        vector: JSON.stringify(vector6d), // 6次元を保存
       },
     });
 
     // Also save to EssenceVector for matching
-    // Make sure to use vectorStore.saveEmbedding for pgvector support
     await vectorStore.saveEmbedding(
         userId,
-        vector,
-        "性格診断結果",
-        1.0 // Self-declared resonance score
+        vector6d, // 6次元ベクトルを渡す
+        "性格診断結果からの自動生成",
+        1.0 
     );
 
     return NextResponse.json({ 
