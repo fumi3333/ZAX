@@ -4,6 +4,8 @@ import { questions } from '@/data/questions';
 import { model, embeddingModel } from '@/lib/gemini'; // Import shared instances
 import { cookies } from 'next/headers';
 
+export const maxDuration = 60; // タイムアウトを60秒に延長
+
 export async function POST(req: Request) {
   try {
     const { answers, freetext } = await req.json();
