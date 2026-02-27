@@ -81,14 +81,14 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
         transition={{ duration: 0.5 }}
         className="text-center space-y-3"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-50 text-rose-600 font-bold text-sm">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 text-white font-bold text-sm">
           <Users className="w-4 h-4" />
           共鳴マッチ
         </div>
         <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900">
-          あなたと<span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-indigo-600">共鳴する</span>パートナー
+          あなたと共鳴するパートナー
         </h2>
-        <p className="text-slate-500 text-sm max-w-lg mx-auto">
+        <p className="text-slate-500 text-sm max-w-lg mx-auto font-medium">
           補完性スコアの高い相手は、似すぎず違いすぎない「成長を促す関係」を築けます。
         </p>
       </motion.div>
@@ -102,9 +102,9 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.1 }}
           >
-            <div className="relative h-full bg-white/70 backdrop-blur-md rounded-2xl border border-slate-200/60 shadow-xl shadow-slate-200/30 overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+            <div className="relative h-full bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               {/* Rank Badge */}
-              <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-black">
+              <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-black shadow-lg">
                 {i + 1}
               </div>
 
@@ -114,7 +114,7 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
                   <h3 className="text-lg font-bold text-slate-900">
                     {match.matchUser.name}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-500 mt-1 leading-relaxed font-medium">
                     {match.matchUser.bio}
                   </p>
                 </div>
@@ -124,7 +124,7 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
                   {match.matchUser.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 text-[10px] font-semibold bg-slate-100 text-slate-600 rounded-full"
+                      className="px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-600 rounded-md"
                     >
                       {tag}
                     </span>
@@ -133,21 +133,21 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
 
                 {/* Scores */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-slate-50 rounded-xl p-3 text-center">
+                  <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-100">
                     <div className="flex items-center justify-center gap-1 mb-1">
-                      <Zap className="w-3 h-3 text-amber-500" />
+                      <Zap className="w-3 h-3 text-slate-400" />
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">共鳴度</span>
                     </div>
                     <span className="text-xl font-black text-slate-900">
                       {Math.round(match.similarity * 100)}%
                     </span>
                   </div>
-                  <div className="bg-indigo-50 rounded-xl p-3 text-center">
+                  <div className="bg-slate-900 rounded-xl p-3 text-center">
                     <div className="flex items-center justify-center gap-1 mb-1">
-                      <TrendingUp className="w-3 h-3 text-indigo-500" />
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">成長性</span>
+                      <TrendingUp className="w-3 h-3 text-white/50" />
+                      <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">成長性</span>
                     </div>
-                    <span className="text-xl font-black text-indigo-600">
+                    <span className="text-xl font-black text-white">
                       {match.growthScore}%
                     </span>
                   </div>
@@ -169,7 +169,7 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
                 {/* チャット → 会う フロー */}
                 <Link
                   href={`/chat?partner=${encodeURIComponent(match.matchUser.name)}`}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-lg transition-colors shadow-lg"
                 >
                   <MessageCircle className="w-4 h-4" />
                   チャットを始める

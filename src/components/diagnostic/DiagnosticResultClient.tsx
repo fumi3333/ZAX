@@ -120,17 +120,15 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
       <main className="max-w-4xl mx-auto px-6 py-12 space-y-16">
         <section className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-100 text-violet-700 font-bold text-sm">
-            <Sparkles className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 text-white font-bold text-sm">
+            <Sparkles className="w-4 h-4 fill-white text-white" />
             分析完了
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
-            あなたの
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">
-              性格特性
-            </span>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+            あなたの<br />
+            性格特性
           </h1>
-          <p className="text-slate-500 max-w-2xl mx-auto">
+          <p className="text-slate-500 max-w-2xl mx-auto font-medium">
             回答データから抽出された、あなたの行動特性と価値観の分析結果です。
           </p>
         </section>
@@ -152,53 +150,65 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           </div>
         </section>
 
-        <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-8 md:p-12 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <section className="bg-slate-900 text-white rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
           <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 relative z-10">
-            <Sparkles className="w-6 h-6 text-yellow-400" />
+            <Sparkles className="w-6 h-6 text-white opacity-80" />
             心理分析レポート
           </h2>
-          <div className="space-y-6 text-lg leading-relaxed text-slate-300 relative z-10 font-medium">
-            {synthesisParagraphs.map((para: string, i: number) =>
-              para.startsWith("#") ? (
-                <h3 key={i} className="text-xl font-bold text-white mt-6 mb-2">
-                  {para.replace(/^#+\s/, "")}
-                </h3>
-              ) : (
-                <p key={i}>{para}</p>
-              )
-            )}
-          </div>
+          
+          {(data.synthesis && data.synthesis !== "分析中..." && !data.synthesis.includes("登録後")) ? (
+            <div className="space-y-6 text-lg leading-relaxed text-slate-300 relative z-10 font-medium">
+              {synthesisParagraphs.map((para: string, i: number) =>
+                para.startsWith("#") ? (
+                  <h3 key={i} className="text-xl font-bold text-white mt-6 mb-2">
+                    {para.replace(/^#+\s/, "")}
+                  </h3>
+                ) : (
+                  <p key={i}>{para}</p>
+                )
+              )}
+            </div>
+          ) : (
+            <div className="space-y-8 py-10 text-center relative z-10">
+               <div className="inline-block p-4 rounded-full bg-slate-800 mb-4">
+                  <Sparkles className="w-12 h-12 text-slate-500" />
+               </div>
+               <div className="space-y-2">
+                 <h3 className="text-xl font-bold text-white">詳細レポートを生成中</h3>
+                 <p className="text-slate-400 max-w-md mx-auto">
+                   大学のメールアドレスで登録すると、AIがあなたの回答と自由記述を深く読み解き、プロの心理分析レポートを生成します。
+                 </p>
+               </div>
+               <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+               >
+                 登録してレポートを読む
+                 <ArrowRight className="w-5 h-5" />
+               </Link>
+            </div>
+          )}
         </section>
 
         <MatchResults userVector={userVector6d} synthesis={data.synthesis} />
 
-        {/* 登録誘導セクション */}
-        <section className="bg-white rounded-3xl p-8 md:p-12 text-center space-y-8 border-2 border-indigo-100 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500" />
+        <section className="bg-white rounded-3xl p-8 md:p-12 text-center space-y-8 border border-slate-200 shadow-2xl relative overflow-hidden">
           <div className="space-y-3">
-            <h2 className="text-3xl font-black text-slate-900">マッチングを開始しますか？</h2>
+            <h2 className="text-3xl font-black text-slate-900">共鳴マッチを始めましょう</h2>
             <p className="text-slate-600 max-w-xl mx-auto">
-              大学のメールアドレスを登録すると、今回の診断結果に基づいて、あなたの価値観と深く響き合う相手をAIが自動でマッチングします。
+              登録を完了すると、あなたの内面的なエッセンスと最も共鳴するパートナー候補をAIがリストアップします。
             </p>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
              <Link
                 href="/register"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 hover:-translate-y-1"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-2xl font-bold text-lg hover:bg-black transition-all shadow-xl hover:-translate-y-1"
              >
-                大学メアドで登録して開始
+                大学メアドで登録
                 <ArrowRight className="w-6 h-6" />
              </Link>
-             <Link
-                href="/"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 bg-white text-slate-500 border-2 border-slate-100 rounded-2xl font-bold hover:bg-slate-50 transition-all"
-             >
-                今は登録しない
-             </Link>
           </div>
-          <p className="text-xs text-slate-400">※登録しなくても、この診断結果はブラウザに一時的に保存されます。</p>
         </section>
 
         <section className="text-center pt-8">
