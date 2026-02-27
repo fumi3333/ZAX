@@ -24,9 +24,10 @@ interface Match {
 interface MatchResultsProps {
   userVector: number[];
   synthesis?: string;
+  isGuest?: boolean;
 }
 
-export default function MatchResults({ userVector, synthesis }: MatchResultsProps) {
+export default function MatchResults({ userVector, synthesis, isGuest }: MatchResultsProps) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -168,11 +169,11 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
 
                 {/* チャット → 会う フロー */}
                 <Link
-                  href="/register"
+                  href={isGuest ? "/register" : `/chat?partner=${encodeURIComponent(match.matchUser.name)}`}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-lg transition-colors shadow-lg group"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>大学メアドで登録してチャット</span>
+                  <span>{isGuest ? "大学メアドで登録してチャット" : "チャットを始める"}</span>
                   <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>

@@ -10,6 +10,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 interface ResultData {
   id: string;
+  isGuest: boolean;
   synthesis: string;
   answers: Record<string, number>;
   vector?: number[] | string;
@@ -140,7 +141,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
             性格特性
           </h1>
           <p className="text-slate-500 max-w-2xl mx-auto font-medium">
-            回答データから抽出された、あなたの行動特性と価値観の分析結果です。
+            あなたの履歴データから抽出された、行動特性と価値観の分析結果です。
           </p>
         </section>
 
@@ -168,7 +169,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           </h2>
           
           <div className="relative z-10">
-            {(data.synthesis && data.synthesis !== "分析中..." && !data.synthesis.includes("登録後") && !data.synthesis.includes("エラー")) ? (
+            {data.isGuest ? (
               <div className="relative">
                 <div className="space-y-6 text-lg leading-relaxed text-slate-300 font-medium filter blur-md select-none opacity-40">
                   {synthesisParagraphs.map((para: string, i: number) =>
@@ -202,48 +203,43 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                 </div>
               </div>
             ) : (
-              <div className="space-y-8 py-10 text-center relative z-10">
-                 <div className="inline-block p-4 rounded-full bg-slate-800 mb-4">
-                    <Sparkles className="w-12 h-12 text-slate-500" />
-                 </div>
-                 <div className="space-y-2">
-                   <h3 className="text-xl font-bold text-white">詳細レポートの閲覧と保存</h3>
-                   <p className="text-slate-400 max-w-md mx-auto">
-                     詳細な心理分析レポートの閲覧と、診断結果の保存には大学メアドでの登録が必要です。
-                   </p>
-                 </div>
-                 <Link
-                    href="/register"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-200 transition-colors"
-                 >
-                   大学メアドで登録する
-                   <ArrowRight className="w-5 h-5" />
-                 </Link>
+              <div className="space-y-6 text-lg leading-relaxed text-slate-300 font-medium">
+                {synthesisParagraphs.map((para: string, i: number) =>
+                  para.startsWith("#") ? (
+                    <h3 key={i} className="text-xl font-bold text-white mt-6 mb-2 text-left">
+                      {para.replace(/^#+\s/, "")}
+                    </h3>
+                  ) : (
+                    <p key={i} className="text-left">{para}</p>
+                  )
+                )}
               </div>
             )}
           </div>
         </section>
 
-        <MatchResults userVector={userVector6d} synthesis={data.synthesis} />
+        <MatchResults userVector={userVector6d} synthesis={data.synthesis} isGuest={data.isGuest} />
 
-        <section className="bg-white rounded-3xl p-8 md:p-12 text-center space-y-8 border border-slate-200 shadow-2xl relative overflow-hidden">
-          <div className="space-y-3">
-            <h2 className="text-3xl font-black text-slate-900">共鳴マッチを始めましょう</h2>
-            <p className="text-slate-600 max-w-xl mx-auto">
-              マッチ登録をして、あなたと共鳴するパートナーとチャットを始めましょう。
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-             <Link
-                href="/register"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-2xl font-bold text-lg hover:bg-black transition-all shadow-xl hover:-translate-y-1"
-             >
-                マッチ登録する
-                <ArrowRight className="w-6 h-6" />
-             </Link>
-          </div>
-        </section>
+        {data.isGuest && (
+          <section className="bg-white rounded-3xl p-8 md:p-12 text-center space-y-8 border border-slate-200 shadow-2xl relative overflow-hidden">
+            <div className="space-y-3">
+              <h2 className="text-3xl font-black text-slate-900">共鳴マッチを始めましょう</h2>
+              <p className="text-slate-600 max-w-xl mx-auto">
+                マッチ登録をして、あなたと共鳴するパートナーとチャットを始めましょう。
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+               <Link
+                  href="/register"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-2xl font-bold text-lg hover:bg-black transition-all shadow-xl hover:-translate-y-1"
+               >
+                  マッチ登録する
+                  <ArrowRight className="w-6 h-6" />
+               </Link>
+            </div>
+          </section>
+        )}
 
         <section className="text-center pt-8">
           <Link

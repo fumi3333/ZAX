@@ -181,10 +181,10 @@ export default function TechnologyPage() {
 
             <div className="grid md:grid-cols-2 gap-5 mb-6">
               {[
-                { title: "動的16タイプ診断", desc: "日々の行動ログから「今のタイプ」をリアルタイム推定。自分でも気づかなかった自分を知る。" },
-                { title: "AI自己理解壁打ち", desc: "RAGを用いて過去の自分の思考と対話。悩み事に対し、過去の成功体験からAIが助言。" },
-                { title: "ベクトル・マッチング", desc: "潜在的な「価値観の近さ」で新入生同士を繋ぎ、本当に気の合う友達に出会える確率を向上。" },
-                { title: "成長の可視化", desc: "入学時から現在までの思考ベクトルの軌跡をグラフ化。大学生活での変化・成長が一目でわかる。" },
+                { title: "履歴ベースのベクトル解析", desc: "YouTubeの視聴履歴から「今の関心と価値観」をリアルタイム推定。自分でも気づかなかった自分を知る。" },
+                { title: "AI自己理解壁打ち", desc: "RAGを用いて過去の自分と対話。悩み事に対し、過去の成功体験からAIが助言。" },
+                { title: "ベクトル・マッチング", desc: "潜在的な「価値観の近さ」で学生同士を繋ぎ、本当に気の合う友達に出会える確率を向上。" },
+                { title: "シミュレーション・グラフ", desc: "入学時から現在までの思考ベクトルの軌跡を可視化。大学生活での変化・成長が一目でわかる。" },
               ].map((item) => (
                 <div key={item.title} className="bg-slate-50 rounded-xl p-5 border border-slate-100">
                   <h4 className="font-bold text-slate-900 text-sm mb-2">{item.title}</h4>

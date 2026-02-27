@@ -25,8 +25,8 @@ export default function PrivacyPolicyPage() {
               </p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
                 <li><strong>メールアドレス</strong>: 入力されたメールアドレスは、送信された瞬間にSHA-256アルゴリズムを用いてハッシュ化（匿名化）されます。生のメールアドレスはデータベースに保存されず、管理者も閲覧できません。</li>
-                <li><strong>ニックネーム</strong>: 診断結果の表示に使用されます。</li>
-                <li><strong>診断データ</strong>: 性格特性ベクトルとして数値化され、同一ドメイン内での仲間探しアルゴリズム計算に使用されます。</li>
+                <li><strong>ブラウザ履歴（Brave）</strong>: ユーザーが自ら実行した場合に限り、ローカルにインストールされたBraveブラウザのYouTube視聴履歴を読み取ります。</li>
+                <li><strong>解析データ</strong>: 視聴履歴は一時的にAI（Gemini）によって解析され、性格特性ベクトルとして数値化されます。元の履歴リスト自体は永続保存されず、解析後のベクトルとサマリーのみが保存されます。</li>
               </ul>
             </section>
 
