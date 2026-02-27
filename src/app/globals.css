@@ -68,12 +68,19 @@
   border-color: hsl(var(--border));
 }
 
+html {
+  color-scheme: light;
+  background-color: #f8fafc; /* 背景色をhtmlにも明示的に設定 */
+  filter: none !important; /* ブラウザ拡張や設定によるフィルタを防止 */
+}
+
 body {
   font-family: var(--font-inter), "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
   letter-spacing: -0.02em;
   color-scheme: light;
   background-color: #f8fafc; /* bg-slate-50 の実色 */
+  color: #0f172a; /* 明示的なテキスト色 (zax-primary) */
 }
 
 /* シャインアニメーション */
