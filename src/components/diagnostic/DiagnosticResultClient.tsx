@@ -12,6 +12,7 @@ interface ResultData {
   id: string;
   synthesis: string;
   answers: Record<string, number>;
+  vector?: number[] | string;
 }
 
 interface DiagnosticResultClientProps {
@@ -70,38 +71,48 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     );
   }
 
-  const answers = data.answers;
+  const answers = data.answers || {};
+  // Prioritize the vector from the data (History Analysis result)
+  let userVector6d: number[] = [50, 50, 50, 50, 50, 50];
 
-  // 5カテゴリ（質問ベース）のスコア計算
-  const CATEGORY_ORDER = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
-  const categoryScores: Record<string, { sum: number; count: number }> = {};
-  CATEGORY_ORDER.forEach((c) => { categoryScores[c] = { sum: 0, count: 0 }; });
-
-  Object.entries(answers).forEach(([qId, score]) => {
-    const q = questions.find((q) => q.id === Number(qId));
-    if (q && categoryScores[q.category]) {
-      categoryScores[q.category].sum += score;
-      categoryScores[q.category].count += 1;
+  if (data.vector && Array.isArray(data.vector)) {
+    userVector6d = data.vector;
+  } else if (data.vector && typeof data.vector === 'string') {
+    try {
+        userVector6d = JSON.parse(data.vector);
+    } catch {
+        console.warn("Failed to parse vector string");
     }
-  });
+  } else {
+    // 5カテゴリ（質問ベース）の旧計算ロジック（質問回答がある場合のみ実行）
+    const CATEGORY_ORDER = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
+    const categoryScores: Record<string, { sum: number; count: number }> = {};
+    CATEGORY_ORDER.forEach((c) => { categoryScores[c] = { sum: 0, count: 0 }; });
 
-  // 0-100スケールの生スコア（カテゴリ順: Social, Empathy, Discipline, Openness, Emotional）
-  const rawByCat = CATEGORY_ORDER.map((c) => {
-    const d = categoryScores[c];
-    const avg = d.count > 0 ? d.sum / d.count : 4;
-    return Math.round(((avg - 1) / 6) * 100);
-  });
-  const [social, empathy, discipline, openness, emotional] = rawByCat;
+    Object.entries(answers).forEach(([qId, score]) => {
+      const q = questions.find((q) => q.id === Number(qId));
+      if (q && categoryScores[q.category]) {
+        categoryScores[q.category].sum += score;
+        categoryScores[q.category].count += 1;
+      }
+    });
 
-  // マッチングと同じ6次元にマッピング: 論理性, 直感力, 共感性, 意志力, 創造性, 柔軟性
-  const userVector6d: number[] = [
-    discipline,   // 論理性 ← 誠実性
-    openness,     // 直感力 ← 開放性
-    empathy,      // 共感性 ← 協調性
-    discipline,   // 意志力 ← 誠実性
-    openness,     // 創造性 ← 開放性
-    Math.round((emotional + social) / 2),  // 柔軟性 ← 情緒安定性・外向性
-  ];
+    const rawByCat = CATEGORY_ORDER.map((c) => {
+      const d = categoryScores[c];
+      const avg = d.count > 0 ? d.sum / d.count : 4;
+      return Math.round(((avg - 1) / 6) * 100);
+    });
+    const [social, empathy, discipline, openness, emotional] = rawByCat;
+
+    userVector6d = [
+      discipline,   // 論理性 ← 誠実性
+      openness,     // 直感力 ← 開放性
+      empathy,      // 共感性 ← 協調性
+      discipline,   // 意志力 ← 誠実性
+      openness,     // 創造性 ← 開放性
+      Math.round((emotional + social) / 2),  // 柔軟性 ← 情緒安定性・外向性
+    ];
+  }
 
   const chartData = DIMENSION_LABELS.map((label, i) => ({
     subject: label,

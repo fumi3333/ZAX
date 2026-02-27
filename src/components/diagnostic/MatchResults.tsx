@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Users, Zap, TrendingUp, MessageCircle } from "lucide-react";
+import { Users, Zap, TrendingUp, MessageCircle, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import CompareRadarChart from "./CompareRadarChart";
 
@@ -168,11 +168,12 @@ export default function MatchResults({ userVector, synthesis }: MatchResultsProp
 
                 {/* チャット → 会う フロー */}
                 <Link
-                  href={`/chat?partner=${encodeURIComponent(match.matchUser.name)}`}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-lg transition-colors shadow-lg"
+                  href="/register"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-semibold rounded-lg transition-colors shadow-lg group"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  チャットを始める
+                  <span>大学メアドで登録してチャット</span>
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
             </div>

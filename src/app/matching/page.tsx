@@ -57,8 +57,8 @@ export default function MatchingPage() {
           </svg>
           <p className="font-semibold text-lg mb-2">アクセスできません</p>
           <p className="text-sm opacity-90 mb-4">{error}</p>
-          <Link href="/diagnostic" className="inline-block bg-white text-red-600 font-medium px-4 py-2 rounded-lg hover:bg-red-50 transition-colors border border-red-200">
-            診断を受ける
+          <Link href="/history" className="inline-block bg-white text-red-600 font-medium px-4 py-2 rounded-lg hover:bg-red-50 transition-colors border border-red-200">
+            履歴解析を受ける
           </Link>
         </div>
       </div>

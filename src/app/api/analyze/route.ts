@@ -46,7 +46,8 @@ export async function POST(request: Request) {
             userId,
             result.vector,
             encryptedReasoning,
-            result.resonance_score || 0
+            result.resonance_score || 0,
+            result.embedding
         );
 
         // Return PLAIN text to the user (they need to see their own result immediately)
