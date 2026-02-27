@@ -34,6 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" suppressHydrationWarning>
+      <head>
+        <meta name="color-scheme" content="only light" />
+        <meta name="theme-color" content="#ffffff" />
+      </head>
       <body
         className={`${inter.variable} font-sans antialiased bg-slate-50`}
         suppressHydrationWarning
