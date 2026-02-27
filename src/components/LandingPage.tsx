@@ -67,7 +67,7 @@ export default function LandingPage() {
             transition={{ delay: 0.18, duration: 0.5 }}
             className="text-sm text-slate-500 mb-12 max-w-md"
           >
-            50の質問から、価値観とつながり方を可視化します。
+            あなたのブラウザの履歴から、価値観とつながり方を可視化します。
           </motion.p>
 
           <motion.div
@@ -77,10 +77,10 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row gap-3"
           >
             <Link
-              href="/diagnostic"
+              href="/history"
               className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-all shadow-sm hover:shadow-md"
             >
-              診断を開始
+              無料で履歴解析を開始
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
@@ -194,11 +194,11 @@ export default function LandingPage() {
               属性ではなく価値観でつながる、新しいマッチングプロトコル。
             </p>
             <Link
-              href="/diagnostic"
+              href="/history"
               className="inline-flex items-center gap-2 px-7 py-3.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm"
             >
               <Sparkles className="w-4 h-4" />
-              診断を開始
+              無料で履歴解析を開始
             </Link>
           </div>
         </motion.div>

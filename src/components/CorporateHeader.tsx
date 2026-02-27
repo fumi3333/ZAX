@@ -9,7 +9,7 @@ const navLinks = [
   { label: "ABOUT US", href: "/about" },
   { label: "VISION", href: "/philosophy" },
   { label: "PRODUCT", href: "/technology" },
-  { label: "DIAGNOSTIC", href: "/diagnostic" },
+  { label: "YOUR HISTORY", href: "/history" },
 ];
 
 export default function CorporateHeader() {
@@ -97,11 +97,11 @@ export default function CorporateHeader() {
                 className="mt-12"
               >
                 <Link
-                  href="/diagnostic"
+                  href="/history"
                   onClick={() => setIsMenuOpen(false)}
                   className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white text-base font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm hover:shadow-md"
                 >
-                  無料で診断を開始
+                  無料で履歴解析を開始
                 </Link>
               </motion.div>
             </nav>
