@@ -13,10 +13,7 @@ export default function DiagnosticPage() {
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
             ZAX 性格・価値観診断
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            59の質問から、あなたの価値観を可視化します。<br/>
-            直感で回答してください。
-          </p>
+
         </div>
 
         <DiagnosticWizard />
