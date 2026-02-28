@@ -13,6 +13,7 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String   // bcryptでハッシュ化されたパスワード
+  nickname  String?  // 表示用名
   createdAt DateTime @default(now())
   
   // Relations

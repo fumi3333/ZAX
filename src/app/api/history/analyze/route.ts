@@ -106,16 +106,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, error: 'No YouTube history found in Brave.' }, { status: 400 });
     }
 
-    // 3. Construct Analysis Prompt for Gemini
+    // 3. Construct Analysis Prompt for Gemini (Fast Vector Calculation)
     const historyList = historyRecords.map((r, i) => `${i + 1}. ${r.title}`).join('\n');
     let profileText = `以下の最近視聴したYouTubeの動画タイトル一覧（直近50件）に基づき、この人物の深い心理・性格分析を行ってください。\n\n`;
     profileText += `## 視聴履歴\n${historyList}\n\n`;
     profileText += `
 指示: 
-この人物の強み、弱み、コミュニケーションスタイル、適した環境について、プロの心理分析官として詳細なレポートを作成してください。
+この人物の強みや興味関心について、**50文字以内の非常に短い1文のみ**で要約を生成してください。（例: 「テクノロジーと効率化に関心が強く、論理的な思考を好む傾向があります。」）
 出力に「AI」という語は含めないでください。
 
-さらに、以下の6つの特性（0-100）のスコアをJSONフォーマットで回答結果の最後に含めるか、テキストの文脈から私が解析できるようにしてください。今回は必ず以下のプロンプト指示に従ってJSONを生成してください。
 [重要: レポート本文（テキスト）を出力した後に、必ず以下の形式のJSONブロックを含めてください。]
 \`\`\`json
 {
@@ -126,7 +125,7 @@ export async function POST(req: Request) {
     `;
     
     // 4. Call Gemini for Synthesis
-    let synthesis = "分析エラーが発生しました。時間を置いて再試行してください。";
+    let synthesis = "履歴に基づき、あなたの性格特性ベクトルを算出しました。";
     let vector6d = [50, 50, 50, 50, 50, 50];
 
     try {

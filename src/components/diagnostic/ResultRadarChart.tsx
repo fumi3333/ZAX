@@ -31,8 +31,8 @@ export default function ResultRadarChart({ data }: ResultRadarChartProps) {
           <Radar
             name="Personality"
             dataKey="A"
-            stroke="#000000"
-            fill="#000000"
+            stroke="#6366f1"
+            fill="#818cf8"
             fillOpacity={0.7}
           />
         </RadarChart>
