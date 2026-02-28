@@ -15,7 +15,7 @@ export default function DiagnosticPage() {
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             59の質問から、あなたの価値観を可視化します。<br/>
-            直感で回答してください。正解はありません。
+            直感で回答してください。
           </p>
         </div>
 
