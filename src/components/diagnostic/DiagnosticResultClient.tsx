@@ -98,10 +98,15 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
             synthesis: genData.synthesis
          }));
       } else {
-         setRegError("レポートの生成に失敗しました。ページをリロードしてください。");
+         // Even if generation fails, user is registered now. Update state to show the result section (with fallback text)
+         setData({ ...(data as ResultData), isGuest: false });
+         sessionStorage.setItem(`diagnostic_result_${(data as ResultData).id}`, JSON.stringify({ ...(data as ResultData), isGuest: false }));
+         alert("レポートの生成に失敗しましたが、登録は完了しました。時間をおいて再度ご確認ください。");
       }
     } catch (err) {
-      setRegError("通信エラーが発生しました。");
+      // Network error during generation
+      setData({ ...data, isGuest: false } as ResultData);
+      alert("通信エラーが発生しましたが、おそらく登録は完了しています。ページをリロードしてください。");
     } finally {
       setIsGenerating(false);
     }
@@ -193,9 +198,9 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                 <div className="inline-block p-4 rounded-full bg-slate-800 mb-2">
                   <BookOpen className="w-12 h-12 text-indigo-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-white">深層心理レポート</h3>
+                <h3 className="text-2xl font-bold text-white">分析レポート</h3>
                 <p className="text-slate-300 text-sm leading-relaxed">
-                  ここから先は、あなたの価値観と行動特性を深く掘り下げる約3,000文字の「深層パーソナリティレポート」をご用意しています。閲覧および保存には無料のアカウント登録が必要です。
+                  ここから先は、あなたの価値観と行動特性を深く掘り下げる「分析レポート」をご用意しています。閲覧および保存には無料のアカウント登録が必要です。
                 </p>
 
                 <form onSubmit={handleRegister} className="mt-8 space-y-4 text-left">
@@ -265,9 +270,9 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                 <Loader2 className="w-16 h-16 text-indigo-400 animate-spin absolute inset-0 m-auto" />
                 <Sparkles className="w-8 h-8 text-indigo-300 opacity-50 absolute -top-2 -right-2 animate-pulse" />
              </div>
-             <h3 className="text-2xl font-bold text-white">深層心理レポートを生成中...</h3>
+             <h3 className="text-2xl font-bold text-white">分析レポートを生成中...</h3>
              <div className="max-w-md mx-auto text-slate-400 text-sm space-y-2 font-medium">
-               <p>あなたの履歴ベクトルデータから、約3,000文字に及ぶ詳細な専門的心理分析レポートを執筆しています。</p>
+               <p>あなたの診断データから、専門的分析レポートを執筆しています。</p>
                <p className="opacity-70 text-xs">※データの複雑さにより数十秒かかる場合があります。この画面のままお待ちください。</p>
              </div>
           </section>
@@ -278,13 +283,39 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           <section className="bg-white text-slate-900 rounded-2xl p-8 md:p-12 shadow-xl border border-slate-200">
             <h2 className="text-3xl font-black mb-8 flex items-center gap-3 text-slate-900 border-b border-slate-100 pb-4">
               <BookOpen className="w-8 h-8 text-indigo-600" />
-              深層パーソナリティレポート
+              分析レポート
             </h2>
             
             <div className="space-y-6 text-base md:text-lg leading-loose text-slate-700 font-medium">
-              {synthesisParagraphs.map((para: string, i: number) => (
-                <p key={i} className="text-left">{para}</p>
-              ))}
+              {data.synthesis.includes("登録後にAI詳細分析レポートが生成されます") || data.synthesis.includes("分析エラーが発") ? (
+                 <div className="bg-slate-50 border border-slate-200 p-8 rounded-xl flex flex-col items-center text-center space-y-4">
+                    <p className="text-slate-600 font-bold">レポートデータがまだ生成されていないか、エラーが発生しました。</p>
+                    <button 
+                       onClick={async () => {
+                         setIsGenerating(true);
+                         try {
+                           const res = await fetch("/api/diagnostic/generate-report", {
+                             method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ resultId: data.id })
+                           });
+                           const d = await res.json();
+                           if (d.success) {
+                              setData({...data, synthesis: d.synthesis});
+                              sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify({...data, synthesis: d.synthesis}));
+                           } else {
+                              alert("生成に失敗しました。時間をおいてお試しください。");
+                           }
+                         } finally { setIsGenerating(false); }
+                       }}
+                       className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 font-bold shadow-md hover:shadow-lg transition-all"
+                    >
+                       レポートを再生成する
+                    </button>
+                 </div>
+              ) : (
+                synthesisParagraphs.map((para: string, i: number) => (
+                  <p key={i} className="text-left">{para}</p>
+                ))
+              )}
             </div>
 
             {/* ZAXcampus CTA - At the bottom of the long report */}
