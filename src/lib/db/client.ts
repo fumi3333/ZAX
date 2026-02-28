@@ -19,8 +19,22 @@ if (!useRealDb) {
 try {
     if (!useRealDb) throw new Error("Using mock DB");
     const { PrismaClient } = require("@prisma/client");
+    
+    let dbUrl = process.env.DATABASE_URL;
+    // Vercel等のサーバーレス環境でPostgreSQLのコネクションプーラー（PgBouncer等）を使う場合
+    // prepared statementの競合エラー (42P05) を防ぐために pgbouncer=true を付与する
+    if (dbUrl && !dbUrl.includes("pgbouncer=true") && !dbUrl.includes("localhost")) {
+        const sep = dbUrl.includes("?") ? "&" : "?";
+        dbUrl += `${sep}pgbouncer=true`;
+    }
+
     const globalForPrisma = global as unknown as { prisma: any };
-    prisma = globalForPrisma.prisma || new PrismaClient({ log: ["warn", "error"] });
+    prisma = globalForPrisma.prisma || new PrismaClient({ 
+        log: ["warn", "error"],
+        datasources: {
+            db: { url: dbUrl }
+        }
+    });
     if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
     // Real Vector Store (pgvector)
