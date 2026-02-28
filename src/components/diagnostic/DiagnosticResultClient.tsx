@@ -137,12 +137,8 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
             分析完了
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-            あなたの<br />
-            性格特性
+            分析結果
           </h1>
-          <p className="text-slate-500 max-w-2xl mx-auto font-medium">
-            あなたの履歴データから抽出された、行動特性と価値観の分析結果です。
-          </p>
         </section>
 
         <section className="bg-white/70 backdrop-blur-md rounded-2xl p-8 shadow-xl shadow-slate-200/30 border border-slate-200/60">
@@ -170,43 +166,29 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           
           <div className="relative z-10">
             {data.isGuest ? (
-              <div className="relative">
-                <div className="space-y-6 text-lg leading-relaxed text-slate-300 font-medium filter blur-md select-none opacity-40">
-                  {synthesisParagraphs.map((para: string, i: number) =>
-                    para.startsWith("#") ? (
-                      <h3 key={i} className="text-xl font-bold text-white mt-6 mb-2">
-                        {para.replace(/^#+\s/, "")}
-                      </h3>
-                    ) : (
-                      <p key={i}>{para}</p>
-                    )
-                  )}
-                </div>
-                
-                <div className="absolute inset-0 flex items-center justify-center">
-                   <div className="bg-slate-900/95 p-8 rounded-2xl text-center border border-slate-700 shadow-2xl max-w-md mx-auto backdrop-blur-sm">
-                     <div className="inline-block p-4 rounded-full bg-slate-800 mb-4">
-                        <Sparkles className="w-12 h-12 text-slate-400" />
-                     </div>
-                     <h3 className="text-xl font-bold text-white mb-2">詳細レポートの閲覧と保存</h3>
-                     <p className="text-slate-400 mb-6 text-sm leading-relaxed">
-                       これより先の詳細な心理分析レポートの閲覧と、診断結果の保存には大学メアドでの登録が必要です。
-                     </p>
-                     <Link
-                        href="/register"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-200 transition-colors"
-                     >
-                       大学メアドで登録する
-                       <ArrowRight className="w-4 h-4" />
-                     </Link>
+              <div className="relative py-12">
+                 <div className="bg-slate-900/95 p-8 rounded-2xl text-center border border-slate-700 shadow-2xl max-w-md mx-auto backdrop-blur-sm">
+                   <div className="inline-block p-4 rounded-full bg-slate-800 mb-4">
+                      <Sparkles className="w-12 h-12 text-slate-400" />
                    </div>
-                </div>
+                   <h3 className="text-xl font-bold text-white mb-2">詳細レポートの閲覧と保存</h3>
+                   <p className="text-slate-400 mb-6 text-sm leading-relaxed">
+                     これより先の詳細な心理分析レポートの閲覧と、診断結果の保存には大学メアドでの登録が必要です。
+                   </p>
+                   <Link
+                      href="/register"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-200 transition-colors"
+                   >
+                     大学メアドで登録する
+                     <ArrowRight className="w-4 h-4" />
+                   </Link>
+                 </div>
               </div>
             ) : (
-              <div className="space-y-6 text-lg leading-relaxed text-slate-300 font-medium">
+              <div className="space-y-6 text-lg leading-relaxed text-slate-300 font-medium font-serif">
                 {synthesisParagraphs.map((para: string, i: number) =>
                   para.startsWith("#") ? (
-                    <h3 key={i} className="text-xl font-bold text-white mt-6 mb-2 text-left">
+                    <h3 key={i} className="text-xl font-bold text-white mt-6 mb-2 text-left font-sans">
                       {para.replace(/^#+\s/, "")}
                     </h3>
                   ) : (
@@ -224,7 +206,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           <section className="bg-white rounded-3xl p-8 md:p-12 text-center space-y-8 border border-slate-200 shadow-2xl relative overflow-hidden">
             <div className="space-y-3">
               <h2 className="text-3xl font-black text-slate-900">共鳴マッチを始めましょう</h2>
-              <p className="text-slate-600 max-w-xl mx-auto">
+              <p className="text-slate-600 max-w-xl mx-auto font-medium">
                 マッチ登録をして、あなたと共鳴するパートナーとチャットを始めましょう。
               </p>
             </div>
@@ -246,7 +228,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
             href="/history"
             className="text-slate-400 text-sm font-bold hover:text-indigo-500 transition-colors uppercase tracking-widest"
           >
-            履歴から再解析する
+            やり直す
           </Link>
         </section>
       </main>

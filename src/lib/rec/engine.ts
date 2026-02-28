@@ -111,9 +111,9 @@ export async function findTopMatches(
         results.push({
           matchUser: {
             id: candidate.userId,
-            name: "共鳴する魂",
+            name: "共鳴するパートナー",
             vector: candidateVector,
-            bio: candidate.reasoning || "ベクトル空間上で共鳴する存在。",
+            bio: candidate.reasoning || "価値観の近い学生ユーザーです。",
             tags: [],
           },
           similarity: sim,
