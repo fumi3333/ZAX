@@ -41,8 +41,6 @@ const targetFiles = [
   'src\\app\\api\\reflection\\route.ts',
   'src\\app\\api\\mypage\\route.ts',
   'src\\app\\api\\gemini-logs\\route.ts',
-  'src\\app\\api\\auth\\guest-register\\route.ts',
-  'src\\app\\api\\diagnostic\\generate-report\\route.ts',
   // コンポーネント
   'src\\components\\AppNavigation.tsx',
   'src\\components\\CorporateHeader.tsx',
