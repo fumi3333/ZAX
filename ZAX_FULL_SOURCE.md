@@ -1,5 +1,5 @@
 # ZAX - Full Source Code Bundle
-生成日時: 2026/2/26 16:49:18
+生成日時: 2026/2/28 17:14:27
 
 このファイルはZAXプロジェクトの全ソースコードをGeminiによるコードレビュー用にまとめたものです。
 
@@ -33,35 +33,37 @@
 27. `src\app\api\reflection\route.ts`
 28. `src\app\api\mypage\route.ts`
 29. `src\app\api\gemini-logs\route.ts`
-30. `src\components\AppNavigation.tsx`
-31. `src\components\CorporateHeader.tsx`
-32. `src\components\LandingPage.tsx`
-33. `src\components\ImpactSimulationGraph.tsx`
-34. `src\components\ImpactChart.tsx`
-35. `src\components\EssenceInput.tsx`
-36. `src\components\EvidenceAnalysis.tsx`
-37. `src\components\BlindChat.tsx`
-38. `src\components\VectorTransformationVisual.tsx`
-39. `src\components\Footer.tsx`
-40. `src\components\Providers.tsx`
-41. `src\components\diagnostic\DiagnosticWizard.tsx`
-42. `src\components\diagnostic\DiagnosticResultClient.tsx`
-43. `src\components\diagnostic\ResultRadarChart.tsx`
-44. `src\components\diagnostic\CompareRadarChart.tsx`
-45. `src\components\chat\PostChatInterview.tsx`
-46. `src\components\chat\ReflectionView.tsx`
-47. `src\components\product\ThreeLayerModel.tsx`
-48. `src\components\ui\card.tsx`
-49. `src\components\ui\button.tsx`
-50. `src\lib\gemini.ts`
-51. `src\lib\gemini-log.ts`
-52. `src\lib\db\client.ts`
-53. `src\lib\crypto.ts`
-54. `src\lib\utils.ts`
-55. `src\lib\rec\engine.ts`
-56. `src\lib\actions\manual-auth.ts`
-57. `src\data\questions.ts`
-58. `src\context\DiagnosticContext.tsx`
+30. `src\app\api\auth\guest-register\route.ts`
+31. `src\app\api\diagnostic\generate-report\route.ts`
+32. `src\components\AppNavigation.tsx`
+33. `src\components\CorporateHeader.tsx`
+34. `src\components\LandingPage.tsx`
+35. `src\components\ImpactSimulationGraph.tsx`
+36. `src\components\ImpactChart.tsx`
+37. `src\components\EssenceInput.tsx`
+38. `src\components\EvidenceAnalysis.tsx`
+39. `src\components\BlindChat.tsx`
+40. `src\components\VectorTransformationVisual.tsx`
+41. `src\components\Footer.tsx`
+42. `src\components\Providers.tsx`
+43. `src\components\diagnostic\DiagnosticWizard.tsx`
+44. `src\components\diagnostic\DiagnosticResultClient.tsx`
+45. `src\components\diagnostic\ResultRadarChart.tsx`
+46. `src\components\diagnostic\CompareRadarChart.tsx`
+47. `src\components\chat\PostChatInterview.tsx`
+48. `src\components\chat\ReflectionView.tsx`
+49. `src\components\product\ThreeLayerModel.tsx`
+50. `src\components\ui\card.tsx`
+51. `src\components\ui\button.tsx`
+52. `src\lib\gemini.ts`
+53. `src\lib\gemini-log.ts`
+54. `src\lib\db\client.ts`
+55. `src\lib\crypto.ts`
+56. `src\lib\utils.ts`
+57. `src\lib\rec\engine.ts`
+58. `src\lib\actions\manual-auth.ts`
+59. `src\data\questions.ts`
+60. `src\context\DiagnosticContext.tsx`
 
 ---
 
@@ -83,48 +85,15 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String   // bcryptでハッシュ化されたパスワード
+  nickname  String?  // 表示用名
   createdAt DateTime @default(now())
-  
-  // Phase 1.5 Fields
-  nickname      String?
-  affiliation   String?
-  isStudent     Boolean  @default(false)
-  domainHash    String?
-  contactEmail  String?  // 暗号化された生のメールアドレス（マッチング時の連絡用）
-  isCampusMatchRegistered Boolean @default(false)
   
   // Relations
   vectors    EssenceVector[]
   feedbacks  Feedback[]
   diagnostics DiagnosticResult[]
-  reflections Reflection[]
 
   @@map("users")
-}
-
-model Reflection {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  partnerName String
-  answers     String   // JSON: { aboutPartner, howChanged, grew, togetherFeel } (1-7 each)
-  summary     String   // Gemini要約
-  createdAt   DateTime @default(now())
-
-  @@map("reflections")
-  @@index([userId, createdAt(sort: Desc)])
-}
-
-model GeminiLog {
-  id        String   @id @default(uuid())
-  type      String   // synthesis, matchReasoning, reflectionSummary, analyzeEssence, etc.
-  prompt    String   @db.Text
-  response  String   @db.Text
-  metadata  String?  // JSON
-  createdAt DateTime @default(now())
-
-  @@map("gemini_logs")
-  @@index([type, createdAt(sort: Desc)])
 }
 
 model EssenceVector {
@@ -132,15 +101,14 @@ model EssenceVector {
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // 768次元の埋め込みベクトル (RAG検索用 - Gemini Embedding)
-  // 変更: vector(6) -> vector(768)
-  vector         Unsupported("vector(768)") 
+  // 6次元のエッセンスベクトル (検索・表示用)
+  vector         Unsupported("vector(6)") 
   
-  // JSON文字列表現 (フロントエンド表示用バックアップ / 6次元ステータス用)
+  // 768次元のセマンティック埋め込み (深い分析・履歴検索用)
+  embedding      Unsupported("vector(768)")? 
+  
+  // JSON文字列表現 (フロントエンド表示用バックアップ)
   vectorJson     String   
-  
-  // 6次元のステータスベクトル (可視化用: Logic, Intuition, etc.)
-  statsVector    String?  // JSON string "[50, 60, ...]"
 
   reasoning      String   
   resonanceScore Float    @default(0.0)
@@ -156,7 +124,6 @@ model Feedback {
   content     String
   deltaVector String   // JSON string
   growthScore Float
-  biometrics  Json?    // For wearable data (heart rate, etc.)
   createdAt   DateTime @default(now())
 
   @@map("feedbacks")
@@ -188,13 +155,24 @@ model Interaction {
 model DiagnosticResult {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
   answers   String   // JSON
   synthesis String   
   vector    String   // JSON
   createdAt DateTime @default(now())
 
   @@map("diagnostic_results")
+}
+
+model GeminiLog {
+  id        String   @id @default(uuid())
+  type      String   // "synthesis", "matching", "error" etc.
+  prompt    String   @db.Text
+  response  String   @db.Text
+  metadata  String?  // JSON string
+  createdAt DateTime @default(now())
+
+  @@map("gemini_logs")
 }
 
 ```
@@ -204,36 +182,31 @@ model DiagnosticResult {
 ## `src\middleware.ts`
 
 ```typescript
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { v4 as uuidv4 } from 'uuid'
 
 export function middleware(request: NextRequest) {
-  const session = request.cookies.get('zax-session')?.value;
-  const { pathname } = request.nextUrl;
-
-  // Protected Routes (Campus Launch features)
-  const protectedRoutes = ['/matching', '/history'];
-
-  // 1. Check if trying to access protected route without session
-  if (protectedRoutes.some(route => pathname.startsWith(route))) {
-    if (!session) {
-      // User is not authenticated/sessionized at all.
-      // Redirect to Diagnostic (Onboarding) or Home
-      // Let's redirect to Home with a query param to show "Please start here"
-      const url = request.nextUrl.clone();
-      url.pathname = '/';
-      url.searchParams.set('alert', 'auth_required');
-      return NextResponse.redirect(url);
-    }
+  const response = NextResponse.next()
+  
+  // Check for existing session
+  const sessionCookie = request.cookies.get('zax-session')
+  
+  if (!sessionCookie) {
+    // Create new session ID
+    const newSessionId = uuidv4()
+    
+    // Set cookie
+    response.cookies.set('zax-session', newSessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    })
   }
 
-  // 2. Future: Check if session is "Student Verified" for specific routes
-  // Middleware can't easily check DB, so we rely on session cookie having a flag (JWT) 
-  // or checks in the Route Handler / Page Component (Client).
-  // For Phase 1.5 MVP, cookie existence is the base check, 
-  // and specific API calls (like /api/matching/candidates) do the deep DB check.
-
-  return NextResponse.next();
+  return response
 }
 
 export const config = {
@@ -244,11 +217,10 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - diagnostic (publicly accessible)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|diagnostic|$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
-};
+}
 
 ```
 
@@ -268,7 +240,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "ZAX | Value-Based Connection",
-  description: "表面的な属性ではなく、価値観と性格特性で気の合う友達・仲間と繋がるプラットフォーム。",
+  description: "表面的な属性ではなく、価値観と性格特性で繋がる、新しいマッチングプラットフォーム。",
   openGraph: {
     title: "ZAX | Value-Based Connection",
     description: "Connect through values, not just attributes.",
@@ -284,9 +256,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { Providers } from "@/components/Providers";
-import AppNavigation from "@/components/AppNavigation";
-import Footer from "@/components/Footer";
+import CorporateHeader from "@/components/CorporateHeader";
 
 export default function RootLayout({
   children,
@@ -295,19 +265,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" suppressHydrationWarning>
+      <head>
+        <meta name="color-scheme" content="only light" />
+        <meta name="theme-color" content="#ffffff" />
+      </head>
       <body
         className={`${inter.variable} font-sans antialiased bg-slate-50`}
         suppressHydrationWarning
       >
-        <Providers>
-            <AppNavigation />
-            <div className="flex flex-col min-h-screen">
-              <div className="flex-1">
-                {children}
-              </div>
-              <Footer />
-            </div>
-        </Providers>
+        <CorporateHeader />
+        {children}
       </body>
     </html>
   );
@@ -403,10 +370,19 @@ export default function Home() {
   border-color: hsl(var(--border));
 }
 
+html {
+  color-scheme: only light; /* ブラウザの強制カラー変更を拒否 */
+  background-color: #ffffff; 
+  filter: none !important;
+}
+
 body {
   font-family: var(--font-inter), "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
   letter-spacing: -0.02em;
+  color-scheme: only light;
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 /* シャインアニメーション */
@@ -458,20 +434,40 @@ body {
 "use client";
 
 import { motion } from "framer-motion";
-import { Building2, Sparkles, Lightbulb, Database } from "lucide-react";
+import { Globe, Building2, Sparkles, Lightbulb, BarChart3, Database } from "lucide-react";
 import EvidenceAnalysis from "@/components/EvidenceAnalysis";
 import ImpactChart from "@/components/ImpactChart";
 
 export default function AboutPage() {
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans pb-40 selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
-            {/* 背景のアンビエント効果 (Removed for B&W design) */}
-            <div className="fixed inset-0 pointer-events-none z-0 bg-white" />
+            {/* 背景のアンビエント効果 */}
+            <div className="fixed inset-0 pointer-events-none z-0">
+                <div className="absolute top-[-20%] right-[-10%] w-[1000px] h-[1000px] bg-blue-100/50 rounded-full blur-[120px] mix-blend-multiply" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-purple-100/50 rounded-full blur-[100px] mix-blend-multiply" />
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
+            </div>
 
             {/* 縦スクロールレイアウト */}
             <div className="relative z-10 max-w-[1200px] mx-auto px-4 md:px-8 flex flex-col gap-8 md:gap-12" style={{ paddingTop: '160px' }}>
 
-
+                {/* ───────────────────────────────────────────── */}
+                {/* [A] HERO — タイトルセクション */}
+                {/* ───────────────────────────────────────────── */}
+                <motion.section 
+                    className="w-full min-h-[60vh] flex flex-col items-center justify-center text-center"
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                >
+                    <div className="text-xs font-mono font-bold tracking-[0.3em] text-indigo-500 mb-8 uppercase">Vision</div>
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-none tracking-tighter text-slate-900">
+                        Restoring<br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                            Human Resonance
+                        </span>
+                    </h1>
+                </motion.section>
 
                 {/* ───────────────────────────────────────────── */}
                 {/* [B] INFO GRID — 基本情報 */}
@@ -489,8 +485,8 @@ export default function AboutPage() {
                             { icon: Sparkles, label: "Mission", value: "Value Connection" },
                             { icon: Lightbulb, label: "Vision", value: "Total Happiness" },
                         ].map((item, i) => (
-                            <div key={i} className="bg-slate-50 border border-slate-100 p-8 md:p-10 rounded-2xl flex flex-col items-center justify-center text-center hover:bg-slate-100 hover:border-slate-300 transition-colors duration-300">
-                                <item.icon className="w-8 h-8 text-slate-900 mb-4" />
+                            <div key={i} className="bg-slate-50 border border-slate-100 p-8 md:p-10 rounded-2xl flex flex-col items-center justify-center text-center hover:bg-blue-50 hover:border-blue-200 transition-colors duration-300">
+                                <item.icon className="w-8 h-8 text-blue-600 mb-4" />
                                 <div className="text-[10px] text-slate-400 font-mono mb-2 uppercase tracking-wider">{item.label}</div>
                                 <div className="text-lg md:text-xl font-bold text-slate-800">{item.value}</div>
                             </div>
@@ -502,16 +498,17 @@ export default function AboutPage() {
                 {/* [C] PHILOSOPHY 1 — 構造的な機会損失 */}
                 {/* ───────────────────────────────────────────── */}
                 <motion.section
-                    className="w-full min-h-[50vh] bg-slate-900 rounded-[32px] p-12 md:p-16 relative overflow-hidden flex flex-col justify-center shadow-xl"
+                    className="w-full min-h-[50vh] bg-white border border-slate-100 rounded-[32px] p-12 md:p-16 relative overflow-hidden group shadow-lg shadow-slate-200/50 flex flex-col justify-center"
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-10%" }}
                     transition={{ duration: 0.6 }}
                 >
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="relative z-10 max-w-2xl">
-                        <div className="text-8xl md:text-9xl font-black text-slate-800 mb-4">01</div>
-                        <h3 className="text-4xl md:text-5xl font-bold text-white mb-8">構造的な機会損失</h3>
-                        <p className="text-slate-300 text-lg md:text-xl leading-relaxed">
+                        <div className="text-8xl md:text-9xl font-black text-slate-100 mb-4">01</div>
+                        <h3 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8">構造的な機会損失</h3>
+                        <p className="text-slate-600 text-lg md:text-xl leading-relaxed">
                             私たちは、無意識のうちに学歴、年収、外見といった「属性」というフィルターに思考を占領されています。
                             その結果、本来であれば長期的に深い関係を築けたはずの「真に相性の良い相手」を見逃してしまう...
                             これこそが、人生最大の機会損失です。
@@ -523,16 +520,20 @@ export default function AboutPage() {
                 {/* [D] PHILOSOPHY 2 — 潜在意識へのアクセス */}
                 {/* ───────────────────────────────────────────── */}
                 <motion.section
-                    className="w-full min-h-[50vh] bg-white border-2 border-slate-900 text-slate-900 rounded-[32px] p-12 md:p-16 relative overflow-hidden flex flex-col justify-center shadow-sm"
+                    className="w-full min-h-[50vh] bg-gradient-to-br from-indigo-600 to-blue-700 text-white rounded-[32px] p-12 md:p-16 relative overflow-hidden flex flex-col justify-center shadow-xl"
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-10%" }}
                     transition={{ duration: 0.6 }}
                 >
+                    {/* 背景デコレーション */}
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3" />
+                    <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-indigo-400/10 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/4" />
+                    
                     <div className="relative z-10 max-w-2xl">
-                        <div className="text-8xl md:text-9xl font-black text-slate-100 mb-4">02</div>
-                        <h3 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8">潜在意識へのアクセス</h3>
-                        <p className="text-slate-600 text-lg md:text-xl leading-relaxed">
+                        <div className="text-8xl md:text-9xl font-black text-white/10 mb-4">02</div>
+                        <h3 className="text-4xl md:text-5xl font-bold text-white mb-8">潜在意識へのアクセス</h3>
+                        <p className="text-white/80 text-lg md:text-xl leading-relaxed">
                             真の幸福は、自分が自覚している「条件」の先にある、自分でも気づいていない「潜在的な感情や意識」の中に眠っています。
                             ZAXは、ユーザー一人ひとりの内面を高次元のベクトルとして捉え、長期的な視点での幸福値を最大化します。
                         </p>
@@ -550,7 +551,7 @@ export default function AboutPage() {
                     transition={{ duration: 0.6 }}
                 >
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center justify-center w-16 h-16 border-2 border-slate-900 rounded-full mb-6 text-slate-900">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-6 text-blue-600">
                             <Database size={24} />
                         </div>
                         <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
@@ -558,7 +559,7 @@ export default function AboutPage() {
                         </h2>
                         <p className="text-slate-500 text-lg max-w-2xl mx-auto">
                             World Happiness Report 2019のデータを用いた実証分析。
-                            GDPと幸福度の相関(<span className="font-mono font-bold text-slate-900">R² &gt; 0.6</span>)をテコに、新しい経済循環を生み出します。
+                            GDPと幸福度の相関(<span className="font-mono font-bold text-blue-600">R² &gt; 0.6</span>)をテコに、新しい経済循環を生み出します。
                         </p>
                     </div>
                     
@@ -589,11 +590,11 @@ export default function AboutPage() {
                     <div className="grid md:grid-cols-2 gap-8 text-sm text-slate-400 font-mono leading-relaxed">
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
-                                <span className="text-slate-500 mt-0.5">▸</span>
+                                <span className="text-blue-400 mt-0.5">▸</span>
                                 World Happiness Report 2019
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-slate-500 mt-0.5">▸</span>
+                                <span className="text-blue-400 mt-0.5">▸</span>
                                 The World Bank (GDP per capita)
                             </li>
                         </ul>
@@ -615,7 +616,7 @@ export default function AboutPage() {
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
 import Link from "next/link";
 import ImpactChart from "@/components/ImpactChart";
 
@@ -626,6 +627,7 @@ export default function PhilosophyPage() {
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-[-20%] right-[-10%] w-[1000px] h-[1000px] bg-blue-100/50 rounded-full blur-[180px] mix-blend-multiply" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-purple-100/50 rounded-full blur-[150px] mix-blend-multiply" />
+                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
             </div>
 
             <div className="relative z-10 max-w-4xl mx-auto px-6 pt-32">
@@ -679,7 +681,7 @@ export default function PhilosophyPage() {
                         </p>
                         <ul className="list-none pl-0 space-y-2 mt-4">
                             <li><strong className="text-slate-900">・潜在意識の解析：</strong> ユーザー自身も言語化できていない「心地よさ」や「価値観」をデータとして抽出します。</li>
-                            <li><strong className="text-slate-900">・長期目線での最適化：</strong> 一過性の盛り上がりではなく、人生単位で互いを高め合える「相性の良さ」を演算します。</li>
+                            <li><strong className="text-slate-900">・長期目線での最適化：</strong> 一過性の盛り上がりではなく、人生単位で互いを高め合える「共鳴」を演算します。</li>
                         </ul>
                         <p className="mt-6">
                             このシステムの目的関数は、単なるマッチングの成立ではなく、「ユーザー個人の長期的な幸福量（<span className="font-serif italic font-bold text-slate-900">H<sub>long-term</sub></span>）の最大化」であると考えています。
@@ -728,7 +730,7 @@ export default function PhilosophyPage() {
                             個々人が自分にとって最適な場所、最適なパートナー、そして真の自己に繋がることができたとき、その社会は勝手に良くなっていくはずです。
                         </p>
                         <ul className="list-none pl-0 space-y-2 mt-4">
-                            <li><strong className="text-slate-900">・イノベーションの加速：</strong> 深いレベルで価値観の合う個体が繋がることで、これまでにない創造的な火花が散ります。</li>
+                            <li><strong className="text-slate-900">・イノベーションの加速：</strong> 魂のレベルで共鳴する個体が繋がることで、これまでにない創造的な火花が散ります。</li>
                             <li><strong className="text-slate-900">・経済への正の影響：</strong> 孤独による停滞やミスマッチによる損失が消え、個々の知性が最大出力で駆動するようになります。</li>
                         </ul>
                         <p className="mt-6">
@@ -811,7 +813,7 @@ export default function TechnologyPage() {
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl leading-relaxed">
             ZAXは、個人の内面的特性を多次元データとして捉え、相互作用による「個人の変容」を
-            記録・最適化する、<span className="font-semibold text-slate-900">動的コミュニティOS</span>です。
+            記録・最適化する、<span className="font-semibold text-slate-900">動的マッチングOS</span>です。
           </p>
         </motion.div>
 
@@ -839,12 +841,12 @@ export default function TechnologyPage() {
                 <tr className="border-b border-slate-50">
                   <td className="px-6 py-4 font-semibold text-slate-900">Core Trait</td>
                   <td className="px-6 py-4 text-slate-600">価値観、思考のプロセス、深層的な関心事</td>
-                  <td className="px-6 py-4 text-slate-500 hidden md:table-cell">価値観の近さを測る基準点</td>
+                  <td className="px-6 py-4 text-slate-500 hidden md:table-cell">マッチングの基礎となる基準点</td>
                 </tr>
                 <tr className="border-b border-slate-50">
                   <td className="px-6 py-4 font-semibold text-slate-900">Interaction Log</td>
                   <td className="px-6 py-4 text-slate-600">接続時間、反応率、対話の深度</td>
-                  <td className="px-6 py-4 text-slate-500 hidden md:table-cell">価値観の合致を測定する</td>
+                  <td className="px-6 py-4 text-slate-500 hidden md:table-cell">共鳴の強さを測定する</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 font-semibold text-slate-900">Delta State</td>
@@ -865,7 +867,7 @@ export default function TechnologyPage() {
             <h2 className="text-2xl font-bold">2. 相互変容トラッキング</h2>
           </div>
           <p className="text-slate-600 mb-8 max-w-2xl">
-            ZAXの最大の特徴は、単なる「出会い」で終わらず、その後の
+            ZAXの最大の特徴は、単なる「マッチング」で終わらず、その後の
             <span className="font-semibold text-slate-900">「変容（Transformation）」</span>をシステムが評価する点にあります。
           </p>
           <div className="grid md:grid-cols-2 gap-5">
@@ -890,16 +892,16 @@ export default function TechnologyPage() {
             <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
               <Network className="w-4 h-4 text-emerald-600" />
             </div>
-            <h2 className="text-2xl font-bold">3. 仲間探しロジックのフロー</h2>
+            <h2 className="text-2xl font-bold">3. マッチング・ロジックのフロー</h2>
           </div>
           <p className="text-slate-600 mb-8 max-w-2xl">
-            システムは以下のサイクルを自動で回し続け、コミュニティ全体の繋がりを強化します。
+            システムは以下のサイクルを自動で回し続け、コミュニティ全体の共鳴密度を高めます。
           </p>
           <div className="space-y-4">
             {[
-              { num: "01", title: "高精度な推論（Reasoning）", desc: "入力された断片的なデータから、推論型AIを用いてユーザーの潜在的な「価値観の合致点」を特定します。" },
-              { num: "02", title: "未来予測シミュレーション", desc: "候補者同士が繋がった場合、互いにどのような変容をもたらすかを予測し、期待値の高い組み合わせを選出します。" },
-              { num: "03", title: "相性エンジンの実行", desc: "算出されたマッチ度に基づいて接続を提案します。" },
+              { num: "01", title: "高精度な推論（Reasoning）", desc: "入力された断片的なデータから、推論型AIを用いてユーザーの潜在的な「共鳴点」を特定します。" },
+              { num: "02", title: "未来予測シミュレーション", desc: "候補者同士をマッチングさせた場合、互いにどのような変容をもたらすかを予測し、期待値の高い組み合わせを選出します。" },
+              { num: "03", title: "レゾナンス・エンジンの実行", desc: "算出された共鳴係数に基づいて接続を提案します。" },
               { num: "04", title: "変容データの書き戻し", desc: "実際の対面・対話後の変化を再度ベクトル化し、データベースを更新します。" },
             ].map((step) => (
               <div key={step.num} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xl shadow-slate-200/40 flex gap-5">
@@ -919,7 +921,7 @@ export default function TechnologyPage() {
               R<sub>score</sub> = ∫<sub>t₀</sub><sup>t₁</sup> f(A, B) dt
             </p>
             <p className="text-slate-500 text-xs mt-3">
-              R<sub>score</sub>：期間 t における価値観の合致と変容の累積値
+              R<sub>score</sub>：期間 t における共鳴と変容の累積値
             </p>
           </div>
         </motion.section>
@@ -962,10 +964,10 @@ export default function TechnologyPage() {
 
             <div className="grid md:grid-cols-2 gap-5 mb-6">
               {[
-                { title: "動的16タイプ診断", desc: "日々の行動ログから「今のタイプ」をリアルタイム推定。自分でも気づかなかった自分を知る。" },
-                { title: "AI自己理解壁打ち", desc: "RAGを用いて過去の自分の思考と対話。悩み事に対し、過去の成功体験からAIが助言。" },
-                { title: "ベクトル・コネクト", desc: "潜在的な「価値観の近さ」で新入生同士を繋ぎ、本当に気の合う友達に出会える確率を向上。" },
-                { title: "成長の可視化", desc: "入学時から現在までの思考ベクトルの軌跡をグラフ化。大学生活での変化・成長が一目でわかる。" },
+                { title: "履歴ベースのベクトル解析", desc: "YouTubeの視聴履歴から「今の関心と価値観」をリアルタイム推定。自分でも気づかなかった自分を知る。" },
+                { title: "AI自己理解壁打ち", desc: "RAGを用いて過去の自分と対話。悩み事に対し、過去の成功体験からAIが助言。" },
+                { title: "ベクトル・マッチング", desc: "潜在的な「価値観の近さ」で学生同士を繋ぎ、本当に気の合う友達に出会える確率を向上。" },
+                { title: "シミュレーション・グラフ", desc: "入学時から現在までの思考ベクトルの軌跡を可視化。大学生活での変化・成長が一目でわかる。" },
               ].map((item) => (
                 <div key={item.title} className="bg-slate-50 rounded-xl p-5 border border-slate-100">
                   <h4 className="font-bold text-slate-900 text-sm mb-2">{item.title}</h4>
@@ -1062,7 +1064,7 @@ export default function ProductPage() {
                     <span className="text-indigo-400">常に変化するあなた</span>を捉え続ける。
                     従来のマッチングは、年齢・職業・趣味といった「固定された属性」でフィルタリングします。
                     しかしZAXは、あなたの「今この瞬間の思考の方向性」をベクトル化し、
-                    リアルタイムに更新される動的なプロフィールで価値観の合う相手を見つけます。
+                    リアルタイムに更新される動的なプロフィールで共鳴する相手を見つけます。
                 </p>
             </div>
         </motion.section>
@@ -1098,7 +1100,7 @@ export default function ProductPage() {
                 <p className="text-white/80 text-lg leading-relaxed">
                     ZAXは一度マッチして終わりではありません。
                     対話するたびにあなたのベクトルは更新され、
-                    より精度の高い相性の良い相手が見つかるようになります。
+                    より精度の高い共鳴相手が見つかるようになります。
                     使えば使うほど、あなた自身の「本質」も可視化されていく — 
                     これがEvolutionary Loopです。
                 </p>
@@ -1156,7 +1158,7 @@ export default function ProductPage() {
                  <p className="text-slate-600 font-medium text-lg md:text-xl leading-relaxed max-w-2xl">
                      個々のモデルは孤立せず、成功体験を共有。<br/>
                      人類全体の幸福の最適解を探索する分散型知能。<br/><br/>
-                     あるペアの対話から得られた「価値観の合致パターン」は、
+                     あるペアの対話から得られた「共鳴パターン」は、
                      匿名化された上で全体のマッチングアルゴリズムにフィードバックされます。
                      これにより、ユーザーが増えるほど精度が向上する集合知能を実現しています。
                  </p>
@@ -1250,8 +1252,8 @@ export default function PrivacyPolicyPage() {
               </p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
                 <li><strong>メールアドレス</strong>: 入力されたメールアドレスは、送信された瞬間にSHA-256アルゴリズムを用いてハッシュ化（匿名化）されます。生のメールアドレスはデータベースに保存されず、管理者も閲覧できません。</li>
-                <li><strong>ニックネーム</strong>: 診断結果の表示に使用されます。</li>
-                <li><strong>診断データ</strong>: 性格特性ベクトルとして数値化され、同一ドメイン内での仲間探しアルゴリズム計算に使用されます。</li>
+                <li><strong>ブラウザ履歴（Brave）</strong>: ユーザーが自ら実行した場合に限り、ローカルにインストールされたBraveブラウザのYouTube視聴履歴を読み取ります。</li>
+                <li><strong>解析データ</strong>: 視聴履歴は一時的にAI（Gemini）によって解析され、性格特性ベクトルとして数値化されます。元の履歴リスト自体は永続保存されず、解析後のベクトルとサマリーのみが保存されます。</li>
               </ul>
             </section>
 
@@ -1383,21 +1385,10 @@ export default function TermsOfServicePage() {
 ## `src\app\diagnostic\page.tsx`
 
 ```tsx
-import DiagnosticWizard from '@/components/diagnostic/DiagnosticWizard';
-
-export const metadata = {
-  title: '性格・価値観診断 | ZAX',
-  description: 'AIがあなたの性格と価値観を分析し、価値観の合う友達や仲間との繋がりをサポートします。',
-};
+import { redirect } from 'next/navigation';
 
 export default function DiagnosticPage() {
-  return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center pt-12 pb-12 px-4 space-y-8">
-      <div className="w-full max-w-4xl">
-        <DiagnosticWizard />
-      </div>
-    </div>
-  );
+  redirect('/history');
 }
 
 ```
@@ -1425,20 +1416,85 @@ export default async function DiagnosticResultPage({
 ## `src\app\history\page.tsx`
 
 ```tsx
-import ImpactSimulationGraph from '@/components/ImpactSimulationGraph';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { PlayCircle, Loader2 } from 'lucide-react';
 
 export default function HistoryPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleAnalyze = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/history/analyze', { method: 'POST' });
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Redirect to the same diagnostic result page structure
+        const resultData = { id: data.id, synthesis: data.synthesis, answers: data.answers };
+        sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify(resultData));
+        router.push(`/diagnostic/result/${data.id}`);
+      } else {
+        setError(data.error || '解析に失敗しました。Braveブラウザの履歴が存在するか確認してください。');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('通信エラーが発生しました。時間を置いて再試行してください。');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-black text-slate-900 tracking-widest sm:text-4xl">
-            診断履歴
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+      <div className="max-w-2xl w-full text-center space-y-8">
+        <div className="space-y-4">
+          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+            YOUR HISTORY
           </h1>
+          <p className="text-slate-500 text-lg">
+            あなたの Brave ブラウザの YouTube 視聴履歴から、<br className="hidden sm:block" />
+            深層の興味関心と性格特性をAIが分析します。
+          </p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-          <ImpactSimulationGraph />
+        <div className="bg-white p-8 sm:p-12 rounded-3xl shadow-xl border border-slate-200 space-y-8 relative overflow-hidden">
+          <div className="relative z-10 space-y-6">
+            <h2 className="text-2xl font-bold text-slate-800">ブラウザ履歴解析の開始</h2>
+            <p className="text-slate-600">
+              ※ PC版 Brave ブラウザの閲覧履歴（SQLiteデータベース）を直接読み込みます。別のブラウザを開いている状態でも実行可能です。
+            </p>
+            
+            {error && (
+              <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold border border-red-100">
+                {error}
+              </div>
+            )}
+
+            <Button 
+                onClick={handleAnalyze} 
+                disabled={loading}
+                className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white px-8 py-6 rounded-2xl text-lg font-bold shadow-lg transition-all"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                  あなたの履歴を解析中...
+                </>
+              ) : (
+                <>
+                  <PlayCircle className="w-6 h-6 mr-3" />
+                  無料で履歴解析を開始
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -1511,8 +1567,8 @@ export default function MatchingPage() {
           </svg>
           <p className="font-semibold text-lg mb-2">アクセスできません</p>
           <p className="text-sm opacity-90 mb-4">{error}</p>
-          <Link href="/diagnostic" className="inline-block bg-white text-red-600 font-medium px-4 py-2 rounded-lg hover:bg-red-50 transition-colors border border-red-200">
-            診断を受ける
+          <Link href="/history" className="inline-block bg-white text-red-600 font-medium px-4 py-2 rounded-lg hover:bg-red-50 transition-colors border border-red-200">
+            履歴解析を受ける
           </Link>
         </div>
       </div>
@@ -1610,9 +1666,11 @@ export default function MatchingPage() {
 ## `src\app\input\page.tsx`
 
 ```tsx
+import { requireAuth } from '@/lib/auth-check';
 import InputClient from './InputClient';
 
 export default async function InputPage() {
+  await requireAuth();
 
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
@@ -1630,47 +1688,19 @@ export default async function InputPage() {
 ```tsx
 'use client';
 
-import { useState } from 'react';
 import EssenceInput, { EssenceInputData } from '@/components/EssenceInput';
 import VectorTransformationVisual from '@/components/VectorTransformationVisual';
 import { useRouter } from 'next/navigation';
-
 export default function InputClient() {
   const router = useRouter();
-  const [analyzing, setAnalyzing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleComplete = async (data: EssenceInputData) => {
-    const inputs = data.fragments.filter((f) => f.trim());
-    if (inputs.length === 0) {
-      setError('少なくとも1つ以上の入力が必要です');
-      return;
-    }
-
-    setAnalyzing(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          inputs,
-          biases: data.biases,
-          purpose: data.purpose || 'general',
-        }),
-      });
-      const json = await res.json();
-
-      if (!res.ok) {
-        throw new Error(json.error || '分析に失敗しました');
-      }
-
-      router.push('/matching');
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '分析に失敗しました');
-    } finally {
-      setAnalyzing(false);
-    }
+      console.log("Input Complete:", data);
+      
+      // TODO: Save analysis result when backend is ready
+      
+      // Redirect to Chat
+      router.push('/chat');
   };
 
   return (
@@ -1681,20 +1711,7 @@ export default function InputClient() {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative">
-                {analyzing && (
-                    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex items-center justify-center z-10">
-                        <div className="text-center">
-                            <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                            <p className="text-sm text-slate-600 font-medium">分析中...</p>
-                        </div>
-                    </div>
-                )}
-                {error && (
-                    <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                        {error}
-                    </div>
-                )}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <EssenceInput onComplete={handleComplete} />
             </div>
             
@@ -1720,211 +1737,133 @@ export default function InputClient() {
 ```typescript
 import { NextResponse } from 'next/server';
 import { prisma, vectorStore } from '@/lib/db/client';
-import { questions, effectiveScore } from '@/data/questions';
-import { model, embeddingModel } from '@/lib/gemini';
-import { logGemini } from '@/lib/gemini-log';
+import { questions } from '@/data/questions';
+import { model, embeddingModel } from '@/lib/gemini'; // Import shared instances
 import { cookies } from 'next/headers';
-import crypto from 'crypto';
-import { signSession, verifySession } from '@/lib/crypto';
 
-// Allow execution up to 60 seconds to accommodate long Gemini responses
-export const maxDuration = 60;
+export const maxDuration = 60; // タイムアウトを60秒に延長
 
 export async function POST(req: Request) {
   try {
-    const { answers, freeText } = await req.json();
+    const { answers, freetext } = await req.json();
 
     if (!answers || Object.keys(answers).length === 0) {
       return NextResponse.json({ success: false, error: 'No answers provided' }, { status: 400 });
     }
 
-    // 1. Authenticate / Create User
+    // 1. Authenticate User (or create guest session)
     const cookieStore = await cookies();
-    let sessionId = verifySession(cookieStore.get('zax-session')?.value);
+    let sessionId = cookieStore.get('zax-session')?.value;
 
     if (!sessionId) {
       sessionId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
-      cookieStore.set('zax-session', signSession(sessionId), {
-        httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365,
+      cookieStore.set('zax-session', sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 365,
       });
     }
 
     let userId = sessionId;
-    let user = null;
-    
-    // B. If no user yet (Guest fallback)
+    let user = await prisma.user.findUnique({ where: { id: userId } });
+
     if (!user) {
-        user = await prisma.user.findUnique({ where: { id: userId } });
-        
-        // もしDBにユーザーが存在しない場合（古いCookieが残っている場合など）
+        const email = `guest_${sessionId}@musashino-u.ac.jp`;
+        user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
-            const uniqueSuffix = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-            const guestEmail = `guest_${uniqueSuffix}@zax.guest`; 
-            
-            try {
-                user = await prisma.user.create({
-                    data: {
-                        email: guestEmail,
-                        password: "guest-password",
-                        isStudent: false,
-                    }
-                });
-            } catch (e) {
-                console.error("Failed to create fallback guest user:", e);
-                user = await prisma.user.findFirst(); // ultimate fallback
-            }
+             try {
+                user = await prisma.user.create({ data: { email, password: "guest-password" } });
+             } catch (e) {
+                 const firstUser = await prisma.user.findFirst();
+                 if (firstUser) user = firstUser;
+                 else throw new Error("Could not create or find user");
+             }
         }
     }
-    
-    if (!user) {
-        return NextResponse.json({ success: false, error: 'User session could not be established' }, { status: 500 });
-    }
-
-    userId = user.id;
-    if (userId !== sessionId) {
-         cookieStore.set('zax-session', signSession(userId), { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 });
-    }
+    if (user) userId = user.id;
 
     // 2. Construct Analysis Prompt
-    let profileText = "以下の性格診断データに基づき、この人物の性格、価値観、行動特性を詳細に分析し、日本語で記述してください。\n\n";
+    let profileText = "以下の性格診断（1-7尺度）の回答と自由記述に基づき、深い分析を行ってください。\n\n";
     
-    if (freeText && freeText.trim()) {
-        profileText += `## ユーザーによる自由記述（生の声）\n"${freeText.trim()}"\n\n`;
+    if (freetext) {
+        profileText += `## 本人の自由記述（悩み、理想、価値観）\n"${freetext}"\n\n`;
     }
-    
-    profileText += "## カテゴリ別スコア傾向（1-7尺度）\n";
+
     const sortedAnswerIds = Object.keys(answers).map(Number).sort((a,b) => a-b);
     const categoryScores: Record<string, {sum: number, count: number}> = {};
     
     for (const id of sortedAnswerIds) {
       const q = questions.find(q => q.id === id);
-      const rawScore = answers[id];
-      if (q && typeof rawScore === 'number') {
+      const score = answers[id];
+      if (q) {
         if (!categoryScores[q.categoryJa]) {
             categoryScores[q.categoryJa] = { sum: 0, count: 0 };
         }
-        categoryScores[q.categoryJa].sum += effectiveScore(q, rawScore);
+        categoryScores[q.categoryJa].sum += score;
         categoryScores[q.categoryJa].count += 1;
       }
     }
 
-    profileText += "## カテゴリ別スコア傾向\n";
+    profileText += "## 診断スコア傾向\n";
     for (const [cat, data] of Object.entries(categoryScores)) {
-        const avg = (data.sum / data.count).toFixed(1);
-        profileText += `- ${cat}: 平均 ${avg}/7.0\n`;
+        profileText += `- ${cat}: 平均 ${(data.sum / data.count).toFixed(1)}/7.0\n`;
     }
 
-    profileText += "\n## 詳細回答データ\n";
-    for (const id of sortedAnswerIds) {
-        const q = questions.find(q => q.id === id);
-        const score = answers[id];
-        if (q) {
-            profileText += `Q${id} [${q.categoryJa}]: "${q.text}" -> ${score}\n`;
+    profileText += "\n指示: この人物の強み、弱み、コミュニケーションスタイル、適した環境について、プロの心理分析官として詳細なレポートを作成してください。回答には自由記述の内容も深く反映させてください。出力に「AI」という語は含めないでください。";
+    
+    // 3. Call Gemini for Synthesis (Skip for guest to encourage registration)
+    let synthesis = "登録後にAI詳細分析レポートが生成されます。";
+    const isGuest = user?.email.startsWith("guest_");
+
+    if (!isGuest) {
+        try {
+            const result = await model.generateContent(profileText);
+            const response = await result.response;
+            synthesis = response.text() || synthesis;
+        } catch (e) {
+            console.warn("Gemini API Error (Synthesis):", e);
+            synthesis = "分析エラーが発生しました。時間を置いて再試行してください。";
         }
     }
 
-    profileText += `\n\n指示: 
-    1. 上記の数値データ（スコア）に加え、もし「自由記述」がある場合はその文脈や熱量を深く考慮してください。
-    2. 数値と記述内容に乖離がある場合は、言語化された「生の声」により深層心理が隠れていると仮定して分析してください。
-    3. この人物の深層心理、行動特性、そして「どういう状態がその人にとっての真の充足（幸福）か」について、プロの認知科学者・心理分析官としての視点から詳細なレポートを作成してください。
-    `;
-
-    profileText += `
-    以下の見出し（Markdown形式の h3 '### '）を必ず含め、非常に読み応えのある長文で出力してください。出力内に「AI」という単語は絶対に含めないでください。
-
-    ### 認知ベクトルと本質的な強み
-    （この人物が持つ特徴的な強みと、世界をどう捉えているかの分析。500文字程度で深掘りしてください）
-
-    ### 深層的な価値観とモチベーションの源泉
-    （表面的な欲求ではなく、何がこの人物の心を動かし、情熱を傾けさせるのかについて。具体的かつ深く考察してください）
-
-    ### 摩擦が生じやすい環境と弱み
-    （どのような状況でストレスを感じやすいか、その理由は何か。またそれをどう乗り越えるべきか）
-
-    ### 充足感（幸福）を感じる条件
-    （スピリチュアルで胡散臭い表現は避け、脳科学的・環境的・社会的な側面から客観的かつ具体的に「こういう環境・役割において最もパフォーマンスと幸福度が高まる」と記述すること）
-
-    ### 推奨される行動パターン（Next Action）
-    （この特性を活かして、今後の学業やキャリア、人間関係をどう構築していくべきか。具体的な行動指針を3つ以上提示してください）
-
-    ### 総評（今後の進化に向けたフィードバック）
-    （全体を括るアドバイスと、より高い次元へ自己統合していくためのエール）`;
-
-    // 3. Call Gemini for Synthesis
-    let synthesis = "";
-    try {
-        const result = await model.generateContent(profileText);
-        const response = await result.response;
-        synthesis = response.text();
-        if (!synthesis) throw new Error("Empty response from Gemini");
-        logGemini("synthesis", profileText, synthesis).catch(() => {});
-    } catch (e: any) {
-        console.error("Gemini API Error (Synthesis):", e);
-        // Log the error to the DB for debugging
-        await logGemini("error", profileText, `ERROR: ${e.message || String(e)}`, { stack: e.stack }).catch(() => {});
-        
-        throw new Error("現在、サーバーへのアクセスが集中しており、分析エンジンが応答しません。しばらく経ってから再度お試しください。");
-    }
-
-    // 4. 6次元ベクトルをカテゴリスコアから算出（論理性, 直感力, 共感性, 意志力, 創造性, 柔軟性）
-    const CATEGORY_ORDER = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
-    const CATEGORY_JA: Record<string, string> = { Social: '外向性', Empathy: '協調性', Discipline: '誠実性', Openness: '開放性', Emotional: '情緒安定性' };
-    const rawByCat = CATEGORY_ORDER.map((c) => {
-        const d = categoryScores[CATEGORY_JA[c]] || { sum: 0, count: 0 };
-        const avg = d.count > 0 ? d.sum / d.count : 4;
+    // 4. 6次元ベクトル (レーダーチャート用)
+    const categoryOrder = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
+    const jaMap: Record<string, string> = { 'Social': '外向性', 'Empathy': '協調性', 'Discipline': '誠実性', 'Openness': '開放性', 'Emotional': '情緒安定性' };
+    const rawByCat = categoryOrder.map(c => {
+        const d = categoryScores[jaMap[c]];
+        const avg = d && d.count > 0 ? d.sum / d.count : 4;
         return Math.round(((avg - 1) / 6) * 100);
     });
     const [social, empathy, discipline, openness, emotional] = rawByCat;
-    const vector: number[] = [
-        discipline,                          // 論理性 ← 誠実性
-        openness,                            // 直感力 ← 開放性
-        empathy,                             // 共感性 ← 協調性
-        discipline,                          // 意志力 ← 誠実性
-        openness,                            // 創造性 ← 開放性
-        Math.round((emotional + social) / 2), // 柔軟性 ← 情緒安定性・外向性
-    ];
+    const vector6d = [discipline, openness, empathy, discipline, openness, Math.round((emotional + social) / 2)];
 
-    // 5. Generate 768-dim Embedding for RAG
-    let embedding: number[] = [];
-    
-    if (!process.env.GOOGLE_API_KEY) {
-        throw new Error("GOOGLE_API_KEY is not configured.");
-    }
-
+    // 4.5. 768次元ベクトル (セマンティック検索用)
+    let embedding768: number[] | undefined = undefined;
     try {
-        const embeddingResult = await embeddingModel.embedContent(synthesis);
-        // Force slice to 768 dims to match Prisma schema vector(768)
-        embedding = embeddingResult.embedding.values.slice(0, 768);
+        const embedText = `Synthesis: ${synthesis}\nFreetext: ${freetext || "N/A"}`;
+        const embeddingResult = await embeddingModel.embedContent(embedText);
+        embedding768 = embeddingResult.embedding.values.slice(0, 768);
     } catch (e) {
-        console.error("Embedding API Error:", e);
-        throw new Error("ベクトル生成に失敗しました。");
+        console.warn("Gemini API Error (Embedding):", e);
     }
 
-    // 6. Save to Database
+    // 5. Save to Database
     const diagnosticResult = await prisma.diagnosticResult.create({
       data: {
         userId: userId,
         answers: JSON.stringify(answers),
         synthesis: synthesis,
-        vector: JSON.stringify(embedding), // Start storing 768-dim in DB 'vector' field? Schema says 'vectorJson'
-        // Wait, Schema DiagonosticResult.vector is string. 
-        // Let's store the 6-dim stats there? Or the 768? 
-        // Usage of DiagnosticResult.vector? 
-        // It's likely used for specific diagnostic retrieval. 
-        // Let's store the 6-dim there for now as it was before, or store both?
-        // Let's store the 6-dim stats in DiagnosticResult for backward compat if any.
-        // Actually, the prompt says "vector: JSON.stringify(vector)" where vector is 6-dim.
-        // Let's keep it.
+        vector: JSON.stringify(vector6d),
       },
     });
 
-    // Also save to EssenceVector for matching & History
     await vectorStore.saveEmbedding(
         userId,
-        embedding,  // 768-dim
-        vector,     // 6-dim stats
-        "性格診断結果",
-        1.0 
+        vector6d,
+        "性格診断結果と自由記述に基づく分析",
+        1.0,
+        embedding768 // 768次元を追加
     );
 
     return NextResponse.json({ 
@@ -1936,10 +1875,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error('Diagnostic Error:', error);
-    return NextResponse.json({ 
-        success: false, 
-        error: 'Internal Server Error' 
-    }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
 
@@ -1961,6 +1897,7 @@ export async function GET(
     const { id } = await params;
     const result = await prisma.diagnosticResult.findUnique({
       where: { id },
+      include: { user: true }
     });
     if (!result) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -1968,8 +1905,11 @@ export async function GET(
     const answers = JSON.parse(result.answers) as Record<string, number>;
     return NextResponse.json({
       id: result.id,
+      userId: result.userId,
+      isGuest: result.user.email.startsWith("guest_"),
       synthesis: result.synthesis,
       answers,
+      vector: result.vector ? JSON.parse(result.vector) : null,
     });
   } catch (e) {
     console.error("Diagnostic result fetch error:", e);
@@ -2223,7 +2163,7 @@ import { findTopMatches } from "@/lib/rec/engine";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { vector, topN = 5, synthesis, optimalSimilarity } = body;
+    const { vector, topN = 5, synthesis } = body;
 
     if (!vector || !Array.isArray(vector) || vector.length !== 6) {
       return NextResponse.json(
@@ -2232,11 +2172,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const opt = typeof optimalSimilarity === 'number' && optimalSimilarity >= 0.1 && optimalSimilarity <= 0.9
-      ? optimalSimilarity
-      : undefined;
-
-    const matches = await findTopMatches(vector, topN, synthesis, opt);
+    const matches = await findTopMatches(vector, topN, synthesis);
 
     return NextResponse.json({
       success: true,
@@ -2268,7 +2204,7 @@ import { NextResponse } from "next/server";
 import { analyzeEssence } from "@/lib/gemini";
 import { vectorStore } from "@/lib/db/client";
 import { z } from "zod";
-import { encrypt, verifySession } from "@/lib/crypto";
+import { encrypt } from "@/lib/crypto";
 import { cookies } from "next/headers";
 
 export const runtime = "nodejs";
@@ -2276,8 +2212,7 @@ export const runtime = "nodejs";
 // Input Validation Schema
 const AnalyzeRequestSchema = z.object({
     inputs: z.array(z.string().min(1, "Input cannot be empty")).min(1, "At least one input is required"),
-    biases: z.array(z.union([z.string(), z.number()])).optional(),
-    purpose: z.string().optional(),
+    biases: z.array(z.string()).optional(),
 });
 
 export async function POST(request: Request) {
@@ -2293,31 +2228,28 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
-        const { inputs, biases, purpose } = validation.data;
+        const { inputs, biases } = validation.data;
 
         // 2. AI Analysis
         const numericBiases = biases?.map((b) => Number(b));
-        const result = await analyzeEssence(inputs, numericBiases, purpose || "general");
+        const result = await analyzeEssence(inputs, numericBiases);
 
         // [DB] Persist the analysis result
         const cookieStore = await cookies();
 
-        const sessionId = verifySession(cookieStore.get('zax-session')?.value);
+        const sessionId = cookieStore.get('zax-session')?.value;
         const userId = sessionId || "guest_" + new Date().getTime();
         
-        // Encrypt reasoning before saving to protect user privacy
+        // 3. Data Encryption (Encrypt sensitive reasoning before saving)
         const encryptedReasoning = encrypt(result.reasoning);
 
-        // Bug fix: 2nd arg must be 768-dim embedding (for pgvector), 3rd is 6-dim statsVector (for display)
-        const embedding768 = result.embedding || new Array(768).fill(0); // analyzeEssence always returns embedding
-        const stats6dim = result.vector || null; // 6-dim for radar chart
-
+        // Save with encrypted reasoning
         await vectorStore.saveEmbedding(
             userId,
-            embedding768,   // 768次元 ← pgvector vector(768)に保存
-            stats6dim,      // 6次元  ← statsVectorに保存
+            result.vector,
             encryptedReasoning,
-            result.resonance_score || 0
+            result.resonance_score || 0,
+            result.embedding
         );
 
         // Return PLAIN text to the user (they need to see their own result immediately)
@@ -2339,8 +2271,6 @@ export async function POST(request: Request) {
 import { NextResponse } from "next/server";
 import { calculateDeltaVector } from "@/lib/gemini";
 import { prisma } from "@/lib/db/client";
-import { cookies } from "next/headers";
-import { verifySession } from "@/lib/crypto";
 
 export const runtime = "nodejs";
 
@@ -2358,10 +2288,7 @@ export async function POST(request: Request) {
 
         // [DB] Persist Feedback & Delta (Prisma)
         try {
-            const cookieStore = await cookies();
-            const sessionId = verifySession(cookieStore.get('zax-session')?.value);
-            const userId = sessionId || "guest_" + Date.now(); // Fallback for testing/no session
-            
+            const userId = "guest_demo_user"; // Fixed for MVP demo
             await prisma.feedback.create({
                 data: {
                     content: feedback,
@@ -2370,11 +2297,7 @@ export async function POST(request: Request) {
                     user: {
                         connectOrCreate: {
                             where: { id: userId },
-                            create: { 
-                                id: userId, 
-                                email: "guest@example.com",
-                                password: "guest_dummy_password"
-                            }
+                            create: { id: userId, email: "guest@example.com" }
                         }
                     }
                 }
@@ -2405,92 +2328,19 @@ export async function POST(request: Request) {
 ```typescript
 import { NextResponse } from "next/server";
 import { generateReflectionSummary } from "@/lib/gemini";
-import { prisma } from "@/lib/db/client";
-import { cookies } from "next/headers";
-import { verifySession } from "@/lib/crypto";
-
-const LIKERT_LABELS: Record<number, string> = {
-  1: "同意しない",
-  2: "やや同意しない",
-  3: "どちらかといえば同意しない",
-  4: "中立",
-  5: "どちらかといえば同意する",
-  6: "やや同意する",
-  7: "同意する",
-};
-
-function answersToText(answers: {
-  aboutPartner: number;
-  howChanged: number;
-  grew: number;
-  togetherFeel: number;
-}): string {
-  return [
-    `相手はどうでしたか: ${LIKERT_LABELS[answers.aboutPartner] ?? answers.aboutPartner}`,
-    `自分はどう変わった: ${LIKERT_LABELS[answers.howChanged] ?? answers.howChanged}`,
-    `成長を実感できた: ${LIKERT_LABELS[answers.grew] ?? answers.grew}`,
-    `一緒にいてどうだった: ${LIKERT_LABELS[answers.togetherFeel] ?? answers.togetherFeel}`,
-  ].join("\n");
-}
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { interviewText: legacyText, answers, partnerName } = body;
-
-    let textForGemini: string;
-    let answersJson: string;
-    const partner = partnerName || "相手";
-
-    if (answers && typeof answers === "object") {
-      const { aboutPartner, howChanged, grew, togetherFeel } = answers;
-      if (
-        typeof aboutPartner !== "number" ||
-        typeof howChanged !== "number" ||
-        typeof grew !== "number" ||
-        typeof togetherFeel !== "number"
-      ) {
-        return NextResponse.json({ error: "Invalid answers format" }, { status: 400 });
-      }
-      textForGemini = answersToText(answers);
-      answersJson = JSON.stringify(answers);
-    } else if (legacyText && typeof legacyText === "string") {
-      textForGemini = legacyText;
-      answersJson = "{}";
-    } else {
-      return NextResponse.json({ error: "interviewText or answers required" }, { status: 400 });
-    }
-
-    const summary = await generateReflectionSummary(textForGemini);
-
-    const cookieStore = await cookies();
-    const userId = verifySession(cookieStore.get("zax-session")?.value);
-    if (userId) {
-      try {
-        const p = prisma as { reflection?: { create: (args: any) => Promise<any> } };
-        if (p?.reflection) {
-          await p.reflection.create({
-            data: {
-              userId,
-              partnerName: partner,
-              answers: answersJson,
-              summary,
-            },
-          });
+    try {
+        const { interviewText } = await request.json();
+        if (!interviewText || typeof interviewText !== "string") {
+            return NextResponse.json({ error: "interviewText required" }, { status: 400 });
         }
-      } catch (e) {
-        console.warn("Reflection DB save failed:", e);
-      }
+        const summary = await generateReflectionSummary(interviewText);
+        return NextResponse.json({ summary });
+    } catch (error) {
+        console.error("Reflection API Error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
-
-    return NextResponse.json({ summary });
-  } catch (error) {
-    console.error("Reflection API Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
 }
 
 ```
@@ -2588,6 +2438,150 @@ export async function GET(request: Request) {
   } catch (e) {
     console.error("Gemini logs fetch error:", e);
     return NextResponse.json({ error: "Failed to fetch logs" }, { status: 500 });
+  }
+}
+
+```
+
+---
+
+## `src\app\api\auth\guest-register\route.ts`
+
+```typescript
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db/client';
+import { cookies } from 'next/headers';
+import bcrypt from 'bcryptjs';
+
+export async function POST(req: Request) {
+  try {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('zax-session')?.value;
+
+    if (!sessionId) {
+      return NextResponse.json({ success: false, error: 'セッションが見つかりません' }, { status: 401 });
+    }
+
+    const { email, password, nickname } = await req.json();
+
+    if (!email || !password || !nickname) {
+      return NextResponse.json({ success: false, error: '必須項目が不足しています' }, { status: 400 });
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json({ success: false, error: 'パスワードは6文字以上で入力してください' }, { status: 400 });
+    }
+
+    // Domain check
+    if (!email.endsWith('@stu.musashino-u.ac.jp') && !email.endsWith('@musashino-u.ac.jp')) {
+      return NextResponse.json({ success: false, error: '武蔵野大学のメールアドレスのみ登録可能です' }, { status: 400 });
+    }
+
+    // Check if email already used by a REAL user
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing && !existing.email.startsWith('guest_')) {
+       return NextResponse.json({ success: false, error: 'このメールアドレスは既に登録されています' }, { status: 400 });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update the guest user record to a real user
+    await prisma.user.update({
+      where: { id: sessionId },
+      data: {
+        email,
+        password: hashedPassword,
+        nickname
+      }
+    });
+
+    return NextResponse.json({ success: true });
+
+  } catch (error: any) {
+    console.error('Guest Register Error:', error);
+    return NextResponse.json({ success: false, error: 'サーバーエラーが発生しました' }, { status: 500 });
+  }
+}
+
+```
+
+---
+
+## `src\app\api\diagnostic\generate-report\route.ts`
+
+```typescript
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db/client';
+import { model } from '@/lib/gemini';
+import { cookies } from 'next/headers';
+
+export const maxDuration = 60;
+
+export async function POST(req: Request) {
+  try {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('zax-session')?.value;
+
+    if (!sessionId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { resultId } = await req.json();
+    if (!resultId) {
+      return NextResponse.json({ success: false, error: 'Result ID is required' }, { status: 400 });
+    }
+
+    const diagnosticResult = await prisma.diagnosticResult.findUnique({
+      where: { id: resultId },
+      include: { user: true }
+    });
+
+    if (!diagnosticResult) {
+      return NextResponse.json({ success: false, error: 'Result not found' }, { status: 404 });
+    }
+
+    // Security check: Make sure user is not a guest anymore
+    if (diagnosticResult.user.email.startsWith('guest_')) {
+      return NextResponse.json({ success: false, error: 'Registration required to generate full report' }, { status: 403 });
+    }
+
+    const vector6d = JSON.parse(diagnosticResult.vector);
+
+    const prompt = `
+あなたはプロの深層心理アナリストです。
+対象者の性格特性が以下の6次元の数値（0-100）で算出されました。
+
+論理性: ${vector6d[0]}
+直感力: ${vector6d[1]}
+共感性: ${vector6d[2]}
+意志力: ${vector6d[3]}
+創造性: ${vector6d[4]}
+柔軟性: ${vector6d[5]}
+
+【指示】
+この数値データを元に、対象者の深層心理、行動特性、コミュニケーションの傾向、潜在的な強みと課題、そして未来に向けたアドバイスを網羅した、非常に詳細なレポートを作成してください。
+*   文字数は **約3000文字** 程度になるように、深堀りして記述してください。
+*   出力はプレーンテキストで行い、段落分けを活用してください。
+*   **絶対条件**: アスタリスク（*）やハッシュタグ（#）などのMarkdown記号は **一切使用しないでください**。
+*   「AI」という単語は含めず、一人の人間（専門家）として語りかけるような、丁寧で温かみのあるトーン（日本語）で記述してください。
+*   法的に問題になるような表現、極端な断定、医療的な診断などは避け、前向きな成長を促す内容にしてください。
+`;
+
+    const result = await model.generateContent(prompt);
+    let fullReport = await result.response.text();
+    fullReport = fullReport.replace(/[*#]/g, '').trim(); // Fallback sanitation
+
+    // Update the DB with the long synthesis
+    await prisma.diagnosticResult.update({
+      where: { id: resultId },
+      data: { synthesis: fullReport }
+    });
+
+    return NextResponse.json({ success: true, synthesis: fullReport });
+
+  } catch (error: any) {
+    console.error('Report Generation Error:', error);
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
@@ -2759,13 +2753,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Menu } from "lucide-react";
-import { logout } from '@/lib/actions/manual-auth';
 
 const navLinks = [
   { label: "ABOUT US", href: "/about" },
   { label: "VISION", href: "/philosophy" },
   { label: "PRODUCT", href: "/technology" },
-  { label: "DIAGNOSTIC", href: "/diagnostic" },
+  { label: "YOUR HISTORY", href: "/history" },
 ];
 
 export default function CorporateHeader() {
@@ -2843,21 +2836,6 @@ export default function CorporateHeader() {
                     </Link>
                   </motion.div>
                 ))}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 + navLinks.length * 0.06, duration: 0.3 }}
-                    className="pt-6 mt-4 border-t border-slate-100"
-                >
-                    <form action={logout}>
-                      <button
-                        type="submit"
-                        className="block w-full text-left py-4 text-xl md:text-2xl font-bold text-slate-400 hover:text-red-500 transition-colors tracking-tight"
-                      >
-                        LOGOUT
-                      </button>
-                    </form>
-                </motion.div>
               </div>
 
               {/* CTA Button */}
@@ -2868,11 +2846,11 @@ export default function CorporateHeader() {
                 className="mt-12"
               >
                 <Link
-                  href="/diagnostic"
+                  href="/history"
                   onClick={() => setIsMenuOpen(false)}
                   className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white text-base font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm hover:shadow-md"
                 >
-                  無料で診断を開始
+                  無料で履歴解析を開始
                 </Link>
               </motion.div>
             </nav>
@@ -2899,34 +2877,7 @@ export default function CorporateHeader() {
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, BrainCircuit, Users, TrendingUp, Sparkles } from "lucide-react";
-
-const features = [
-  {
-    icon: BrainCircuit,
-    label: "性格分析",
-    title: "思考の6次元を可視化",
-    desc: "思考特性を6次元ベクトルとして分析し、あなたの内面を可視化。属性ではなく、価値観から相手を見つけます。",
-    iconBg: "bg-slate-100",
-    iconColor: "text-slate-900",
-  },
-  {
-    icon: Users,
-    label: "価値観の合う仲間探し",
-    title: "ベクトル空間で出会う",
-    desc: "高次元の空間計算により、自分でも気づかない「共通点」を持つ相手を見つけ、AIが論理的に相性を説明します。",
-    iconBg: "bg-slate-200",
-    iconColor: "text-black",
-  },
-  {
-    icon: TrendingUp,
-    label: "成長記録",
-    title: "対話で進化する自分",
-    desc: "対話を通じた自己の変化を記録し、新たな価値観への気づきを促します。あなたのベクトルは出会いごとに更新されます。",
-    iconBg: "bg-slate-300",
-    iconColor: "text-slate-800",
-  },
-];
+import { ArrowRight } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -2934,8 +2885,8 @@ export default function LandingPage() {
       {/* ─── HERO ─── */}
       <section className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] bg-slate-200/40 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-5%] left-[-5%] w-[500px] h-[500px] bg-slate-300/30 rounded-full blur-[100px]" />
+          <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] bg-blue-100/40 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-5%] left-[-5%] w-[500px] h-[500px] bg-violet-100/30 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative z-10 w-full max-w-3xl px-6 flex flex-col items-center text-center">
@@ -2964,7 +2915,7 @@ export default function LandingPage() {
             transition={{ delay: 0.18, duration: 0.5 }}
             className="text-sm text-slate-500 mb-12 max-w-md"
           >
-            50の質問から、価値観とつながり方を可視化します。
+            あなたのブラウザの履歴から、価値観とつながり方を可視化します。
           </motion.p>
 
           <motion.div
@@ -2974,10 +2925,10 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row gap-3"
           >
             <Link
-              href="/diagnostic"
+              href="/history"
               className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-all shadow-sm hover:shadow-md"
             >
-              診断を開始
+              無料で履歴解析を開始
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
@@ -2988,117 +2939,6 @@ export default function LandingPage() {
             </Link>
           </motion.div>
         </div>
-      </section>
-
-      {/* ─── FEATURE CARDS ─── */}
-      <section id="features" className="w-full py-28 lg:py-40">
-        <div className="max-w-5xl mx-auto px-6 lg:px-10">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16 lg:mb-20"
-          >
-            <h2 className="text-sm font-semibold text-slate-400 tracking-[0.15em] uppercase mb-3">
-              Features
-            </h2>
-            <h3 className="text-3xl md:text-4xl font-bold text-slate-900">
-              ZAXの3つの機能
-            </h3>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {features.map((f, i) => (
-              <motion.div
-                key={f.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-              >
-                <div className="h-full bg-white rounded-2xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100 hover:shadow-2xl hover:shadow-slate-200/70 transition-shadow duration-300">
-                  <div className={`w-12 h-12 rounded-xl ${f.iconBg} flex items-center justify-center mb-5`}>
-                    <f.icon className={`w-6 h-6 ${f.iconColor}`} />
-                  </div>
-                  <p className="text-xs font-semibold text-slate-400 tracking-wider mb-2">{f.label}</p>
-                  <h4 className="text-lg font-bold text-slate-900 mb-3">{f.title}</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">{f.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── VALUE PROP ─── */}
-      <section className="w-full py-28 lg:py-40 bg-white">
-        <div className="max-w-5xl mx-auto px-6 lg:px-10">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center"
-          >
-            <div>
-              <span className="text-xs font-semibold text-slate-400 tracking-[0.15em] block mb-3">TECHNOLOGY</span>
-              <h3 className="text-3xl md:text-4xl font-bold text-slate-900 mb-5 leading-tight">
-                AIが描く、<br />6次元のベクトル空間
-              </h3>
-              <p className="text-slate-600 leading-relaxed mb-8">
-                論理、直感、共感... ZAXのアルゴリズムは、あなたの発話や行動から6つの指標を抽出し、
-                他者との相性を「距離」として計算します。
-              </p>
-              <Link
-                href="/technology"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900 hover:text-slate-500 transition-colors"
-              >
-                プロダクト・アーキテクチャを見る
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="h-72 lg:h-80 bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center"
-            >
-              <svg viewBox="0 0 200 200" className="w-full h-full opacity-50 p-10">
-                <circle cx="100" cy="100" r="80" stroke="#000000" strokeWidth="1" fill="none" />
-                <circle cx="100" cy="100" r="50" stroke="#64748b" strokeWidth="1" fill="none" />
-                <line x1="100" y1="20" x2="100" y2="180" stroke="#cbd5e1" strokeWidth="0.5" />
-                <line x1="20" y1="100" x2="180" y2="100" stroke="#cbd5e1" strokeWidth="0.5" />
-                <circle cx="140" cy="70" r="4" fill="#000000" />
-                <circle cx="60" cy="130" r="4" fill="#64748b" />
-              </svg>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── CTA ─── */}
-      <section className="w-full py-28 lg:py-40">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-3xl mx-auto px-6 text-center"
-        >
-          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-12 lg:p-20">
-            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">
-              あなたの価値観を、可視化する。
-            </h3>
-            <p className="text-slate-600 mb-8 max-w-md mx-auto">
-              属性ではなく価値観でつながる、新しい形での友達・仲間探し。
-            </p>
-            <Link
-              href="/diagnostic"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors shadow-sm"
-            >
-              <Sparkles className="w-4 h-4" />
-              診断を開始
-            </Link>
-          </div>
-        </motion.div>
       </section>
     </main>
   );
@@ -3111,219 +2951,177 @@ export default function LandingPage() {
 ## `src\components\ImpactSimulationGraph.tsx`
 
 ```tsx
-
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import ReactECharts from "echarts-for-react";
-import { type EChartsOption } from "echarts";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Activity, Loader2, BarChart4, MessageSquare, Users, Cpu } from "lucide-react";
-
-interface VectorData {
-    id: string;
-    vector: number[]; // 768-dim (not used for this graph directly unless reduced) 
-    // Wait, we need the 6-dim stats for the radar/line chart evolution.
-    // The API returns vectorJson which is 768-dim. 
-    // We need to store/retrieve the 6-dim STATS vector.
-    // In schema, we added 'statsVector'. 
-    // Let's assume the API returns statsVector as well.
-    statsVector?: string; // JSON string [v1, v2, v3, v4, v5, v6]
-    createdAt: string;
-    reasoning: string;
-}
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function ImpactSimulationGraph() {
-    const [data, setData] = useState<VectorData[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedData, setSelectedData] = useState<VectorData | null>(null);
+    // Simulated prediction data
+    const points = [
+        { year: 2024, baseline: 100, optimized: 100 },
+        { year: 2025, baseline: 101.5, optimized: 102.8 },
+        { year: 2026, baseline: 102.8, optimized: 106.5 },
+        { year: 2027, baseline: 104.1, optimized: 112.4 },
+        { year: 2028, baseline: 105.3, optimized: 119.8 },
+        { year: 2029, baseline: 106.4, optimized: 128.5 },
+        { year: 2030, baseline: 107.5, optimized: 139.2 },
+    ];
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const res = await fetch('/api/vectors/history');
-                const json = await res.json();
-                if (json.success) {
-                    setData(json.data);
-                }
-            } catch (e) {
-                console.error("Failed to fetch vector history", e);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchData();
-    }, []);
+    const width = 600;
+    const height = 300;
+    const padding = 40;
 
-    if (loading) {
-        return <div className="flex justify-center items-center h-[300px]"><Loader2 className="animate-spin text-blue-500" /></div>;
-    }
+    // Scale helpers
+    const getX = (index: number) => padding + (index / (points.length - 1)) * (width - 2 * padding);
+    const getY = (value: number) => height - padding - ((value - 90) / (150 - 90)) * (height - 2 * padding); // Scale 90-150 range
 
-    // Process data for chart
-    const dimensions = ["論理性", "直感力", "共感性", "意志力", "創造性", "柔軟性"];
-    const dates = data.map(d => {
-        const date = new Date(d.createdAt);
-        return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
-    });
-    
-    const series = dimensions.map((dim, i) => {
-        const colors = [
-            '#2563eb', // blue-600 (論理性)
-            '#7c3aed', // violet-600 (直感力)
-            '#db2777', // pink-600 (共感性)
-            '#ea580c', // orange-600 (意志力)
-            '#ca8a04', // yellow-600 (創造性)
-            '#059669', // emerald-600 (柔軟性)
-        ];
-        return {
-            name: dim,
-            type: 'line',
-            smooth: true,
-            symbol: 'circle',
-            symbolSize: 8,
-            itemStyle: { color: colors[i] },
-            lineStyle: { width: 3 },
-            areaStyle: {
-                opacity: 0.05,
-                color: colors[i]
-            },
-            data: data.map(d => {
-                if (d.statsVector) {
-                    try {
-                        const stats = JSON.parse(d.statsVector);
-                        return stats[i] || 50;
-                    } catch { return 50; }
-                }
-                return 50 + (Math.random() * 10 - 5);
-            })
-        } as any;
-    });
-
-    const option: EChartsOption = {
-        backgroundColor: "transparent",
-        tooltip: {
-            trigger: 'axis',
-            padding: 12,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderColor: '#e2e8f0',
-            textStyle: { color: '#1e293b' }
-        },
-        legend: {
-            data: dimensions,
-            top: 0,
-            left: 'center',
-            padding: [5, 20],
-            textStyle: { color: "#64748b", fontSize: 11 },
-            icon: 'circle',
-            itemGap: 15
-        },
-        grid: {
-            left: '4%',
-            right: '5%',
-            bottom: '15%',
-            top: '15%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: true,
-            data: dates,
-            axisLine: { lineStyle: { color: '#e2e8f0' } },
-            axisTick: { show: false },
-            axisLabel: { 
-                color: "#64748b",
-                fontSize: 10,
-                margin: 12,
-                rotate: dates.length > 5 ? 30 : 0
-            }
-        },
-        yAxis: {
-            type: 'value',
-            min: 0,
-            max: 100,
-            interval: 20,
-            splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
-            axisLabel: { color: "#94a3b8", fontSize: 10 }
-        },
-        series: series
-    };
-
-    const onChartClick = (params: any) => {
-        if (params.dataIndex !== undefined) {
-            setSelectedData(data[params.dataIndex]);
-        }
-    };
-
-    const onEvents = {
-        'click': onChartClick
-    };
+    const baselinePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${getX(i)} ${getY(p.baseline)}`).join(" ");
+    const optimizedPath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${getX(i)} ${getY(p.optimized)}`).join(" ");
 
     return (
-        <div className="space-y-6">
-            <Card className="bg-white/80 backdrop-blur-sm border-slate-200 w-full h-full min-h-[600px] flex flex-col shadow-sm">
-                <CardHeader className="pb-3 border-b border-gray-100">
-                    <div className="flex items-center gap-2">
-                        <BarChart4 className="w-5 h-5 text-black" />
-                        <CardTitle className="text-sm font-bold text-black tracking-tight">
-                            推移
-                        </CardTitle>
-                    </div>
-                </CardHeader>
-                <CardContent className="flex-1 p-6 min-h-[400px]">
-                    {data.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm">
-                            <p>データがまだありません。</p>
-                            <p>診断を行うと、ここに軌跡が描かれます。</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-6">
-                            <ReactECharts 
-                                option={option} 
-                                style={{ height: "400px", width: "100%" }} 
-                                notMerge={true}
-                                onEvents={onEvents}
+        <div className="w-full bg-black/40 border border-white/10 rounded-2xl p-6 md:p-8 backdrop-blur-sm relative overflow-hidden group">
+            {/* Header */}
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                    <h3 className="text-white font-bold text-lg flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-zax-accent animate-pulse" />
+                        Economic Ripple Prediction
+                    </h3>
+                    <p className="text-xs text-zax-muted font-mono mt-1">
+                        Model: LightGBM v4.2 (Verified) / Horizon: 2030
+                    </p>
+                </div>
+                <div className="text-right">
+                    <div className="text-2xl font-bold text-zax-accent">+29.4%</div>
+                    <div className="text-[10px] text-zax-muted uppercase tracking-wider">Projected GDP Impact</div>
+                </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-8">
+                {/* Graph Area */}
+                <div className="flex-1 relative">
+                    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible">
+                        {/* Grid Lines */}
+                        {[0, 1, 2, 3, 4].map(i => (
+                            <line
+                                key={i}
+                                x1={padding}
+                                y1={padding + (i * (height - 2 * padding)) / 4}
+                                x2={width - padding}
+                                y2={padding + (i * (height - 2 * padding)) / 4}
+                                stroke="rgba(255,255,255,0.05)"
+                                strokeWidth="1"
                             />
-                            <div className="text-center text-xs text-slate-400 animate-pulse">
-                                グラフの点をクリックすると、その時の詳細レポートが表示されます
+                        ))}
+
+                        {/* Baseline Line */}
+                        <motion.path
+                            d={baselinePath}
+                            fill="none"
+                            stroke="#444"
+                            strokeWidth="2"
+                            strokeDasharray="5,5"
+                            initial={{ pathLength: 0 }}
+                            whileInView={{ pathLength: 1 }}
+                            transition={{ duration: 2, ease: "easeInOut" }}
+                        />
+
+                        {/* Optimized Line (ZAX) */}
+                        <motion.path
+                            d={optimizedPath}
+                            fill="none"
+                            stroke="#00F0FF"
+                            strokeWidth="3"
+                            initial={{ pathLength: 0 }}
+                            whileInView={{ pathLength: 1 }}
+                            transition={{ duration: 2, delay: 0.5, ease: "easeInOut" }}
+                            style={{ filter: "drop-shadow(0 0 8px rgba(0, 240, 255, 0.5))" }}
+                        />
+
+                        {/* Area under optimized (Gradient) */}
+                        <defs>
+                            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="rgba(0, 240, 255, 0.2)" />
+                                <stop offset="100%" stopColor="rgba(0, 240, 255, 0)" />
+                            </linearGradient>
+                        </defs>
+                        <motion.path
+                            d={`${optimizedPath} L ${width - padding} ${height - padding} L ${padding} ${height - padding} Z`}
+                            fill="url(#areaGradient)"
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            transition={{ duration: 1, delay: 1.5 }}
+                        />
+
+                        {/* Points & Labels */}
+                        {points.map((p, i) => (
+                            <g key={i}>
+                                {/* X Axis Labels */}
+                                <text x={getX(i)} y={height - 10} textAnchor="middle" fill="#666" fontSize="10" fontFamily="monospace">
+                                    {p.year}
+                                </text>
+                                {/* Dots on Optimized */}
+                                <motion.circle
+                                    cx={getX(i)}
+                                    cy={getY(p.optimized)}
+                                    r="3"
+                                    fill="#00F0FF"
+                                    initial={{ scale: 0 }}
+                                    whileInView={{ scale: 1 }}
+                                    transition={{ delay: 0.5 + (i * 0.1) }}
+                                />
+                            </g>
+                        ))}
+                    </svg>
+
+                    {/* Legend */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-0.5 bg-zax-accent" />
+                            <span className="text-[10px] text-white">ZAX Scenerio</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-0.5 bg-gray-600 border-t border-dashed border-gray-400" />
+                            <span className="text-[10px] text-gray-500">Baseline</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Feature Importance Sidebar */}
+                <div className="w-full md:w-48 flex flex-col justify-center space-y-4 border-l border-white/10 md:pl-6">
+                    <div className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">
+                        Feature Importance
+                    </div>
+                    {[
+                        { label: "Mental Health", value: 0.92, color: "bg-zax-accent" },
+                        { label: "Labor Mobility", value: 0.78, color: "bg-purple-500" },
+                        { label: "Creativity", value: 0.65, color: "bg-blue-500" },
+                        { label: "Consumption", value: 0.45, color: "bg-gray-500" },
+                    ].map((feature, i) => (
+                        <div key={i} className="group/bar">
+                            <div className="flex justify-between text-[10px] text-gray-400 mb-1">
+                                <span>{feature.label}</span>
+                                <span className="font-mono">{feature.value}</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    whileInView={{ width: `${feature.value * 100}%` }}
+                                    transition={{ duration: 1, delay: 0.5 + (i * 0.2) }}
+                                    className={`h-full ${feature.color} shadow-[0_0_10px_currentColor] opacity-80 group-hover/bar:opacity-100 transition-opacity`}
+                                />
                             </div>
                         </div>
-                    )}
-                </CardContent>
-            </Card>
+                    ))}
 
-            {selectedData && (
-                <Card className="bg-white border-2 border-black rounded-none p-8 md:p-10 shadow-sm transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
-                    <CardHeader className="px-0 pt-0 pb-6 border-b-2 border-black flex flex-row items-center justify-between">
-                         <div>
-                            <CardTitle className="text-xl font-bold flex items-center gap-2 text-black">
-                                <MessageSquare className="w-5 h-5" />
-                                診断レポートの振り返り
-                            </CardTitle>
-                            <p className="text-xs text-slate-500 mt-1 font-mono">
-                                {new Date(selectedData.createdAt).toLocaleString()} の軌跡
-                            </p>
+                    <div className="mt-4 pt-4 border-t border-white/5">
+                        <div className="text-[9px] text-zax-muted leading-relaxed">
+                            *Parameters optimized via Gradient Boosting Decision Tree (GBDT). showing high correlation between well-being & productivity.
                         </div>
-                        <button 
-                            onClick={() => setSelectedData(null)}
-                            className="text-slate-400 hover:text-black transition-colors"
-                        >
-                            閉じる
-                        </button>
-                    </CardHeader>
-                    <CardContent className="px-0 pt-8">
-                        <div className="space-y-6 text-sm md:text-base leading-relaxed text-black font-medium">
-                            {selectedData.reasoning.split('\n').filter(p => p.trim() !== "").map((para, i) => (
-                                <p key={i}>
-                                    {para.replace(/AI・?/g, "").replace(/AI分析/g, "分析").replace(/\*/g, "")}
-                                </p>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
@@ -3578,7 +3376,7 @@ export default function EssenceInput({ onComplete }: EssenceInputProps) {
 
     const purposes = [
         { id: "happiness", label: "HAPPINESS", title: "幸福の探求", desc: "人生単位の幸福と精神的充足を追求する", emoji: "✨", color: "#F59E0B" },
-        { id: "romance", label: "ROMANCE", title: "深い結びつき", desc: "心から信頼し合える深いパートナーシップを築く", emoji: "💫", color: "#EC4899" },
+        { id: "romance", label: "ROMANCE", title: "魂の共鳴", desc: "魂が共鳴する深いパートナーシップを築く", emoji: "💫", color: "#EC4899" },
         { id: "friendship", label: "ALLIANCE", title: "生涯の盟友", desc: "相互に高め合う生涯の盟友を見つける", emoji: "🤝", color: "#7C3AED" },
     ];
 
@@ -4172,7 +3970,7 @@ export default function EvidenceAnalysis() {
     return (
         <div className="space-y-8 font-sans">
             {/* Header Panel */}
-            <div className="border-l-4 border-l-slate-400 bg-slate-900/50 p-6 border-y border-r border-slate-800 backdrop-blur-md">
+            <div className="border-l-4 border-l-cyan-400 bg-slate-900/50 p-6 border-y border-r border-slate-800 backdrop-blur-md">
                 <div className="flex justify-between items-start">
                     <div>
                         <h2 className="text-2xl font-black text-white tracking-tight uppercase mb-2">Evidence Analysis</h2>
@@ -4181,7 +3979,7 @@ export default function EvidenceAnalysis() {
                         </p>
                     </div>
                     <div className="text-right hidden md:block">
-                        <div className="text-xs font-mono text-slate-400 mb-1">DATA_SOURCE</div>
+                        <div className="text-xs font-mono text-cyan-400 mb-1">DATA_SOURCE</div>
                         <div className="text-sm font-bold text-white">WHR_2019_DATASET</div>
                     </div>
                 </div>
@@ -4236,7 +4034,168 @@ export default function EvidenceAnalysis() {
 
 ## `src\components\BlindChat.tsx`
 
-_ファイルが見つかりませんでした: ENOENT: no such file or directory, open 'c:\ZAX\src\components\BlindChat.tsx'_
+```tsx
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { Send, Zap, Coffee } from "lucide-react";
+
+interface BlindChatProps {
+    partnerName?: string;
+    onEndChat: () => void;
+}
+
+export default function BlindChat({ partnerName, onEndChat }: BlindChatProps) {
+    const [messages, setMessages] = useState<{ id: number; text: string; sender: "me" | "them" }[]>([
+        { id: 1, text: "はじめまして。", sender: "them" },
+    ]);
+    const [inputText, setInputText] = useState("");
+    const [resonance, setResonance] = useState(50);
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+    // Simulate resonance fluctuation
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setResonance(prev => Math.min(100, Math.max(0, prev + (Math.random() - 0.4) * 5)));
+        }, 2000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleSend = () => {
+        if (!inputText.trim()) return;
+
+        const newMsg = { id: Date.now(), text: inputText, sender: "me" as const };
+        setMessages(prev => [...prev, newMsg]);
+        setInputText("");
+
+        // Simulate reply with random responses to feel "alive"
+        setTimeout(() => {
+            const responses = [
+                "なるほど、その視点は面白いですね。",
+                "確かに。でも、逆にこういう見方もできませんか？",
+                "すごく共感します。僕も同じことを考えていました。",
+                "それは深いですね...もう少し詳しく教えてもらえますか？",
+                "ふむ、あなたの価値観が少し見えてきた気がします。",
+                "意外です。そういう一面もお持ちなんですね。",
+                "そう言われると、確かにそうかもしれません。",
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                text: randomResponse,
+                sender: "them"
+            }]);
+            setResonance(prev => Math.min(100, prev + 15)); // Boost resonance on reply
+        }, 1500);
+    };
+
+    return (
+        <div className="w-full h-[80vh] flex flex-col bg-white/70 backdrop-blur-xl rounded-[32px] overflow-hidden border border-white/40 relative shadow-xl shadow-slate-200/50">
+            {/* Header with Resonance Metter */}
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-white/50 backdrop-blur-md z-20">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-100 to-indigo-50 flex items-center justify-center relative">
+                        <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />
+                        <div className="absolute inset-0 rounded-full border border-blue-200 opacity-50" />
+                    </div>
+                    <div>
+                        <div className="text-[10px] text-slate-400 tracking-widest uppercase mb-0.5 font-bold">相手</div>
+                        <div className="text-base font-bold text-slate-800 tracking-tight">{partnerName || '共鳴する相手'}</div>
+                    </div>
+                </div>
+                
+                <div className="flex items-center gap-6">
+                    <div className="flex flex-col items-end">
+                        <div className="flex items-center gap-1 text-blue-600 text-xs font-mono mb-1 tracking-wider font-bold">
+                            <Zap size={12} fill="currentColor" />
+                            共鳴度: {Math.round(resonance)}%
+                        </div>
+                        <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <motion.div
+                                className="h-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                                animate={{ width: `${resonance}%` }}
+                            />
+                        </div>
+                    </div>
+                    
+                    <button
+                        onClick={onEndChat}
+                        className="text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors border-l border-slate-200 pl-6 py-1 font-bold"
+                    >
+                        終了
+                    </button>
+                </div>
+            </div>
+
+            {/* Chat Area */}
+            <div className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide bg-slate-50/50" ref={scrollRef}>
+                {messages.map((msg) => (
+                    <motion.div
+                        key={msg.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}
+                    >
+                        <div className={`max-w-[80%] p-5 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.sender === "me"
+                                ? "bg-white border border-blue-100 text-slate-700 rounded-br-none shadow-blue-100/50"
+                                : "bg-white border border-slate-100 text-slate-600 rounded-bl-none"
+                            }`}>
+                            {msg.text}
+                        </div>
+                    </motion.div>
+                ))}
+
+                {resonance > 80 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex flex-col items-center gap-3 my-4"
+                    >
+                        <span className="px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-bold tracking-wider shadow-sm">
+                            共鳴度高
+                        </span>
+                        <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-full transition-colors">
+                            <Coffee className="w-4 h-4" />
+                            会う約束をする
+                        </button>
+                    </motion.div>
+                )}
+            </div>
+
+            {/* Floating Input Area (The "Floor") */}
+            <div className="p-8 bg-gradient-to-t from-white via-white/80 to-transparent z-20">
+                <div className="relative flex items-center gap-3 bg-white border border-slate-200 rounded-full px-2 py-2 shadow-2xl shadow-slate-200/50 ring-4 ring-slate-50 group focus-within:ring-blue-50 transition-all">
+                    <input
+                        type="text"
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                        placeholder="メッセージを入力..."
+                        className="flex-1 bg-transparent border-none px-6 text-slate-800 placeholder-slate-400 focus:outline-none text-sm font-medium tracking-wide"
+                    />
+                    <motion.button
+                        whileHover={{ scale: 1.05, backgroundColor: "rgba(37, 99, 235, 1)" }} // Blue-600
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleSend}
+                        className="p-3 bg-slate-900 rounded-full text-white shadow-lg shadow-slate-200 transition-all"
+                    >
+                        <Send size={18} />
+                    </motion.button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+```
 
 ---
 
@@ -4374,228 +4333,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
 ## `src\components\diagnostic\DiagnosticWizard.tsx`
 
-```tsx
-'use client';
-
-import { useState, useRef, useEffect } from 'react';
-import { questions } from '@/data/questions';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
-import { useDiagnostic } from '@/context/DiagnosticContext';
-
-export default function DiagnosticWizard() {
-  const { answers, currentStep: currentQuestionIndex, setAnswer: contextSetAnswer, setStep: setCurrentQuestionIndex } = useDiagnostic();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [direction, setDirection] = useState<'next' | 'prev'>('next');
-  const [isComplete, setIsComplete] = useState(false);
-  const [freeText, setFreeText] = useState('');
-
-  // For auto-scroll or focus effects
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const currentQuestion = questions[currentQuestionIndex];
-  const totalQuestions = questions.length;
-  const answeredCount = Object.keys(answers).length;
-  const lastQuestionAnswered = currentQuestion && answers[currentQuestion.id] !== undefined;
-  
-  const allAnswered = answeredCount >= totalQuestions * 0.8 ||
-                      (currentQuestionIndex === totalQuestions - 1 && (lastQuestionAnswered || answeredCount >= totalQuestions * 0.7));
-
-  const handleAnswer = (value: number) => {
-    if (currentQuestion) {
-       contextSetAnswer(currentQuestion.id, value);
-    }
-    
-    // Auto-advance with a slight delay for visual feedback
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setTimeout(() => {
-        setDirection('next');
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-      }, 300);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setDirection('next');
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else if (currentQuestionIndex === totalQuestions - 1 && allAnswered) {
-      setIsComplete(true);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (isComplete) {
-        setIsComplete(false);
-        return;
-    }
-    if (currentQuestionIndex > 0) {
-      setDirection('prev');
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    try {
-      const response = await fetch('/api/diagnostic/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers, freeText }),
-      });
-      const data = await response.json();
-      if (response.ok && data.success) {
-        const resultData = { id: data.id, synthesis: data.synthesis, answers: data.answers };
-        sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify(resultData));
-        window.location.href = `/diagnostic/result/${data.id}`;
-      } else {
-        console.error('Failed to submit:', data.error);
-        alert('エラーが発生しました: ' + (data.error || '不明なエラー'));
-      }
-    } catch (error) {
-      console.error('Error submitting diagnostic:', error);
-      alert('通信エラーが発生しました。ブラウザのコンソールを確認してください。');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const options = [
-    { value: 1, label: '同意しない', color: 'bg-black', size: 'w-16 h-16', border: 'border-black' },
-    { value: 2, label: '', color: 'bg-gray-800', size: 'w-12 h-12', border: 'border-gray-800' },
-    { value: 3, label: '', color: 'bg-gray-600', size: 'w-8 h-8', border: 'border-gray-600' },
-    { value: 4, label: '中立', color: 'bg-gray-200', size: 'w-6 h-6', border: 'border-gray-300' },
-    { value: 5, label: '', color: 'bg-gray-400', size: 'w-8 h-8', border: 'border-gray-400' },
-    { value: 6, label: '', color: 'bg-gray-600', size: 'w-12 h-12', border: 'border-gray-600' },
-    { value: 7, label: '同意する', color: 'bg-black', size: 'w-16 h-16', border: 'border-black' },
-  ];
-
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-8 min-h-[600px] flex flex-col justify-center">
-      <div className="relative">
-          <Card 
-            ref={cardRef}
-            className="border-2 border-black shadow-none rounded-none bg-white"
-          >
-            <CardContent className="p-8 sm:p-12 text-center space-y-10">
-              
-              {!isComplete ? (
-                <>
-                  {currentQuestion && (
-                  <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300 key={currentQuestionIndex}">
-                    <span className="text-[10px] font-bold text-gray-400 tracking-[0.3em] uppercase">
-                        質問 {currentQuestion.id} / {totalQuestions}
-                    </span>
-                    <h2 className="text-xl sm:text-2xl font-bold text-black leading-tight tracking-tight">
-                      {currentQuestion.text}
-                    </h2>
-                  </div>
-                  )}
-
-                  <div className="flex items-center justify-center gap-3 sm:gap-6 py-4">
-                    <div className="hidden sm:block text-[10px] font-bold text-gray-400 mr-2">同意しない</div>
-                    
-                        {options.map((opt) => {
-                        const isSelected = currentQuestion && answers[currentQuestion.id] === opt.value;
-                        const isAnswered = currentQuestion && answers[currentQuestion.id] !== undefined;
-                        
-                        return (
-                            <button
-                                key={opt.value}
-                                onClick={() => currentQuestion && handleAnswer(opt.value)}
-                                className={`
-                                    rounded-full transition-all duration-300 flex items-center justify-center
-                                    ${opt.size}
-                                    ${isSelected 
-                                        ? `bg-black ring-4 ring-offset-2 ring-gray-100 scale-110` 
-                                        : `bg-transparent border border-gray-200 hover:bg-black group`
-                                    }
-                                    ${!isSelected && isAnswered ? 'opacity-40 hover:opacity-100' : 'opacity-100'}
-                                `}
-                                aria-label={`Select option ${opt.value}`}
-                            >
-                                {isSelected ? (
-                                    <Check className="text-white w-5 h-5 stroke-[3px]" />
-                                ) : (
-                                    <span className="opacity-0 group-hover:opacity-10 transition-opacity bg-black rounded-full w-full h-full"></span>
-                                )}
-                            </button>
-                        );
-                    })}
-
-                    <div className="hidden sm:block text-[10px] font-bold text-gray-400 ml-2">同意する</div>
-                  </div>
-
-                  <div className="flex sm:hidden justify-between text-[10px] font-bold text-gray-400 px-2">
-                    <span>同意しない</span>
-                    <span>同意する</span>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300 py-6">
-                    <h2 className="text-2xl font-black text-black tracking-widest text-center uppercase">診断完了</h2>
-                    <p className="text-gray-500 text-xs leading-relaxed max-w-md mx-auto text-center px-4">
-                        すべての質問への回答が完了しました。<br/>
-                        最後に、あなたの回答をどう解釈してほしいかなどを自由に教えてください（任意）。<br/>
-                        <span className="text-[10px] text-gray-400">例：「『優しい嘘』ならついてもいいと思う」「仕事より平穏を優先したい」など</span>
-                    </p>
-                    <div className="px-4">
-                        <textarea
-                            value={freeText}
-                            onChange={(e) => setFreeText(e.target.value)}
-                            placeholder="例：回答には、論理よりも感情を大切にしたいという意図が含まれています..."
-                            className="text-black w-full h-32 p-4 text-sm border-2 border-black focus:outline-none focus:ring-4 focus:ring-gray-100 transition-all resize-none placeholder:text-gray-300"
-                        />
-                        <p className="text-[9px] text-gray-400 mt-2 text-right">※入力するとAIによる分析がより詳細になります</p>
-                    </div>
-                </div>
-              )}
-
-            </CardContent>
-          </Card>
-      </div>
-
-      <div className="mt-12 flex justify-between items-center px-4">
-        <Button
-          variant="ghost"
-          onClick={handlePrevious}
-          disabled={currentQuestionIndex === 0 && !isComplete}
-          className="text-gray-400 hover:text-black hover:bg-transparent transition-colors text-[10px] font-bold"
-        >
-          <ChevronLeft className="w-3 h-3 mr-1" />
-          戻る
-        </Button>
-
-        {!isComplete ? (
-            currentQuestionIndex === totalQuestions - 1 ? (
-                 <Button 
-                    onClick={() => setIsComplete(true)} 
-                    disabled={!allAnswered}
-                    className="bg-black text-white hover:bg-gray-800 px-8 py-6 rounded-none font-bold uppercase tracking-widest text-xs transition-all disabled:opacity-20"
-                 >
-                    完了
-                 </Button>
-            ) : (
-                <div className="text-[10px] font-bold text-gray-300">
-                    進捗: {Math.round((answeredCount / totalQuestions) * 100)}%
-                </div>
-            )
-        ) : (
-              <Button 
-                onClick={handleSubmit} 
-                disabled={isSubmitting}
-                className="bg-black text-white hover:bg-gray-800 px-10 py-7 rounded-none font-bold uppercase tracking-widest text-xs transition-all disabled:opacity-20 translate-y-[-10px] border-2 border-black"
-             >
-                {isSubmitting ? '分析中...' : '結果を見る'}
-             </Button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-```
+_ファイルが見つかりませんでした: ENOENT: no such file or directory, open 'c:\ZAX\src\components\diagnostic\DiagnosticWizard.tsx'_
 
 ---
 
@@ -4605,16 +4343,19 @@ export default function DiagnosticWizard() {
 "use client";
 
 import { useEffect, useState } from "react";
-import { questions, effectiveScore } from "@/data/questions";
+import { questions } from "@/data/questions";
 import { DIMENSION_LABELS } from "@/lib/rec/engine";
 import ResultRadarChart from "./ResultRadarChart";
+import MatchResults from "./MatchResults";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Loader2, BookOpen, ExternalLink } from "lucide-react";
 
 interface ResultData {
   id: string;
+  isGuest: boolean;
   synthesis: string;
   answers: Record<string, number>;
+  vector?: number[] | string;
 }
 
 interface DiagnosticResultClientProps {
@@ -4625,36 +4366,95 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
   const [data, setData] = useState<ResultData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [nickname, setNickname] = useState("");
+
+  // Registration State
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [regError, setRegError] = useState<string | null>(null);
+
+  // Report Generation State
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const key = `diagnostic_result_${resultId}`;
     const cached = sessionStorage.getItem(key);
-    if (cached) {
-      try {
-        setData(JSON.parse(cached));
-      } catch {
-        setError("データの読み込みに失敗しました");
-      }
-      setLoading(false);
-      return;
-    }
+    // When updating from guest to real, we might need fresh data from server, 
+    // so we always fetch to be safe if not generating right now.
     fetch(`/api/diagnostic/result/${resultId}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Not found"))))
       .then((json) => setData(json))
-      .catch(() => setError("結果の取得に失敗しました。もう一度診断をお試しください。"))
+      .catch(() => {
+          if (cached) {
+            setData(JSON.parse(cached));
+          } else {
+            setError("結果の取得に失敗しました。もう一度診断をお試しください。");
+          }
+      })
       .finally(() => setLoading(false));
   }, [resultId]);
 
-  if (loading) {
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegError(null);
+    setIsRegistering(true);
+
+    try {
+      // 1. Convert guest to real user
+      const regRes = await fetch("/api/auth/guest-register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, nickname }),
+      });
+      const regData = await regRes.json();
+
+      if (!regData.success) {
+        setRegError(regData.error || "登録に失敗しました。");
+        setIsRegistering(false);
+        return;
+      }
+
+      // 2. Registration Success, immediately start generating long report
+      setIsRegistering(false);
+      setIsGenerating(true);
+
+      const genRes = await fetch("/api/diagnostic/generate-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resultId: data?.id }),
+      });
+      const genData = await genRes.json();
+
+      if (genData.success && data) {
+         // Update UI
+         setData({
+             ...data,
+             isGuest: false,
+             synthesis: genData.synthesis
+         });
+         // Update cache
+         sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify({
+            ...data,
+            isGuest: false,
+            synthesis: genData.synthesis
+         }));
+      } else {
+         setRegError("レポートの生成に失敗しました。ページをリロードしてください。");
+      }
+    } catch (err) {
+      setRegError("通信エラーが発生しました。");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  if (loading && !isGenerating) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-600 font-semibold uppercase tracking-widest text-sm">Analyzing...</p>
+          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-600 font-semibold">結果を読み込み中...</p>
         </div>
       </div>
     );
@@ -4666,10 +4466,10 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         <div className="text-center max-w-md px-6">
           <p className="text-slate-600 mb-6">{error || "結果が見つかりませんでした"}</p>
           <Link
-            href="/diagnostic"
+            href="/history"
             className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800"
           >
-            診断をやり直す
+            履歴から再解析する
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -4677,35 +4477,17 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     );
   }
 
-  const answers = data.answers;
-
-  // 5カテゴリ（質問ベース）のスコア計算
-  const CATEGORY_ORDER = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
-  const categoryScores: Record<string, { sum: number; count: number }> = {};
-  CATEGORY_ORDER.forEach((c) => { categoryScores[c] = { sum: 0, count: 0 }; });
-
-  Object.entries(answers).forEach(([qId, score]) => {
-    const q = questions.find((q) => q.id === Number(qId));
-    const rawScore = Number(score);
-    if (q && categoryScores[q.category] && !isNaN(rawScore)) {
-      categoryScores[q.category].sum += effectiveScore(q, rawScore);
-      categoryScores[q.category].count += 1;
+  // Determine vector
+  let userVector6d: number[] = [50, 50, 50, 50, 50, 50];
+  if (data.vector && Array.isArray(data.vector)) {
+    userVector6d = data.vector;
+  } else if (data.vector && typeof data.vector === 'string') {
+    try {
+        userVector6d = JSON.parse(data.vector);
+    } catch {
+        console.warn("Failed to parse vector string");
     }
-  });
-
-  // 0-100スケールの生スコア
-  const rawByCat = CATEGORY_ORDER.map((c) => {
-    const d = categoryScores[c];
-    const avg = d.count > 0 ? d.sum / d.count : 4;
-    return Math.round(((avg - 1) / 6) * 100);
-  });
-  const [social, empathy, discipline, openness, emotional] = rawByCat;
-
-  // 6次元マッピング
-  const userVector6d: number[] = [
-    discipline, openness, empathy, discipline, openness,
-    Math.round((emotional + social) / 2),
-  ];
+  }
 
   const chartData = DIMENSION_LABELS.map((label, i) => ({
     subject: label,
@@ -4713,39 +4495,24 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     fullMark: 100,
   }));
 
-  const synthesisParagraphs = data.synthesis
+  const synthesisParagraphs = (data.synthesis || "")
     .split("\n")
-    .filter((p: string) => p.trim() !== "")
-    .map((p: string) => p.replace(/AI・?/g, "").replace(/AI分析/g, "分析").replace(/\*/g, ""));
-
-  const handleRegister = async () => {
-    if (!nickname) return;
-    setIsRegistering(true);
-    try {
-      const res = await fetch('/api/matching/register', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nickname, email })
-      });
-      const json = await res.json();
-      if (json.success) {
-        setIsRegistered(true);
-      } else {
-        alert("登録に失敗しました: " + (json.error || ""));
-      }
-    } catch (e) {
-      alert("通信エラーが発生しました");
-    } finally {
-      setIsRegistering(false);
-    }
-  };
+    .filter((p: string) => p.trim() !== "");
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
       <div className="h-16" />
 
       <main className="max-w-4xl mx-auto px-6 py-12 space-y-16">
+        <section className="text-center space-y-4">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+            分析結果
+          </h1>
+        </section>
+
+        {/* 1. Radar Chart Section */}
         <section className="bg-white/70 backdrop-blur-md rounded-2xl p-8 shadow-xl shadow-slate-200/30 border border-slate-200/60">
+          <h2 className="text-2xl font-bold mb-8 text-center">特性レーダーチャート</h2>
           <div className="flex justify-center">
             <div className="w-full max-w-md">
               <ResultRadarChart data={chartData} />
@@ -4761,84 +4528,141 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           </div>
         </section>
 
-        {isRegistered && (
-          <section className="bg-white border-2 border-black rounded-none p-8 md:p-12 shadow-sm relative overflow-hidden">
-            <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 tracking-widest text-black border-b-2 border-black pb-4">
-              分析レポート
+        {/* 2. Registration Wall for Guests */}
+        {data.isGuest && !isGenerating && (
+          <section className="bg-slate-900 text-white rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
+             <div className="max-w-md mx-auto relative z-10 text-center space-y-6">
+                <div className="inline-block p-4 rounded-full bg-slate-800 mb-2">
+                  <BookOpen className="w-12 h-12 text-indigo-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">深層心理レポート</h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  ここから先は、あなたの価値観と行動特性を深く掘り下げる約3,000文字の「深層パーソナリティレポート」をご用意しています。閲覧および保存には無料のアカウント登録が必要です。
+                </p>
+
+                <form onSubmit={handleRegister} className="mt-8 space-y-4 text-left">
+                  <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 space-y-4">
+                     {regError && (
+                        <div className="bg-red-500/10 border border-red-500/50 text-red-400 text-xs p-3 rounded-lg font-bold">
+                           {regError}
+                        </div>
+                     )}
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 mb-1">ニックネーム (学内表示用)</label>
+                       <input 
+                          type="text" 
+                          required
+                          value={nickname}
+                          onChange={e => setNickname(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          placeholder="ZAX 太郎"
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 mb-1">大学メールアドレス</label>
+                       <input 
+                          type="email" 
+                          required
+                          value={email}
+                          onChange={e => setEmail(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          placeholder="name@musashino-u.ac.jp"
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 mb-1">パスワード</label>
+                       <input 
+                          type="password" 
+                          required
+                          minLength={6}
+                          value={password}
+                          onChange={e => setPassword(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          placeholder="6文字以上"
+                       />
+                     </div>
+                     <button 
+                        type="submit" 
+                        disabled={isRegistering}
+                        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-500 transition-colors disabled:opacity-50 mt-4"
+                     >
+                        {isRegistering ? (
+                          <><Loader2 className="w-5 h-5 animate-spin" />登録処理中...</>
+                        ) : (
+                          <>無料で登録してレポートを見る<ArrowRight className="w-5 h-5" /></>
+                        )}
+                     </button>
+                  </div>
+                </form>
+             </div>
+             {/* Decor */}
+             <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/20 blur-3xl rounded-full pointer-events-none" />
+          </section>
+        )}
+
+        {/* 3. Generating Report State */}
+        {isGenerating && (
+          <section className="bg-slate-900 text-white rounded-2xl p-12 md:p-20 shadow-2xl text-center space-y-8 border border-slate-800">
+             <div className="inline-block p-6 rounded-full bg-indigo-900/30 border border-indigo-500/20 mb-4 relative">
+                <Loader2 className="w-16 h-16 text-indigo-400 animate-spin absolute inset-0 m-auto" />
+                <Sparkles className="w-8 h-8 text-indigo-300 opacity-50 absolute -top-2 -right-2 animate-pulse" />
+             </div>
+             <h3 className="text-2xl font-bold text-white">深層心理レポートを生成中...</h3>
+             <div className="max-w-md mx-auto text-slate-400 text-sm space-y-2 font-medium">
+               <p>あなたの履歴ベクトルデータから、約3,000文字に及ぶ詳細な専門的心理分析レポートを執筆しています。</p>
+               <p className="opacity-70 text-xs">※データの複雑さにより数十秒かかる場合があります。この画面のままお待ちください。</p>
+             </div>
+          </section>
+        )}
+
+        {/* 4. Full Report Display (For Logged In / Newly Registered Users) */}
+        {!data.isGuest && !isGenerating && (
+          <section className="bg-white text-slate-900 rounded-2xl p-8 md:p-12 shadow-xl border border-slate-200">
+            <h2 className="text-3xl font-black mb-8 flex items-center gap-3 text-slate-900 border-b border-slate-100 pb-4">
+              <BookOpen className="w-8 h-8 text-indigo-600" />
+              深層パーソナリティレポート
             </h2>
-            <div className="space-y-6 text-sm md:text-base leading-relaxed text-black font-medium">
-              {synthesisParagraphs.map((para: string, i: number) =>
-                para.startsWith("#") ? (
-                  <h3 key={i} className="text-lg font-black text-black mt-8 mb-2">
-                    {para.replace(/^#+\s/, "")}
-                  </h3>
-                ) : (
-                  <p key={i}>{para}</p>
-                )
-              )}
+            
+            <div className="space-y-6 text-base md:text-lg leading-loose text-slate-700 font-medium">
+              {synthesisParagraphs.map((para: string, i: number) => (
+                <p key={i} className="text-left">{para}</p>
+              ))}
+            </div>
+
+            {/* ZAXcampus CTA - At the bottom of the long report */}
+            <div className="mt-16 pt-12 border-t border-slate-100 text-center space-y-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-indigo-600 to-purple-600 text-white rounded-2xl shadow-lg mb-4 transform rotate-3 hover:rotate-6 transition-transform">
+                   <span className="font-black text-2xl">Z</span>
+                </div>
+                <h3 className="text-2xl font-black text-slate-900">さらなる出会いと挑戦へ</h3>
+                <p className="text-slate-500 max-w-lg mx-auto font-medium">
+                  ZAXcampusに登録して、学内の新しいプロジェクトや価値観の合う仲間を探しに行きましょう。
+                </p>
+                <a 
+                   href="https://zax-campus.com" // Placeholder external link
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl font-bold text-lg hover:from-black hover:to-black transition-all shadow-xl hover:-translate-y-1 mx-auto"
+                >
+                   ZAXcampusを始める
+                   <ExternalLink className="w-5 h-5 text-indigo-300" />
+                </a>
             </div>
           </section>
         )}
 
-        <section className="text-center pt-8 space-y-4">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        {/* 5. Match Results Section (Optional, keeping it below if they want to chat in the current app, but users flow ends at ZAXcampus) */}
+        {!data.isGuest && !isGenerating && (
+           <MatchResults userVector={userVector6d} synthesis={data.synthesis} isGuest={data.isGuest} />
+        )}
 
-            {isRegistered ? (
-              <div className="inline-flex items-center gap-3 px-8 py-4 bg-slate-100 text-slate-500 border-2 border-slate-200 rounded-none font-bold text-sm">
-                登録完了しました！
-              </div>
-            ) : (
-              <div className="w-full max-w-md mx-auto bg-white p-8 border-2 border-slate-200 rounded-2xl shadow-sm text-left mt-8">
-                <h3 className="text-xl font-bold mb-4 tracking-tight">あなたの軌跡を記録する</h3>
-                <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-                  詳細な分析レポートの閲覧や、今後の自己変容の軌跡を記録するためには登録が必要です。
-                </p>
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-black ml-1">ニックネーム (必須)</label>
-                      <input 
-                          type="text"
-                          placeholder="例: 匿名希望"
-                          value={nickname}
-                          onChange={(e) => setNickname(e.target.value)}
-                          className="w-full bg-white border-2 border-black px-4 py-3 text-sm text-black focus:outline-none transition-colors rounded-none font-bold"
-                      />
-                  </div>
-                  <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-black ml-1">大学メールアドレス または 学籍番号（任意）</label>
-                      <input 
-                          type="text"
-                          placeholder="例: s1234567 または 12345678"
-                          value={email}
-                          onChange={(e) => {
-                              const val = e.target.value;
-                              const trimmed = val.trim().toLowerCase();
-                              if (/^[sS]\d{7}$/.test(trimmed) || /^\d{8}$/.test(trimmed)) {
-                                  setEmail(`${trimmed}@stu.musashino-u.ac.jp`);
-                              } else {
-                                  setEmail(val);
-                              }
-                          }}
-                          className="w-full bg-white border-2 border-black px-4 py-3 text-sm text-black focus:outline-none transition-colors rounded-none placeholder:text-gray-300 font-bold"
-                      />
-                      <p className="text-[9px] text-gray-400 mt-1 leading-relaxed">
-                          ※ s＋7桁 または 8桁の学籍番号を入力した瞬間に、@stu.musashino-u.ac.jp が自動入力されます。<br/>
-                          ※メールアドレスはハッシュ化されて保存され、個人は特定されません。学内共通ドメイン判定に使用されます。<br/>
-                          ※送信ボタンを押すことで、<a href="/terms" target="_blank" className="underline hover:text-black">利用規約</a>および<a href="/privacy" target="_blank" className="underline hover:text-black">プライバシーポリシー</a>に同意したものとみなされます。
-                      </p>
-                  </div>
-                  <button
-                    onClick={handleRegister}
-                    disabled={isRegistering || !nickname.trim()}
-                    className="w-full mt-4 flex justify-center items-center gap-3 px-8 py-4 bg-black text-white border-2 border-black rounded-none font-bold text-sm hover:bg-white hover:text-black transition-colors shadow-sm disabled:opacity-50"
-                  >
-                    {isRegistering ? "処理中..." : "分析レポートを記録して確認する"}
-                    {!isRegistering && <ArrowRight className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+        <section className="text-center pt-8">
+          <Link
+            href="/history"
+            className="text-slate-400 text-sm font-bold hover:text-indigo-500 transition-colors uppercase tracking-widest"
+          >
+            やり直す
+          </Link>
         </section>
       </main>
     </div>
@@ -4876,18 +4700,18 @@ export default function ResultRadarChart({ data }: ResultRadarChartProps) {
     <div className="w-full h-[300px] sm:h-[400px]">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-          <PolarGrid stroke="#e5e7eb" />
+          <PolarGrid stroke="#f1f5f9" />
           <PolarAngleAxis 
             dataKey="subject" 
-            tick={{ fill: '#4b5563', fontSize: 12, fontWeight: 600 }}
+            tick={{ fill: '#0f172a', fontSize: 12, fontWeight: 800 }}
           />
           <PolarRadiusAxis angle={30} domain={[0, data[0]?.fullMark ?? 100]} tick={false} axisLine={false} />
           <Radar
             name="Personality"
             dataKey="A"
-            stroke="#7C3AED"
-            fill="#7C3AED"
-            fillOpacity={0.6}
+            stroke="#6366f1"
+            fill="#818cf8"
+            fillOpacity={0.7}
           />
         </RadarChart>
       </ResponsiveContainer>
@@ -4936,30 +4760,30 @@ export default function CompareRadarChart({
     <div className="w-full h-[240px]">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
-          <PolarGrid stroke="#e2e8f0" />
+          <PolarGrid stroke="#f1f5f9" />
           <PolarAngleAxis
             dataKey="subject"
-            tick={{ fill: "#64748b", fontSize: 10, fontWeight: 600 }}
+            tick={{ fill: "#0f172a", fontSize: 10, fontWeight: 800 }}
           />
           <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
           <Radar
             name="あなた"
             dataKey="me"
-            stroke="#6366f1"
-            fill="#6366f1"
-            fillOpacity={0.25}
-            strokeWidth={2}
+            stroke="#000000"
+            fill="#000000"
+            fillOpacity={0.3}
+            strokeWidth={3}
           />
           <Radar
             name="相手"
             dataKey="partner"
-            stroke="#f43f5e"
-            fill="#f43f5e"
+            stroke="#94a3b8"
+            fill="#94a3b8"
             fillOpacity={0.2}
             strokeWidth={2}
           />
           <Legend
-            wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
+            wrapperStyle={{ fontSize: 11, fontWeight: 800, color: "#0f172a" }}
           />
         </RadarChart>
       </ResponsiveContainer>
@@ -4977,37 +4801,17 @@ export default function CompareRadarChart({
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Send, ChevronLeft, ChevronRight, Check } from "lucide-react";
-
-const QUESTIONS = [
-  { key: "aboutPartner" as const, label: "相手はどうでしたか？" },
-  { key: "howChanged" as const, label: "自分はどう変わった？" },
-  { key: "grew" as const, label: "成長を実感できた？" },
-  { key: "togetherFeel" as const, label: "一緒にいてどうだった？" },
-] as const;
-
-const LIKERT_OPTIONS = [
-  { value: 1, label: "同意しない", color: "bg-red-500", size: "w-16 h-16", border: "border-red-500" },
-  { value: 2, label: "", color: "bg-red-400", size: "w-12 h-12", border: "border-red-400" },
-  { value: 3, label: "", color: "bg-red-300", size: "w-8 h-8", border: "border-red-300" },
-  { value: 4, label: "中立", color: "bg-slate-200", size: "w-6 h-6", border: "border-slate-300" },
-  { value: 5, label: "", color: "bg-green-300", size: "w-8 h-8", border: "border-green-300" },
-  { value: 6, label: "", color: "bg-green-400", size: "w-12 h-12", border: "border-green-400" },
-  { value: 7, label: "同意する", color: "bg-green-500", size: "w-16 h-16", border: "border-green-500" },
-];
-
-export interface ReflectionAnswers {
-  aboutPartner: number;
-  howChanged: number;
-  grew: number;
-  togetherFeel: number;
-}
+import { motion } from "framer-motion";
+import { Send } from "lucide-react";
 
 interface PostChatInterviewProps {
   partnerName: string;
-  onSubmit: (answers: ReflectionAnswers) => void;
+  onSubmit: (answers: {
+    aboutPartner: string;
+    howChanged: string;
+    grew: string;
+    togetherFeel: string;
+  }) => void;
   onSkip: () => void;
 }
 
@@ -5016,120 +4820,100 @@ export default function PostChatInterview({
   onSubmit,
   onSkip,
 }: PostChatInterviewProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Partial<ReflectionAnswers>>({});
-
-  const currentQ = QUESTIONS[currentIndex];
-  const value = answers[currentQ.key];
-  const answeredCount = Object.keys(answers).length;
-  const allAnswered = answeredCount === 4;
-
-  const handleAnswer = (v: number) => {
-    setAnswers((prev) => ({ ...prev, [currentQ.key]: v }));
-    if (currentIndex < 3) {
-      setTimeout(() => setCurrentIndex((i) => i + 1), 300);
-    }
-  };
+  const [aboutPartner, setAboutPartner] = useState("");
+  const [howChanged, setHowChanged] = useState("");
+  const [grew, setGrew] = useState("");
+  const [togetherFeel, setTogetherFeel] = useState("");
 
   const handleSubmit = () => {
-    if (
-      typeof answers.aboutPartner === "number" &&
-      typeof answers.howChanged === "number" &&
-      typeof answers.grew === "number" &&
-      typeof answers.togetherFeel === "number"
-    ) {
-      onSubmit({
-        aboutPartner: answers.aboutPartner,
-        howChanged: answers.howChanged,
-        grew: answers.grew,
-        togetherFeel: answers.togetherFeel,
-      });
-    }
+    onSubmit({ aboutPartner, howChanged, grew, togetherFeel });
   };
 
+  const filled =
+    aboutPartner.trim() ||
+    howChanged.trim() ||
+    grew.trim() ||
+    togetherFeel.trim();
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 min-h-[600px] flex flex-col justify-center">
-      <div className="relative perspective-1000">
-        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm overflow-visible transition-all duration-500 text-slate-900">
-          <CardContent className="p-8 sm:p-12 text-center space-y-10">
-            <div className="space-y-4">
-              <span className="text-sm font-bold text-indigo-500 tracking-widest uppercase">
-                振り返り {currentIndex + 1} / 4
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 leading-tight">
-                {partnerName}さんとの振り返り
-              </h2>
-              <p className="text-sm text-slate-500">1〜7で回答してください</p>
-            </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full max-w-lg bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200/60 p-6"
+    >
+      <h3 className="text-lg font-bold text-slate-900 mb-1">
+        {partnerName}さんとの振り返り
+      </h3>
+      <p className="text-xs text-slate-500 mb-6">短くでOKです</p>
 
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <h3 className="text-xl font-bold text-slate-800">{currentQ.label}</h3>
-              <div className="flex items-center justify-center gap-3 sm:gap-6 py-4">
-                <div className="hidden sm:block text-xs font-bold text-red-500/80 mr-2">同意しない</div>
-                {LIKERT_OPTIONS.map((opt) => {
-                  const isSelected = value === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      onClick={() => handleAnswer(opt.value)}
-                      className={`
-                        rounded-full transition-all duration-300 flex items-center justify-center
-                        ${opt.size}
-                        ${isSelected
-                          ? `${opt.color} ring-4 ring-offset-2 ring-indigo-100 scale-110 text-white`
-                          : `bg-transparent border-2 ${opt.border} hover:bg-slate-50`}
-                      `}
-                      aria-label={`Select ${opt.value}`}
-                    >
-                      {isSelected && <Check className="w-5 h-5 stroke-[3px]" />}
-                    </button>
-                  );
-                })}
-                <div className="hidden sm:block text-xs font-bold text-green-600/80 ml-2">同意する</div>
-              </div>
-              <div className="flex sm:hidden justify-between text-xs font-bold text-slate-400 px-2">
-                <span className="text-red-500">同意しない</span>
-                <span className="text-green-600">同意する</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <Button
-                variant="ghost"
-                onClick={onSkip}
-                className="flex-1 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
-              >
-                スキップ
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
-                disabled={currentIndex === 0}
-                className="text-slate-500"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!allAnswered}
-                className="flex-1 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send className="w-4 h-4" />
-                送信
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => setCurrentIndex((i) => Math.min(3, i + 1))}
-                disabled={currentIndex === 3}
-                className="text-slate-500"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            相手はどうでしたか？
+          </label>
+          <input
+            type="text"
+            value={aboutPartner}
+            onChange={(e) => setAboutPartner(e.target.value)}
+            placeholder="例: 話しやすかった"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            自分はどう変わった？
+          </label>
+          <input
+            type="text"
+            value={howChanged}
+            onChange={(e) => setHowChanged(e.target.value)}
+            placeholder="例: 新しい視点が得られた"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            成長を実感できた？
+          </label>
+          <input
+            type="text"
+            value={grew}
+            onChange={(e) => setGrew(e.target.value)}
+            placeholder="例: 少し"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            一緒にいてどうだった？
+          </label>
+          <input
+            type="text"
+            value={togetherFeel}
+            onChange={(e) => setTogetherFeel(e.target.value)}
+            placeholder="例: 居心地が良かった"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+          />
+        </div>
       </div>
-    </div>
+
+      <div className="mt-6 flex gap-3">
+        <button
+          onClick={onSkip}
+          className="flex-1 py-2.5 text-sm text-slate-500 hover:text-slate-700 font-medium"
+        >
+          スキップ
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={!filled}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors"
+        >
+          <Send className="w-4 h-4" />
+          送信
+        </button>
+      </div>
+    </motion.div>
   );
 }
 
@@ -5146,28 +4930,18 @@ import { motion } from "framer-motion";
 import { Sparkles, Home } from "lucide-react";
 import Link from "next/link";
 
-const LIKERT_LABELS: Record<number, string> = {
-    1: "同意しない",
-    2: "やや同意しない",
-    3: "どちらかといえば同意しない",
-    4: "中立",
-    5: "どちらかといえば同意する",
-    6: "やや同意する",
-    7: "同意する",
-};
-
 interface ReflectionViewProps {
-    answers: { aboutPartner: number; howChanged: number; grew: number; togetherFeel: number };
+    answers: { aboutPartner: string; howChanged: string; grew: string; togetherFeel: string };
     summary: string;
     partnerName: string;
 }
 
 export default function ReflectionView({ answers, summary, partnerName }: ReflectionViewProps) {
     const items = [
-        { q: "相手はどうでしたか？", a: LIKERT_LABELS[answers.aboutPartner] ?? answers.aboutPartner },
-        { q: "自分はどう変わった？", a: LIKERT_LABELS[answers.howChanged] ?? answers.howChanged },
-        { q: "成長を実感できた？", a: LIKERT_LABELS[answers.grew] ?? answers.grew },
-        { q: "一緒にいてどうだった？", a: LIKERT_LABELS[answers.togetherFeel] ?? answers.togetherFeel },
+        { q: "相手はどうでしたか？", a: answers.aboutPartner || "—" },
+        { q: "自分はどう変わった？", a: answers.howChanged || "—" },
+        { q: "成長を実感できた？", a: answers.grew || "—" },
+        { q: "一緒にいてどうだった？", a: answers.togetherFeel || "—" },
     ];
 
     return (
@@ -5177,12 +4951,12 @@ export default function ReflectionView({ answers, summary, partnerName }: Reflec
             className="w-full max-w-lg bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200/60 p-6"
         >
             <div className="flex items-center gap-2 mb-6">
-                <Sparkles className="w-5 h-5 text-slate-700" />
+                <Sparkles className="w-5 h-5 text-indigo-500" />
                 <h3 className="text-lg font-bold text-slate-900">あなたの変化</h3>
             </div>
 
-            <div className="p-4 bg-slate-100 rounded-xl mb-6">
-                <p className="text-sm text-slate-900 font-medium leading-relaxed">{summary}</p>
+            <div className="p-4 bg-indigo-50 rounded-xl mb-6">
+                <p className="text-sm text-indigo-900 font-medium leading-relaxed">{summary}</p>
             </div>
 
             <div className="space-y-3 mb-8">
@@ -5197,21 +4971,13 @@ export default function ReflectionView({ answers, summary, partnerName }: Reflec
                 ))}
             </div>
 
-            <div className="flex gap-3">
-              <Link
-                href="/mypage"
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl transition-colors"
-              >
-                マイページ
-              </Link>
-              <Link
+            <Link
                 href="/"
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors"
-              >
+                className="flex items-center justify-center gap-2 w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors"
+            >
                 <Home className="w-4 h-4" />
                 ホームへ
-              </Link>
-            </div>
+            </Link>
         </motion.div>
     );
 }
@@ -5234,21 +5000,21 @@ export default function ThreeLayerModel() {
       {/* Layer 3: Delta (High Frequency) */}
       <div className="relative w-48 h-16 mb-4 z-30">
         <motion.div 
-          className="absolute inset-0 bg-slate-200/20 border border-slate-300/50 rounded-lg backdrop-blur-sm"
+          className="absolute inset-0 bg-emerald-500/20 border border-emerald-400/50 rounded-lg backdrop-blur-sm"
           animate={{ 
-            boxShadow: ["0 0 10px rgba(203, 213, 225, 0.2)", "0 0 20px rgba(203, 213, 225, 0.6)", "0 0 10px rgba(203, 213, 225, 0.2)"],
-            borderColor: ["rgba(148, 163, 184, 0.5)", "rgba(148, 163, 184, 1)", "rgba(148, 163, 184, 0.5)"]
-           }}
+            boxShadow: ["0 0 10px rgba(16, 185, 129, 0.2)", "0 0 20px rgba(16, 185, 129, 0.6)", "0 0 10px rgba(16, 185, 129, 0.2)"],
+            borderColor: ["rgba(52, 211, 153, 0.5)", "rgba(52, 211, 153, 1)", "rgba(52, 211, 153, 0.5)"]
+          }}
           transition={{ duration: 2, repeat: Infinity }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-slate-700 font-bold font-mono tracking-widest text-sm">LAYER 3: Δ</span>
+            <span className="text-emerald-300 font-bold font-mono tracking-widest text-sm">LAYER 3: Δ</span>
         </div>
         {/* Floating Particles */}
         {[...Array(5)].map((_, i) => (
             <motion.div
                 key={i}
-                className="absolute w-1 h-1 bg-slate-400 rounded-full"
+                className="absolute w-1 h-1 bg-emerald-400 rounded-full"
                 initial={{ x: 0, y: 0, opacity: 0 }}
                 animate={{ 
                     x: (Math.random() - 0.5) * 100, 
@@ -5263,31 +5029,31 @@ export default function ThreeLayerModel() {
 
       {/* Layer 2: Merge (Fluid) */}
       <div className="relative w-56 h-24 mb-1 z-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-400/10 to-slate-600/10 border-x border-t border-slate-500/30 rounded-t-xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-indigo-600/10 border-x border-t border-blue-500/30 rounded-t-xl" />
         <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-slate-400 font-bold font-mono tracking-widest text-sm">LAYER 2: MERGE</span>
+            <span className="text-blue-200/70 font-bold font-mono tracking-widest text-sm">LAYER 2: MERGE</span>
         </div>
         {/* Connecting Lines */}
-        <div className="absolute top-0 left-1/4 w-px h-full bg-slate-500/20" />
-        <div className="absolute top-0 right-1/4 w-px h-full bg-slate-500/20" />
+        <div className="absolute top-0 left-1/4 w-px h-full bg-blue-500/20" />
+        <div className="absolute top-0 right-1/4 w-px h-full bg-blue-500/20" />
       </div>
 
       {/* Layer 1: Core (Solid) */}
-      <div className="relative w-64 h-32 z-10 glass-panel border border-slate-700 bg-slate-900/80 rounded-xl shadow-2xl flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/20 rounded-xl" />
+      <div className="relative w-64 h-32 z-10 glass-panel border border-indigo-500/30 bg-slate-900/80 rounded-xl shadow-2xl flex items-center justify-center">
+        <div className="absolute inset-0 bg-indigo-900/20 rounded-xl" />
         <div className="text-center">
-            <div className="text-slate-200 font-black text-xl tracking-widest mb-1">CORE</div>
-            <div className="text-[10px] text-slate-400 font-mono">IMMUTABLE LOGIC</div>
+            <div className="text-indigo-400 font-black text-xl tracking-widest mb-1">CORE</div>
+            <div className="text-[10px] text-indigo-300/50 font-mono">IMMUTABLE LOGIC</div>
         </div>
         {/* Grid Pattern */}
         <div 
             className="absolute inset-0 opacity-10" 
-            style={{ backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)', backgroundSize: '10px 10px' }} 
+            style={{ backgroundImage: 'radial-gradient(#6366f1 1px, transparent 1px)', backgroundSize: '10px 10px' }} 
         />
       </div>
 
       {/* Central Axis */}
-      <div className="absolute top-10 bottom-10 w-px bg-gradient-to-b from-slate-300/0 via-slate-500/50 to-slate-900/0 z-0" />
+      <div className="absolute top-10 bottom-10 w-px bg-gradient-to-b from-emerald-500/0 via-indigo-500/50 to-indigo-500/0 z-0" />
 
     </div>
   );
@@ -5452,13 +5218,12 @@ export { Button, buttonVariants }
 
 ```typescript
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { logGemini } from "./gemini-log";
 
 const API_KEY = process.env.GOOGLE_API_KEY || "";
 
 export const genAI = new GoogleGenerativeAI(API_KEY);
-export const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-export const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" }); // Updated to supported embedding model
+export const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+export const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
 
 export interface AnalysisResult {
     vector: number[]; // 6-dim radar chart stats (0-100) -> V_display
@@ -5469,7 +5234,12 @@ export interface AnalysisResult {
 
 export async function analyzeEssence(inputs: string[], biases: number[] = [50, 50, 50], purpose: string = "general"): Promise<AnalysisResult> {
     if (!API_KEY) {
-        throw new Error("GOOGLE_API_KEY is not configured. Cannot perform analysis.");
+        console.warn("GOOGLE_API_KEY not found. Using mock data.");
+        return {
+            vector: [80, 60, 90, 45, 70, 85],
+            reasoning: "APIキーが設定されていないため、擬似データを表示しています。あなたの入力は非常に詩的で、論理性よりも直感を重視する傾向が見られます。",
+            resonance_score: 88,
+        };
     }
 
     // 1. Generate V_display (6-dim) via LLM
@@ -5525,16 +5295,18 @@ export async function analyzeEssence(inputs: string[], biases: number[] = [50, 5
         const jsonStr = text.replace(/```json/g, "").replace(/```/g, "").trim();
         const parsed = JSON.parse(jsonStr) as AnalysisResult;
 
-        const out = { ...parsed, embedding: embeddingResult.embedding.values.slice(0, 768) };
-        logGemini("analyzeEssence", prompt, JSON.stringify(parsed), { inputs: safeInputs.length }).catch(() => {});
-        return out;
-    } catch (e: any) {
-        console.error("Gemini API Error (Synthesis):", e);
-        // Log the error to the DB for debugging
-        await logGemini("error", prompt, `ERROR: ${e.message || String(e)}`, { stack: e.stack }).catch(() => {});
-        
-        // Throw error instead of returning mock data to avoid polluting database
-        throw new Error("診断 API の通信に失敗しました。時間をおいて再度お試しください。");
+        return {
+            ...parsed,
+            embedding: embeddingResult.embedding.values.slice(0, 768) // Attach 768-Dim Vector for DB
+        };
+    } catch (error) {
+        console.error("Gemini Analysis Error:", error);
+        // Fallback on error
+        return {
+            vector: [50, 50, 50, 50, 50, 50],
+            reasoning: "解析中にエラーが発生しました。",
+            resonance_score: 50
+        };
     }
 }
 
@@ -5547,7 +5319,7 @@ export async function generateMatchReasoning(
     similarityPercent: number,
     growthScore: number
 ): Promise<string> {
-    if (!API_KEY) throw new Error("GOOGLE_API_KEY is not configured.");
+    if (!API_KEY) return `${partnerName}さんは${partnerBio} 共鳴度${similarityPercent}%、成長ポテンシャル${growthScore}%です。`;
     const prompt = `
 あなたはマッチングアドバイザーです。以下の情報をもとに、なぜこの2人が相性が良いか、50文字以内の日本語で簡潔に説明してください。
 
@@ -5560,19 +5332,17 @@ ${userSynthesis.slice(0, 500)}
 タグ: ${partnerTags.join(", ")}
 
 【数値】
-マッチ度: ${similarityPercent}%
+共鳴度: ${similarityPercent}%
 成長ポテンシャル: ${growthScore}%
 
 50文字以内で、具体的で温かい推薦理由を1文で出力してください。JSONは不要、テキストのみ。
 `;
     try {
         const result = await model.generateContent(prompt);
-        const text = (await result.response).text().trim().slice(0, 120) || `${partnerName}さんとの相性が良いです。`;
-        logGemini("matchReasoning", prompt, text, { partnerName, similarityPercent, growthScore }).catch(() => {});
-        return text;
+        return (await result.response).text().trim().slice(0, 120) || `${partnerName}さんとの相性が良いです。`;
     } catch (e) {
         console.warn("Gemini match reasoning error:", e);
-        return `${partnerName}さんは${partnerBio} マッチ度${similarityPercent}%。`;
+        return `${partnerName}さんは${partnerBio} 共鳴度${similarityPercent}%。`;
     }
 }
 
@@ -5584,7 +5354,11 @@ export interface DeltaResult {
 
 export async function calculateDeltaVector(feedback: string, currentVector: number[] = [50, 50, 50, 50, 50, 50], tags: string[] = []): Promise<DeltaResult> {
     if (!API_KEY) {
-        throw new Error("GOOGLE_API_KEY is not configured.");
+        return {
+            delta_vector: [5, -2, 10, 0, 5, 5],
+            new_vector: currentVector.map((v, i) => Math.min(100, Math.max(0, v + (i % 2 === 0 ? 5 : -2)))),
+            growth_score: 15
+        };
     }
 
     const prompt = `
@@ -5632,9 +5406,7 @@ ${interviewText.slice(0, 500)}
 `;
     try {
         const result = await model.generateContent(prompt);
-        const text = (await result.response).text().trim().slice(0, 80) || "あなたの振り返りが記録されました。";
-        logGemini("reflectionSummary", prompt, text).catch(() => {});
-        return text;
+        return (await result.response).text().trim().slice(0, 80) || "あなたの振り返りが記録されました。";
     } catch (e) {
         console.warn("Reflection summary error:", e);
         return "あなたの振り返りが記録されました。";
@@ -5666,8 +5438,10 @@ export async function logGemini(
   metadata?: Record<string, unknown>
 ): Promise<void> {
   try {
-    const p = prisma as { geminiLog?: { create: (args: any) => Promise<any> } };
+    // 実行時に存在確認を行い、ビルドエラーを回避
+    const p = prisma as any;
     if (!p?.geminiLog) return;
+    
     await p.geminiLog.create({
       data: {
         type,
@@ -5676,8 +5450,9 @@ export async function logGemini(
         metadata: metadata ? JSON.stringify(metadata) : null,
       },
     });
-  } catch {
-    // ログ失敗は本処理に影響させない
+  } catch (error) {
+    // ログ保存の失敗はメイン処理に影響させない
+    console.warn("Gemini logging failed:", error);
   }
 }
 
@@ -5688,119 +5463,158 @@ export async function logGemini(
 ## `src\lib\db\client.ts`
 
 ```typescript
+// ZAX Database Client — Prisma + pgvector
+// Docker (ankane/pgvector) 起動中は実DB接続、未起動時はモックにフォールバック
 
-import { PrismaClient } from '@prisma/client';
+let prisma: any;
+let vectorStore: any;
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+// DATABASE_URL が無い場合はモックのみ使用（Vercel等で未設定時）
+const useRealDb = !!(
+    process.env.DATABASE_URL &&
+    !process.env.DATABASE_URL.includes("localhost:5432/dummy")
+);
 
-let connectionUrl: string | undefined = undefined;
-
-if (process.env.DATABASE_URL) {
-  try {
-    // 改行文字（\n）や空白がVercelの環境変数に混入しているケースを防ぐためのクレンジング
-    let rawUrl = process.env.DATABASE_URL.replace(/\\n/g, '').replace(/\n/g, '').trim();
-    
-    // URLオブジェクトを使って安全にクエリパラメータを付与・上書きする
-    const url = new URL(rawUrl);
-    url.searchParams.set('pgbouncer', 'true');
-    url.searchParams.set('connection_limit', '1');
-    connectionUrl = url.toString();
-  } catch (e) {
-    console.error("Failed to parse DATABASE_URL", e);
-    // パース失敗時のフォールバック
-    let rawUrl = process.env.DATABASE_URL.replace(/\\n/g, '').replace(/\n/g, '').trim();
-    connectionUrl = `${rawUrl}${rawUrl.includes('?') ? '&' : '?'}pgbouncer=true&connection_limit=1`;
-  }
+if (!useRealDb) {
+    if (!process.env.DATABASE_URL) {
+        process.env.DATABASE_URL = "postgresql://localhost:5432/dummy";
+    }
 }
 
-export const prisma = globalForPrisma.prisma || new PrismaClient({
-  datasources: connectionUrl ? { db: { url: connectionUrl } } : undefined,
-  log: ['query', 'info', 'warn', 'error'],
-});
+try {
+    if (!useRealDb) throw new Error("Using mock DB");
+    const { PrismaClient } = require("@prisma/client");
+    const globalForPrisma = global as unknown as { prisma: any };
+    prisma = globalForPrisma.prisma || new PrismaClient({ log: ["warn", "error"] });
+    if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+    // Real Vector Store (pgvector)
+    vectorStore = {
+        async saveEmbedding(
+            userId: string,
+            vector: number[],
+            reasoning: string,
+            resonanceScore: number,
+            embedding?: number[]
+        ) {
+            const vectorString = `[${vector.join(",")}]`;
+            const embeddingString = embedding ? `[${embedding.join(",")}]` : null;
 
-/**
- * ベクトル検索と保存のためのヘルパーオブジェクト
- * PostgreSQLのpgvector拡張を使用
- */
-export const vectorStore = {
-    /**
-     * ベクトルを保存する
-     * @param userId ユーザーID
-     * @param embedding 埋め込みベクトル (768次元 - RAG用)
-     * @param statsVector ステータスベクトル (6次元 - 可視化用) [Optional]
-     * @param reasoning ベクトルの根拠・コンテキスト
-     * @param resonanceScore マッチスコア (各ベクトルの重み付け)
-     */
-    async saveEmbedding(userId: string, embedding: number[], statsVector: number[] | null, reasoning: string, resonanceScore: number) {
-        // pgvector形式の文字列に変換 '[0.1, 0.2, ...]'
-        const vectorString = `[${embedding.join(",")}]`;
-        const statsString = statsVector ? JSON.stringify(statsVector) : null;
-        
-        // 1. EssenceVectorテーブルへの保存 (pgvector型)
-        // vectorJsonにはembeddingを保存しておく（バックアップ）
-        // statsVectorには6次元ステータスをJSONとして保存
-        await prisma.$executeRaw`
-            INSERT INTO "essence_vectors" ("id", "userId", "vector", "vectorJson", "statsVector", "reasoning", "resonanceScore", "createdAt")
-            VALUES (gen_random_uuid(), ${userId}, ${vectorString}::vector, ${vectorString}, ${statsString}, ${reasoning}, ${resonanceScore}, NOW())
-        `;
-    },
-
-    /**
-     * 類似ベクトルを検索する
-     * @param targetVector 検索対象ベクトル (768次元)
-     * @param limit 取得件数
-     * @param userId (Optional) 特定ユーザーのみ対象にする場合
-     * @returns 類似度順にソートされた結果
-     */
-    async searchSimilar(targetVector: number[], limit: number = 5, userId?: string) {
-        const vectorString = `[${targetVector.join(",")}]`;
-        
-        // Cosine distance (<=>) を使用して距離を計算し、昇順ソート (距離が近い＝類似)
-        if (userId) {
+            if (embeddingString) {
+                await prisma.$executeRaw`
+                    INSERT INTO "essence_vectors" ("id", "userId", "vector", "embedding", "vectorJson", "reasoning", "resonanceScore", "createdAt")
+                    VALUES (gen_random_uuid(), ${userId}, ${vectorString}::vector, ${embeddingString}::vector, ${vectorString}, ${reasoning}, ${resonanceScore}, NOW())
+                `;
+            } else {
+                await prisma.$executeRaw`
+                    INSERT INTO "essence_vectors" ("id", "userId", "vector", "vectorJson", "reasoning", "resonanceScore", "createdAt")
+                    VALUES (gen_random_uuid(), ${userId}, ${vectorString}::vector, ${vectorString}, ${reasoning}, ${resonanceScore}, NOW())
+                `;
+            }
+        },
+        async searchSimilar(targetVector: number[], limit: number = 5) {
+            const vectorString = `[${targetVector.join(",")}]`;
             return await prisma.$queryRaw`
-                SELECT ev.id, ev."userId", ev.reasoning, ev."resonanceScore", ev."createdAt", ev."statsVector",
-                       (ev.vector <=> ${vectorString}::vector) as distance
-                FROM "essence_vectors" ev
-                WHERE ev."userId" = ${userId}
-                ORDER BY distance ASC
-                LIMIT ${limit}
-            `;
-        } else {
-             return await prisma.$queryRaw`
-                SELECT ev.id, ev."userId", ev.reasoning, ev."resonanceScore", ev."createdAt", ev."statsVector",
+                SELECT ev.id, ev."userId", ev."vectorJson", ev.reasoning, ev."resonanceScore",
                        (ev.vector <=> ${vectorString}::vector) as distance
                 FROM "essence_vectors" ev
                 ORDER BY distance ASC
                 LIMIT ${limit}
             `;
-        }
-    },
+        },
+    };
 
-    /**
-     * マッチング候補を検索する (ドメイン限定)
-     * @param targetVector 検索対象ベクトル
-     * @param domainHash ドメインハッシュ (必須)
-     * @param limit 取得件数
-     * @param excludeUserId 除外するユーザーID (自分自身)
-     */
-    async searchCandidates(targetVector: number[], domainHash: string, limit: number = 10, excludeUserId: string) {
-        const vectorString = `[${targetVector.join(",")}]`;
-        
-        // UsersテーブルとJOINしてdomainHashでフィルタリング
-        return await prisma.$queryRaw`
-            SELECT u.id as "userId", u.nickname, u.affiliation, u."contactEmail", ev.reasoning, ev."statsVector",
-                   (ev.vector <=> ${vectorString}::vector) as distance
-            FROM "essence_vectors" ev
-            JOIN "users" u ON ev."userId" = u.id
-            WHERE u."domainHash" = ${domainHash}
-            AND u.id != ${excludeUserId}
-            ORDER BY distance ASC
-            LIMIT ${limit}
-        `;
-    }
-};
+    // DB接続テスト (非同期 — 失敗時はログのみ)
+    prisma
+        .$queryRaw`SELECT 1`
+        .then(() => console.log("✅ PostgreSQL + pgvector 接続成功"))
+        .catch((err: any) => console.warn("⚠️ DB接続失敗 (モックにフォールバックはしません):", err.message));
+} catch (e: any) {
+    console.warn(
+        "⚠️ Prisma Client が見つかりません。インメモリ・モックを使用します。",
+        e.message
+    );
+
+    // In-Memory Mock Store (Prisma未生成時 or ビルド時のフォールバック)
+    const mockUsers: any[] = [];
+    const mockVectors: any[] = [];
+    const mockDiagnostics: any[] = [];
+
+    prisma = {
+        user: {
+            findUnique: async ({ where }: any) =>
+                mockUsers.find(
+                    (u) => u.email === where.email || u.id === where.id
+                ) || null,
+            create: async ({ data }: any) => {
+                const newUser = { id: `mock_${Date.now()}`, ...data };
+                mockUsers.push(newUser);
+                return newUser;
+            },
+            findFirst: async () => mockUsers[0] || null,
+        },
+        diagnosticResult: {
+            create: async ({ data }: any) => {
+                const result = {
+                    id: `mock_diag_${Date.now()}`,
+                    ...data,
+                    createdAt: new Date(),
+                };
+                mockDiagnostics.push(result);
+                return result;
+            },
+            findUnique: async ({ where }: any) =>
+                mockDiagnostics.find((d) => d.id === where.id) || null,
+        },
+        essenceVector: {
+            create: async () => {},
+        },
+        $executeRaw: async (...args: any[]) =>
+            console.log("Mock $executeRaw"),
+        $queryRaw: async () => [],
+    };
+
+    vectorStore = {
+        async saveEmbedding(
+            userId: string,
+            vector: number[],
+            reasoning: string,
+            resonanceScore: number,
+            embedding?: number[]
+        ) {
+            console.log("Mock saveEmbedding:", userId, `[${vector.length}dim]`, embedding ? `[${embedding.length}dim]` : "");
+            mockVectors.push({ userId, vector, reasoning, resonanceScore, embedding });
+        },
+        async searchSimilar(targetVector: number[], limit: number = 5) {
+            // モックでも最低限のコサイン類似度検索を実行
+            if (mockVectors.length === 0) return [];
+
+            const dot = (a: number[], b: number[]) =>
+                a.reduce((s, v, i) => s + v * (b[i] || 0), 0);
+            const mag = (a: number[]) =>
+                Math.sqrt(a.reduce((s, v) => s + v * v, 0));
+            const cosine = (a: number[], b: number[]) => {
+                const ma = mag(a);
+                const mb = mag(b);
+                return ma && mb ? dot(a, b) / (ma * mb) : 0;
+            };
+
+            return mockVectors
+                .map((mv) => ({
+                    id: `mock_vec_${mv.userId}`,
+                    userId: mv.userId,
+                    vectorJson: JSON.stringify(mv.vector),
+                    reasoning: mv.reasoning,
+                    resonanceScore: mv.resonanceScore,
+                    distance: 1 - cosine(targetVector, mv.vector),
+                }))
+                .sort((a, b) => a.distance - b.distance)
+                .slice(0, limit);
+        },
+    };
+}
+
+export { prisma, vectorStore };
 
 ```
 
@@ -5811,21 +5625,17 @@ export const vectorStore = {
 ```typescript
 import crypto from 'crypto';
 
-// セキュリティ: 環境変数がなければ起動を拒否（デフォルトキーは含めない）
-// ビルドフェーズ（next build）では未使用のプレースホルダーで通過を許可
-const rawKey = process.env.ENCRYPTION_KEY;
-const isBuildPhase =
-    process.env.npm_lifecycle_event === 'build' ||
-    process.env.NEXT_PHASE === 'phase-production-build';
+// Use a secure key from environment variables or fallback to a hardcoded one for dev (WARNING: Change this in production!)
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'zax_dev_key_32chars_placeholder!'; 
 
-if ((!rawKey || rawKey.trim() === '') && !isBuildPhase) {
-    throw new Error(
-        "[ZAX] ENCRYPTION_KEY environment variable is required. " +
-        "Set a secure 32-character key (e.g. openssl rand -base64 24)."
-    );
+if (process.env.NODE_ENV === 'production' && !process.env.ENCRYPTION_KEY) {
+    console.warn("WARNING: ENCRYPTION_KEY is not defined. Using fallback for build.");
 }
 
-const ENCRYPTION_KEY = (rawKey && rawKey.trim() !== '') ? rawKey : 'build-placeholder-never-used-at-runtime';
+if (ENCRYPTION_KEY.length !== 32) {
+    // console.warn("WARNING: ENCRYPTION_KEY should be 32 characters for AES-256.");
+    // We allow it to pass here but the hash below ensures we get a 32-byte key anyway.
+}
 const IV_LENGTH = 16; // For AES, this is always 16
 
 /**
@@ -5834,7 +5644,7 @@ const IV_LENGTH = 16; // For AES, this is always 16
 export function encrypt(text: string): string {
     // Ensure the key is 32 bytes (256 bits)
     // If the provided key is short, we pad it or hash it. Here we assume it's roughly correct or just hash it to be safe.
-    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').slice(0, 32);
+    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').substr(0, 32);
     
     const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
@@ -5856,7 +5666,7 @@ export function decrypt(text: string): string {
     
     const iv = Buffer.from(ivPart, 'hex');
     const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').slice(0, 32);
+    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').substr(0, 32);
     
     const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
     
@@ -5867,8 +5677,8 @@ export function decrypt(text: string): string {
 }
 
 /**
- * Signs a session ID using HMAC-SHA256 to prevent tampering (Session Hijacking protection).
- * Format: "userId.signature"
+ * セッションIDをHMAC-SHA256で署名し、改ざん防止する
+ * フォーマット: "userId.signature"
  */
 export function signSession(userId: string): string {
     const hmac = crypto.createHmac('sha256', ENCRYPTION_KEY);
@@ -5877,21 +5687,19 @@ export function signSession(userId: string): string {
 }
 
 /**
- * Verifies a signed session ID and returns the raw userId as string.
- * Returns null if the signature is invalid or tampered with.
+ * 署名付きセッションIDを検証し、元のuserIdを返す
+ * 署名が無効な場合はnullを返す
  */
 export function verifySession(signedSession: string | undefined | null): string | null {
     if (!signedSession) return null;
     const parts = signedSession.split('.');
-    
-    // If no signature is present (old cookie), return null for security to force re-auth
-    if (parts.length !== 2) return null; 
-    
+
+    if (parts.length !== 2) return null;
+
     const [userId, signature] = parts;
     const hmac = crypto.createHmac('sha256', ENCRYPTION_KEY);
     hmac.update(userId);
-    
-    // Use timingSafeEqual to prevent timing attacks
+
     const expectedSignature = hmac.digest('hex');
     if (expectedSignature.length === signature.length && crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
         return userId;
@@ -5923,69 +5731,7 @@ export function cn(...inputs: ClassValue[]) {
 import { vectorStore } from "../db/client";
 import { generateMatchReasoning } from "../gemini";
 
-// ─── 50 Archetype Personas (Demo Seed) ───
-// 性格パターンを反映した6次元ベクトル [Logic, Intuition, Empathy, Determination, Creativity, Flexibility]
-export const ARCHETYPE_USERS = [
-  // ─── 論理重視型 (10人) ───
-  { id: "A-001", name: "田中 健太", vector: [92, 25, 35, 78, 40, 30], bio: "構造的な思考を得意とし、物事の根本原理を追求する。", tags: ["Logic", "Structure"] },
-  { id: "A-002", name: "山本 理沙", vector: [88, 30, 45, 70, 35, 40], bio: "データに基づく意思決定を重視する分析家。", tags: ["Logic", "Analysis"] },
-  { id: "A-003", name: "鈴木 翔", vector: [85, 40, 30, 85, 30, 25], bio: "効率と合理性を追求するストラテジスト。", tags: ["Logic", "Strategy"] },
-  { id: "A-004", name: "高橋 美咲", vector: [90, 20, 50, 65, 45, 35], bio: "論理と共感のバランスを模索する研究者。", tags: ["Logic", "Research"] },
-  { id: "A-005", name: "伊藤 大輝", vector: [95, 15, 20, 90, 25, 20], bio: "数理モデルで世界を理解しようとする純粋な論理型。", tags: ["Logic", "Math"] },
-  { id: "A-006", name: "渡辺 麻衣", vector: [82, 35, 55, 60, 50, 45], bio: "科学的思考と人への配慮を両立する。", tags: ["Logic", "Care"] },
-  { id: "A-007", name: "中村 拓也", vector: [87, 28, 40, 75, 38, 32], bio: "システム設計に情熱を注ぐエンジニア気質。", tags: ["Logic", "Systems"] },
-  { id: "A-008", name: "小林 由香", vector: [80, 45, 48, 68, 42, 50], bio: "論理と直感の境界を探る哲学者タイプ。", tags: ["Logic", "Philosophy"] },
-  { id: "A-009", name: "加藤 陸", vector: [93, 18, 25, 88, 20, 28], bio: "白黒はっきりつけたい完璧主義者。", tags: ["Logic", "Precision"] },
-  { id: "A-010", name: "吉田 さくら", vector: [84, 38, 60, 55, 48, 42], bio: "理系でありながら文系的感性も持つ。", tags: ["Logic", "Hybrid"] },
 
-  // ─── 直感・創造型 (10人) ───
-  { id: "A-011", name: "佐藤 愛", vector: [25, 90, 75, 35, 92, 80], bio: "直感でパターンを見抜く天才的な創造力。", tags: ["Intuition", "Creative"] },
-  { id: "A-012", name: "松本 龍之介", vector: [30, 85, 65, 40, 95, 75], bio: "既存の枠を壊して新しいものを生み出す。", tags: ["Creativity", "Innovation"] },
-  { id: "A-013", name: "井上 彩花", vector: [35, 80, 70, 30, 88, 85], bio: "アートと直感で世界を理解する感性派。", tags: ["Intuition", "Art"] },
-  { id: "A-014", name: "木村 悠真", vector: [40, 88, 55, 45, 90, 70], bio: "閃きを形にする発明家タイプ。", tags: ["Creativity", "Invention"] },
-  { id: "A-015", name: "林 美月", vector: [20, 92, 80, 25, 85, 90], bio: "流れるように変化を受け入れる自由人。", tags: ["Intuition", "Flow"] },
-  { id: "A-016", name: "清水 蓮", vector: [45, 78, 60, 50, 92, 65], bio: "音楽とテクノロジーの融合を追求する。", tags: ["Creativity", "Music"] },
-  { id: "A-017", name: "山口 千尋", vector: [28, 86, 72, 32, 88, 82], bio: "言語を超えた表現を模索するアーティスト。", tags: ["Creativity", "Expression"] },
-  { id: "A-018", name: "中島 海斗", vector: [38, 82, 58, 48, 94, 68], bio: "未来を先読みするビジョナリー。", tags: ["Intuition", "Vision"] },
-  { id: "A-019", name: "藤田 凛", vector: [32, 90, 68, 28, 86, 88], bio: "感覚で捉えた美をデザインに落とし込む。", tags: ["Creativity", "Design"] },
-  { id: "A-020", name: "岡田 颯太", vector: [42, 84, 50, 55, 90, 60], bio: "常識を疑い、新しい価値を創出する。", tags: ["Creativity", "Disruption"] },
-
-  // ─── 共感・調和型 (10人) ───
-  { id: "A-021", name: "三浦 優奈", vector: [30, 70, 95, 35, 55, 88], bio: "人の痛みを自分のことのように感じる共感力。", tags: ["Empathy", "Compassion"] },
-  { id: "A-022", name: "前田 隼人", vector: [40, 65, 90, 45, 50, 82], bio: "チームの調和を第一に考えるファシリテーター。", tags: ["Empathy", "Harmony"] },
-  { id: "A-023", name: "石川 結衣", vector: [25, 75, 92, 30, 60, 90], bio: "相手の心に寄り添うカウンセラー気質。", tags: ["Empathy", "Healing"] },
-  { id: "A-024", name: "小川 大和", vector: [45, 60, 88, 50, 45, 78], bio: "組織の潤滑油として信頼を集める。", tags: ["Empathy", "Trust"] },
-  { id: "A-025", name: "後藤 真奈", vector: [35, 72, 94, 28, 58, 85], bio: "言葉にならない感情を察知する。", tags: ["Empathy", "Sensitivity"] },
-  { id: "A-026", name: "長谷川 悠斗", vector: [50, 55, 85, 55, 40, 80], bio: "実務能力と共感力を兼ね備えたリーダー。", tags: ["Empathy", "Leadership"] },
-  { id: "A-027", name: "村上 あかり", vector: [28, 68, 92, 32, 62, 92], bio: "多様性を受け入れ、全ての人と繋がれる。", tags: ["Empathy", "Diversity"] },
-  { id: "A-028", name: "近藤 蒼", vector: [42, 58, 86, 48, 52, 75], bio: "対話を通じて相互理解を促進する。", tags: ["Empathy", "Dialogue"] },
-  { id: "A-029", name: "坂本 花音", vector: [22, 78, 90, 25, 65, 88], bio: "自然体で周囲を癒やす存在。", tags: ["Empathy", "Natural"] },
-  { id: "A-030", name: "遠藤 陽向", vector: [38, 62, 88, 42, 48, 82], bio: "対立を解消し、Win-Winを実現する調停者。", tags: ["Empathy", "Mediation"] },
-
-  // ─── 意志・推進型 (10人) ───
-  { id: "A-031", name: "青木 凌", vector: [65, 35, 25, 95, 45, 35], bio: "目標に向かって一直線に突き進む。", tags: ["Determination", "Focus"] },
-  { id: "A-032", name: "藤井 七海", vector: [55, 40, 35, 92, 50, 40], bio: "困難を楽しむチャレンジャー精神。", tags: ["Determination", "Challenge"] },
-  { id: "A-033", name: "西村 晃太", vector: [70, 30, 20, 90, 40, 30], bio: "結果にこだわる実績主義者。", tags: ["Determination", "Results"] },
-  { id: "A-034", name: "松田 莉子", vector: [60, 45, 40, 88, 55, 45], bio: "ビジョンを語り、人を動かすリーダー。", tags: ["Determination", "Vision"] },
-  { id: "A-035", name: "井田 大翔", vector: [72, 25, 30, 94, 35, 28], bio: "自分に厳しく、限界を超え続ける。", tags: ["Determination", "Discipline"] },
-  { id: "A-036", name: "原田 杏", vector: [50, 50, 45, 85, 60, 50], bio: "起業家精神で新しい道を切り開く。", tags: ["Determination", "Entrepreneurship"] },
-  { id: "A-037", name: "石田 瑛太", vector: [68, 32, 28, 92, 38, 32], bio: "勝負の世界で生きるアスリート気質。", tags: ["Determination", "Competition"] },
-  { id: "A-038", name: "大野 詩織", vector: [58, 42, 50, 86, 48, 48], bio: "粘り強さと柔軟性を使い分ける。", tags: ["Determination", "Resilience"] },
-  { id: "A-039", name: "菅原 匠", vector: [75, 28, 22, 96, 30, 25], bio: "妥協を許さない完遂への執念。", tags: ["Determination", "Completion"] },
-  { id: "A-040", name: "上田 実央", vector: [52, 48, 55, 82, 52, 55], bio: "情熱と思いやりで周囲を巻き込む。", tags: ["Determination", "Passion"] },
-
-  // ─── バランス・柔軟型 (10人) ───
-  { id: "A-041", name: "竹内 涼", vector: [60, 58, 62, 55, 65, 92], bio: "どんな環境にも適応するカメレオン。", tags: ["Flexibility", "Adaptation"] },
-  { id: "A-042", name: "金子 ひなた", vector: [55, 62, 58, 52, 60, 88], bio: "バランスの中に独自のスタイルを見出す。", tags: ["Flexibility", "Balance"] },
-  { id: "A-043", name: "山下 湊", vector: [65, 55, 55, 60, 58, 90], bio: "多趣味で視野が広い万能型。", tags: ["Flexibility", "Versatile"] },
-  { id: "A-044", name: "佐々木 心晴", vector: [50, 65, 65, 48, 68, 85], bio: "流行を敏感にキャッチし、変化を先取りする。", tags: ["Flexibility", "Trend"] },
-  { id: "A-045", name: "阿部 壮太", vector: [58, 60, 55, 58, 62, 94], bio: "対立を嫌い、常に最適解を探す。", tags: ["Flexibility", "Optimization"] },
-  { id: "A-046", name: "橋本 凪", vector: [52, 58, 68, 45, 72, 88], bio: "穏やかさの中に確かな芯を持つ。", tags: ["Flexibility", "Calm"] },
-  { id: "A-047", name: "野村 光", vector: [62, 52, 50, 62, 55, 92], bio: "実行力と柔軟性の高次元バランス。", tags: ["Flexibility", "Execution"] },
-  { id: "A-048", name: "石橋 瑠奈", vector: [48, 68, 62, 42, 75, 86], bio: "好奇心旺盛で、常に新しい体験を求める。", tags: ["Flexibility", "Curiosity"] },
-  { id: "A-049", name: "福田 翼", vector: [55, 55, 55, 55, 55, 95], bio: "究極のバランサー。どんな人ともうまくやれる。", tags: ["Flexibility", "Universal"] },
-  { id: "A-050", name: "安藤 紬", vector: [58, 62, 60, 50, 65, 90], bio: "多様な価値観を繋ぎ合わせるコネクター。", tags: ["Flexibility", "Connection"] },
-];
 
 // ─── 6次元ラベル ───
 export const DIMENSION_LABELS = ["論理性", "直感力", "共感性", "意志力", "創造性", "柔軟性"];
@@ -6006,15 +5752,11 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   return magA === 0 || magB === 0 ? 0 : dotProduct(a, b) / (magA * magB);
 }
 
-/** 補完性スコア: 類似度 optimalSimilarity をピークとするベルカーブ。ユーザー意図で調整可能。 */
-export const DEFAULT_OPTIMAL_SIMILARITY = 0.5; // 恋愛: 0.4, ビジネス: 0.5, 深い共感: 0.6 等
-export function calculateComplementarityScore(
-  userVec: number[],
-  targetVec: number[],
-  optimalSimilarity: number = DEFAULT_OPTIMAL_SIMILARITY
-): number {
+// 補完性スコア: 類似度0.5をピークとするベルカーブ
+export function calculateComplementarityScore(userVec: number[], targetVec: number[]): number {
   const sim = cosineSimilarity(userVec, targetVec);
-  const growthPotential = Math.exp(-Math.pow(sim - optimalSimilarity, 2) / 0.1);
+  const optimalDistance = 0.5;
+  const growthPotential = Math.exp(-Math.pow(sim - optimalDistance, 2) / 0.1);
   return growthPotential * 100;
 }
 
@@ -6051,7 +5793,7 @@ function generateReasoning(userVec: number[], targetVec: number[], sim: number):
   const growthScore = Math.round(calculateComplementarityScore(userVec, targetVec));
 
   const templates = [
-    `あなたの${weakDim}の高さが、相手の${strongDim}と補完関係にあります。マッチ度${simPercent}%は、成長を促す理想的な距離です。`,
+    `あなたの${weakDim}の高さが、相手の${strongDim}と補完関係にあります。共鳴度${simPercent}%は、成長を促す理想的な距離です。`,
     `${strongDim}が際立つ相手です。あなたにない視点を提供し、${weakDim}の強みで支え合える関係が期待できます。`,
     `ベクトル分析の結果、${strongDim}領域で+${Math.round(maxGap)}の差異を検出。互いの盲点を補い合う、成長ポテンシャル${growthScore}%の組み合わせです。`,
   ];
@@ -6063,14 +5805,12 @@ function generateReasoning(userVec: number[], targetVec: number[], sim: number):
 export async function findTopMatches(
   userVector: number[],
   topN: number = 5,
-  userSynthesis?: string,
-  optimalSimilarity: number = DEFAULT_OPTIMAL_SIMILARITY
+  userSynthesis?: string
 ): Promise<MatchResult[]> {
-  const scoreFn = (a: number[], b: number[]) => calculateComplementarityScore(a, b, optimalSimilarity);
 
   // 1. DB検索を試みる
   try {
-    const dbCandidates = await vectorStore.searchSimilar(userVector, 20) as any[];
+    const dbCandidates = await vectorStore.searchSimilar(userVector, 20);
 
     if (dbCandidates.length > 0) {
       const results: MatchResult[] = [];
@@ -6081,15 +5821,15 @@ export async function findTopMatches(
         } catch { continue; }
 
         const sim = cosineSimilarity(userVector, candidateVector);
-        const score = scoreFn(userVector, candidateVector);
+        const score = calculateComplementarityScore(userVector, candidateVector);
 
         let reasoning = generateReasoning(userVector, candidateVector, sim);
         if (userSynthesis) {
           try {
             reasoning = await generateMatchReasoning(
               userSynthesis,
-              "価値観の合う仲間",
-              candidate.reasoning || "互いの考え方に刺激を受け合える存在。",
+              "共鳴する魂",
+              candidate.reasoning || "ベクトル空間上で共鳴する存在。",
               [],
               Math.round(sim * 100),
               Math.round(score)
@@ -6101,9 +5841,9 @@ export async function findTopMatches(
         results.push({
           matchUser: {
             id: candidate.userId,
-            name: "価値観の合う仲間",
+            name: "共鳴するパートナー",
             vector: candidateVector,
-            bio: candidate.reasoning || "互いの考え方に刺激を受け合える存在。",
+            bio: candidate.reasoning || "価値観の近い学生ユーザーです。",
             tags: [],
           },
           similarity: sim,
@@ -6119,43 +5859,11 @@ export async function findTopMatches(
       }
     }
   } catch (e) {
-    console.warn("DB Match failed, falling back to Archetypes", e);
+    console.warn("DB Match failed", e);
   }
 
-  // 2. アーキタイプ（50人）をフォールバック
-  const scored = ARCHETYPE_USERS.map((arch) => {
-    const sim = cosineSimilarity(userVector, arch.vector);
-    const score = scoreFn(userVector, arch.vector);
-    return { arch, sim, score };
-  })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topN);
-
-  const results: MatchResult[] = [];
-  for (const { arch, sim, score } of scored) {
-    let reasoning = generateReasoning(userVector, arch.vector, sim);
-    if (userSynthesis) {
-      try {
-        reasoning = await generateMatchReasoning(
-          userSynthesis,
-          arch.name,
-          arch.bio,
-          arch.tags,
-          Math.round(sim * 100),
-          Math.round(score)
-        );
-      } catch {
-        // フォールバックは既に reasoning に設定済み
-      }
-    }
-    results.push({
-      matchUser: arch,
-      similarity: sim,
-      growthScore: Math.round(score),
-      reasoning,
-    });
-  }
-  return results;
+  // もしマッチ相手が1人もいなければ空配列を返す
+  return [];
 }
 
 // 後方互換
@@ -6178,28 +5886,11 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db/client';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import crypto from 'crypto';
-import { encrypt, signSession, verifySession } from '@/lib/crypto';
 
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
-
-async function migrateGuestData(guestId: string, newUserId: string) {
-    if (!guestId || !guestId.startsWith('guest_')) return;
-    try {
-        await prisma.$transaction([
-            prisma.diagnosticResult.updateMany({ where: { userId: guestId }, data: { userId: newUserId } }),
-            prisma.essenceVector.updateMany({ where: { userId: guestId }, data: { userId: newUserId } }),
-            prisma.feedback.updateMany({ where: { userId: guestId }, data: { userId: newUserId } }),
-            prisma.reflection.updateMany({ where: { userId: guestId }, data: { userId: newUserId } })
-        ]);
-        console.log(`Migrated guest data from ${guestId} to ${newUserId}`);
-    } catch (e) {
-        console.error('Failed to migrate guest data', e);
-    }
-}
 
 export async function manualLogin(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
@@ -6211,12 +5902,9 @@ export async function manualLogin(prevState: any, formData: FormData) {
         return { message: "無効な入力データです。" };
     }
 
-    // 2. メールアドレスをハッシュ化してDB検索（register時と同じアルゴリズムです）
-    const { createHash } = await import('crypto');
-    const emailHash = createHash('sha256').update(email.toLowerCase().trim()).digest('hex');
-
+    // 2. ユーザー検索
     const user = await prisma.user.findUnique({
-        where: { email: emailHash }
+        where: { email }
     });
 
     if (!user) {
@@ -6230,16 +5918,9 @@ export async function manualLogin(prevState: any, formData: FormData) {
         return { message: "メールアドレスまたはパスワードが間違っています。" };
     }
 
-    // 4. ゲストデータの引き継ぎ (もし診断後にログインした場合)
-    const cookieStore = await cookies();
-    const currentSessionId = verifySession(cookieStore.get('zax-session')?.value);
-    if (currentSessionId && currentSessionId !== user.id) {
-        await migrateGuestData(currentSessionId, user.id);
-    }
-
-    // 5. セッション発行 (HTTP-only Cookie)
+    // 4. セッション発行 (HTTP-only Cookie)
     // 注意: 本番環境ではJWTやLucia Auth等のライブラリ推奨だが、ここでは簡易実装
-    cookieStore.set('zax-session', signSession(user.id), { 
+    (await cookies()).set('zax-session', user.id, { 
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 7 // 1週間
@@ -6249,33 +5930,20 @@ export async function manualLogin(prevState: any, formData: FormData) {
 }
 
 export async function manualRegister(prevState: any, formData: FormData) {
-    const rawEmail = formData.get('email') as string;
+    const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    const validated = schema.safeParse({ email: rawEmail, password });
+    const validated = schema.safeParse({ email, password });
     if (!validated.success) {
         return { message: "パスワードは6文字以上で入力してください。" };
     }
 
-    const lowerEmail = rawEmail.toLowerCase().trim();
-
     // ドメイン制限 (武蔵野大学)
-    let isStudent = false;
-    let domainHash = null;
-    let affiliation = null;
-
-    if (lowerEmail.endsWith('@stu.musashino-u.ac.jp') || lowerEmail.endsWith('@musashino-u.ac.jp')) {
-        isStudent = true;
-        domainHash = crypto.createHash('sha256').update('musashino-u.ac.jp').digest('hex');
-        affiliation = "Musashino Univ.";
-    } else {
+    if (!email.endsWith('@stu.musashino-u.ac.jp') && !email.endsWith('@musashino-u.ac.jp')) {
         return { message: "武蔵野大学のメールアドレスのみ登録可能です。" };
     }
 
-    // メールアドレスをハッシュ化（プライバシー保護＆ログイン一貫性）
-    const emailHash = crypto.createHash('sha256').update(lowerEmail).digest('hex');
-
-    const existingUser = await prisma.user.findUnique({ where: { email: emailHash } });
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
         return { message: "このメールアドレスは既に登録されています。" };
     }
@@ -6283,24 +5951,12 @@ export async function manualRegister(prevState: any, formData: FormData) {
     // パスワードハッシュ化
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
+    await prisma.user.create({
         data: {
-            email: emailHash,
-            password: hashedPassword,
-            isStudent,
-            domainHash,
-            affiliation,
-            isCampusMatchRegistered: true,
-            contactEmail: encrypt(lowerEmail)
+            email,
+            password: hashedPassword
         }
     });
-
-    // ゲストデータの引き継ぎ
-    const cookieStore = await cookies();
-    const currentSessionId = verifySession(cookieStore.get('zax-session')?.value);
-    if (currentSessionId && currentSessionId !== newUser.id) {
-        await migrateGuestData(currentSessionId, newUser.id);
-    }
 
     return { message: "登録成功！ログインしてください。" };
 }
@@ -6322,90 +5978,87 @@ export type Question = {
   text: string;
   category: 'Social' | 'Empathy' | 'Discipline' | 'Openness' | 'Emotional';
   categoryJa: string;
-  /** 逆転項目: true のとき 1-7 を 8-score で反転（黙従バイアス軽減） */
   reverse?: boolean;
 };
 
-const Q = (o: Question) => o;
+export const questions: Question[] = [
+  // Social Interaction (外向性・コミュニケーション)
+  { id: 1, text: "初対面の人と会話を始めるのは得意な方だ。", category: 'Social', categoryJa: '外向性' },
+  { id: 2, text: "週末は家で一人で過ごすよりも、友人と出かけたりイベントに参加したい。", category: 'Social', categoryJa: '外向性' },
+  { id: 3, text: "グループの中では、聞き役よりも話し役になることが多い。", category: 'Social', categoryJa: '外向性' },
+  { id: 4, text: "注目を浴びることに抵抗がない、むしろ好きだ。", category: 'Social', categoryJa: '外向性' },
+  { id: 5, text: "自分の感情や考えを、すぐに言葉にして表現する方だ。", category: 'Social', categoryJa: '外向性' },
+  { id: 6, text: "パーティーや交流会など、人が多い場所に行くとエネルギーをもらえる。", category: 'Social', categoryJa: '外向性' },
+  { id: 7, text: "電話よりもテキストメッセージでのやり取りを好む。", category: 'Social', categoryJa: '外向性' }, // Note: Reverse score logic will be handled in analysis if needed, but for vectorization raw score + text is fine.
+  { id: 8, text: "誰かと一緒にいるとき、沈黙が続くと気まずいと感じる。", category: 'Social', categoryJa: '外向性' },
+  { id: 9, text: "浅く広い付き合いよりも、狭く深い付き合いを好む。", category: 'Social', categoryJa: '外向性' },
+  { id: 10, text: "他人の意見に流されず、自分の主張をはっきりと伝えることができる。", category: 'Social', categoryJa: '外向性' },
+
+  // Empathy & Harmony (協調性・共感性)
+  { id: 11, text: "他人の感情の変化に敏感で、すぐ気がつく方だ。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 12, text: "困っている人がいると、自分のことを後回しにしてでも助けたくなる。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 13, text: "議論で勝つことよりも、相手との調和を保つことの方が重要だと思う。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 14, text: "人を批判するよりも、良いところを見つけて褒めるようにしている。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 15, text: "自分の利益よりも、チームやコミュニティ全体の利益を優先する。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 16, text: "映画や小説の登場人物に感情移入して泣いてしまうことがある。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 17, text: "他人の失敗に対して寛容であり、すぐに許すことができる。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 18, text: "嘘をつくことは、どんな理由があっても良くないと思う。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 19, text: "人からの頼み事を断るのが苦手だ。", category: 'Empathy', categoryJa: '協調性' },
+  { id: 20, text: "競争する環境よりも、協力し合う環境の方が能力を発揮できる。", category: 'Empathy', categoryJa: '協調性' },
+
+  // Discipline & Order (誠実性・規律)
+  { id: 21, text: "部屋や机の上は常に整理整頓されている。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 22, text: "計画を立ててから行動する方で、行き当たりばったりの行動は避ける。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 23, text: "期限や約束の時間は必ず守る。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 24, text: "一度始めたことは、どんなに困難でも最後までやり遂げる。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 25, text: "細かい部分まで注意を払い、ミスがないよう徹底するタイプだ。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 26, text: "ルールや規則は、社会秩序のために厳格に守るべきだと思う。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 27, text: "衝動買いをすることはほとんどなく、慎重にお金を使う。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 28, text: "目標達成のためなら、目先の快楽を我慢できる。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 29, text: "効率性を重視し、無駄な作業は極力省きたい。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 30, text: "何事も準備不足だと不安を感じる。", category: 'Discipline', categoryJa: '誠実性' },
+
+  // Openness & Curiosity (開放性・知的好奇心)
+  { id: 31, text: "抽象的な概念や哲学的な議論をするのが好きだ。", category: 'Openness', categoryJa: '開放性' },
+  { id: 32, text: "伝統や慣習よりも、新しい方法や革新的なアイデアに惹かれる。", category: 'Openness', categoryJa: '開放性' },
+  { id: 33, text: "美術館に行ったり、芸術作品に触れたりするのが好きだ。", category: 'Openness', categoryJa: '開放性' },
+  { id: 34, text: "予測可能な日常よりも、変化に富んだ刺激的な毎日を求めている。", category: 'Openness', categoryJa: '開放性' },
+  { id: 35, text: "未知の分野や新しい趣味に挑戦することにワクワクする。", category: 'Openness', categoryJa: '開放性' },
+  { id: 36, text: "物事を多角的な視点から見るのが得意だ。", category: 'Openness', categoryJa: '開放性' },
+  { id: 37, text: "「なぜ？」と根本的な理由を考えることがよくある。", category: 'Openness', categoryJa: '開放性' },
+  { id: 38, text: "SF映画やファンタジー小説など、現実離れした世界観が好きだ。", category: 'Openness', categoryJa: '開放性' },
+  { id: 39, text: "自分の価値観が絶対だとは思わず、多様な考え方を受け入れられる。", category: 'Openness', categoryJa: '開放性' },
+  { id: 40, text: "クリエイティブな活動（執筆、描画、制作など）に時間を費やすのが好きだ。", category: 'Openness', categoryJa: '開放性' },
+
+  // Emotional Logic / Stability (情緒安定性・メンタル)
+  { id: 41, text: "プレッシャーのかかる状況でも、冷静に対処できる。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 42, text: "些細なことでイライラしたり、落ち込んだりすることは少ない。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 43, text: "将来に対して不安を感じるより、楽観的に考えることが多い。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 44, text: "失敗しても、すぐに気持ちを切り替えて次の行動に移せる。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 45, text: "他人からの批判を個人的な攻撃として受け取らず、冷静に分析できる。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 46, text: "感情の起伏が激しい方ではない。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 47, text: "リラックスする時間を意識的に確保している。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 48, text: "自分の弱みを見せることに抵抗がない。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 49, text: "予期せぬトラブルが起きてもパニックにならずに対応できる。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 50, text: "自分自身に対して自信を持っており、自己肯定感が高い。", category: 'Emotional', categoryJa: '情緒安定性' },
+
+  // -- 追加質問 --
+  { id: 51, text: "自分と異なる意見を持つ相手とも、深い信頼関係を築ける。", category: 'Openness', categoryJa: '開放性' },
+  { id: 52, text: "ストレスが溜まったときは、誰かに話すより一人で静かに過ごしたい。", category: 'Social', categoryJa: '外向性', reverse: true },
+  { id: 53, text: "人生において安定よりも刺激や挑戦を常に求めていたい。", category: 'Openness', categoryJa: '開放性' },
+  { id: 54, text: "自分の志や目的のためなら、周囲の環境が変わることも厭わない。", category: 'Discipline', categoryJa: '誠実性' },
+  { id: 55, text: "広く浅い人脈よりも、深く狭い信頼関係の方が価値がある。", category: 'Social', categoryJa: '外向性', reverse: true },
+  { id: 56, text: "物事を判断する基準は、社会的な常識よりも自分の信念に基づいている。", category: 'Discipline', categoryJa: '誠実性', reverse: true },
+  { id: 57, text: "何か問題が起きたとき、感情に寄り添うよりも先に解決策を提示してほしい。", category: 'Empathy', categoryJa: '協調性', reverse: true },
+  { id: 58, text: "自分に自信がある方だ。", category: 'Emotional', categoryJa: '情緒安定性' },
+  { id: 59, text: "どんなに親しい間柄でも、踏み込ませないパーソナルスペースが必要だ。", category: 'Social', categoryJa: '外向性', reverse: true },
+];
 
 /** 1-7スケールで逆転項目の場合は 8 - score を返す */
 export function effectiveScore(question: Question, rawScore: number): number {
   if (question.reverse) return 8 - rawScore;
   return rawScore;
 }
-
-export const questions: Question[] = [
-  // Social Interaction (外向性・コミュニケーション)
-  Q({ id: 1, text: "初対面の人と会話を始めるのは得意な方だ。", category: 'Social', categoryJa: '外向性' }),
-  Q({ id: 2, text: "週末は家で一人で過ごすよりも、友人と出かけたりイベントに参加したい。", category: 'Social', categoryJa: '外向性' }),
-  Q({ id: 3, text: "グループの中では、聞き役よりも話し役になることが多い。", category: 'Social', categoryJa: '外向性' }),
-  Q({ id: 4, text: "注目を浴びることに抵抗がない、むしろ好きだ。", category: 'Social', categoryJa: '外向性' }),
-  Q({ id: 5, text: "自分の感情や考えを、すぐに言葉にして表現する方だ。", category: 'Social', categoryJa: '外向性' }),
-  Q({ id: 6, text: "パーティーや交流会など、人が多い場所に行くとエネルギーをもらえる。", category: 'Social', categoryJa: '外向性' }),
-  Q({ id: 7, text: "電話よりもテキストメッセージでのやり取りを好む。", category: 'Social', categoryJa: '外向性', reverse: true }), // テキスト好み=対面減
-  Q({ id: 8, text: "誰かと一緒にいるとき、沈黙が続くと気まずいと感じる。", category: 'Social', categoryJa: '外向性' }),
-  Q({ id: 9, text: "浅く広い付き合いよりも、狭く深い付き合いを好む。", category: 'Social', categoryJa: '外向性', reverse: true }), // 深く狭く=内向的傾向
-  Q({ id: 10, text: "他人の意見に流されず、自分の主張をはっきりと伝えることができる。", category: 'Social', categoryJa: '外向性' }),
-
-  // Empathy & Harmony (協調性・共感性)
-  Q({ id: 11, text: "他人の感情の変化に敏感で、すぐ気がつく方だ。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 12, text: "困っている人がいると、自分のことを後回しにしてでも助けたくなる。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 13, text: "議論で勝つことよりも、相手との調和を保つことの方が重要だと思う。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 14, text: "人を批判するよりも、良いところを見つけて褒めるようにしている。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 15, text: "自分の利益よりも、チームやコミュニティ全体の利益を優先する。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 16, text: "映画や小説の登場人物に感情移入して泣いてしまうことがある。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 17, text: "他人の失敗に対して寛容であり、すぐに許すことができる。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 18, text: "嘘をつくことは、どんな理由があっても良くないと思う。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 19, text: "人からの頼み事を断るのが苦手だ。", category: 'Empathy', categoryJa: '協調性' }),
-  Q({ id: 20, text: "競争する環境よりも、協力し合う環境の方が能力を発揮できる。", category: 'Empathy', categoryJa: '協調性' }),
-
-  // Discipline & Order (誠実性・規律)
-  Q({ id: 21, text: "部屋や机の上は常に整理整頓されている。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 22, text: "計画を立ててから行動する方で、行き当たりばったりの行動は避ける。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 23, text: "期限や約束の時間は必ず守る。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 24, text: "一度始めたことは、どんなに困難でも最後までやり遂げる。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 25, text: "細かい部分まで注意を払い、ミスがないよう徹底するタイプだ。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 26, text: "ルールや規則は、社会秩序のために厳格に守るべきだと思う。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 27, text: "衝動買いをすることはほとんどなく、慎重にお金を使う。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 28, text: "目標達成のためなら、目先の快楽を我慢できる。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 29, text: "効率性を重視し、無駄な作業は極力省きたい。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 30, text: "何事も準備不足だと不安を感じる。", category: 'Discipline', categoryJa: '誠実性' }),
-
-  // Openness & Curiosity (開放性・知的好奇心)
-  Q({ id: 31, text: "抽象的な概念や哲学的な議論をするのが好きだ。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 32, text: "伝統や慣習よりも、新しい方法や革新的なアイデアに惹かれる。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 33, text: "美術館に行ったり、芸術作品に触れたりするのが好きだ。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 34, text: "予測可能な日常よりも、変化に富んだ刺激的な毎日を求めている。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 35, text: "未知の分野や新しい趣味に挑戦することにワクワクする。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 36, text: "物事を多角的な視点から見るのが得意だ。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 37, text: "「なぜ？」と根本的な理由を考えることがよくある。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 38, text: "SF映画やファンタジー小説など、現実離れした世界観が好きだ。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 39, text: "自分の価値観が絶対だとは思わず、多様な考え方を受け入れられる。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 40, text: "クリエイティブな活動（執筆、描画、制作など）に時間を費やすのが好きだ。", category: 'Openness', categoryJa: '開放性' }),
-
-  // Emotional Logic / Stability (情緒安定性・メンタル)
-  Q({ id: 41, text: "プレッシャーのかかる状況でも、冷静に対処できる。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 42, text: "些細なことでイライラしたり、落ち込んだりすることは少ない。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 43, text: "将来に対して不安を感じるより、楽観的に考えることが多い。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 44, text: "失敗しても、すぐに気持ちを切り替えて次の行動に移せる。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 45, text: "他人からの批判を個人的な攻撃として受け取らず、冷静に分析できる。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 46, text: "感情の起伏が激しい方ではない。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 47, text: "リラックスする時間を意識的に確保している。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 48, text: "自分の弱みを見せることに抵抗がない。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 49, text: "予期せぬトラブルが起きてもパニックにならずに対応できる。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 50, text: "自分自身に対して自信を持っており、自己肯定感が高い。", category: 'Emotional', categoryJa: '情緒安定性' }),
-
-  // -- 追加質問 --
-  Q({ id: 51, text: "自分と異なる意見を持つ相手とも、深い信頼関係を築ける。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 52, text: "ストレスが溜まったときは、誰かに話すより一人で静かに過ごしたい。", category: 'Social', categoryJa: '外向性', reverse: true }),
-  Q({ id: 53, text: "人生において安定よりも刺激や挑戦を常に求めていたい。", category: 'Openness', categoryJa: '開放性' }),
-  Q({ id: 54, text: "自分の志や目的のためなら、周囲の環境が変わることも厭わない。", category: 'Discipline', categoryJa: '誠実性' }),
-  Q({ id: 55, text: "広く浅い人脈よりも、深く狭い信頼関係の方が価値がある。", category: 'Social', categoryJa: '外向性', reverse: true }),
-  Q({ id: 56, text: "物事を判断する基準は、社会的な常識よりも自分の信念に基づいている。", category: 'Discipline', categoryJa: '誠実性', reverse: true }),
-  Q({ id: 57, text: "何か問題が起きたとき、感情に寄り添うよりも先に解決策を提示してほしい。", category: 'Empathy', categoryJa: '協調性', reverse: true }),
-  Q({ id: 58, text: "自分に自信がある方だ。", category: 'Emotional', categoryJa: '情緒安定性' }),
-  Q({ id: 59, text: "どんなに親しい間柄でも、踏み込ませないパーソナルスペースが必要だ。", category: 'Social', categoryJa: '外向性', reverse: true }),
-];
 
 ```
 

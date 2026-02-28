@@ -124,10 +124,10 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         <div className="text-center max-w-md px-6">
           <p className="text-slate-600 mb-6">{error || "結果が見つかりませんでした"}</p>
           <Link
-            href="/history"
+            href="/diagnostic"
             className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800"
           >
-            履歴から再解析する
+            もう一度診断する
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -316,7 +316,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
         <section className="text-center pt-8">
           <Link
-            href="/history"
+            href="/diagnostic"
             className="text-slate-400 text-sm font-bold hover:text-indigo-500 transition-colors uppercase tracking-widest"
           >
             やり直す

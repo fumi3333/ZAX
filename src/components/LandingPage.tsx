@@ -40,7 +40,7 @@ export default function LandingPage() {
             transition={{ delay: 0.18, duration: 0.5 }}
             className="text-sm text-slate-500 mb-12 max-w-md"
           >
-            あなたのブラウザの履歴から、価値観とつながり方を可視化します。
+            59問の質問から、あなたの価値観とつながり方を可視化します。
           </motion.p>
 
           <motion.div
@@ -50,17 +50,11 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row gap-3"
           >
             <Link
-              href="/history"
+              href="/diagnostic"
               className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-all shadow-sm hover:shadow-md"
             >
-              無料で履歴解析を開始
+              無料で診断を開始
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <Link
-              href="/about"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white text-slate-700 text-sm font-semibold rounded-lg border border-slate-200 hover:border-slate-300 transition-colors"
-            >
-              詳しく見る
             </Link>
           </motion.div>
         </div>

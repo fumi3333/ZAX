@@ -18,7 +18,7 @@ export default function AppNavigation() {
     { href: '/about', label: 'About' },
     { href: '/philosophy', label: 'Vision' },
     { href: '/technology', label: 'Product' },
-    { href: '/history', label: 'Your History' },
+    { href: '/diagnostic', label: 'Diagnostic' },
   ];
   
   return (
