@@ -186,7 +186,77 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           </div>
         </section>
 
+        {/* 2. Registration Wall for Guests */}
+        {data.isGuest && !isGenerating && (
+          <section className="bg-slate-900 text-white rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
+             <div className="max-w-md mx-auto relative z-10 text-center space-y-6">
+                <div className="inline-block p-4 rounded-full bg-slate-800 mb-2">
+                  <BookOpen className="w-12 h-12 text-indigo-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">深層心理レポート</h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  ここから先は、あなたの価値観と行動特性を深く掘り下げる約3,000文字の「深層パーソナリティレポート」をご用意しています。閲覧および保存には無料のアカウント登録が必要です。
+                </p>
 
+                <form onSubmit={handleRegister} className="mt-8 space-y-4 text-left">
+                  <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 space-y-4">
+                     {regError && (
+                        <div className="bg-red-500/10 border border-red-500/50 text-red-400 text-xs p-3 rounded-lg font-bold">
+                           {regError}
+                        </div>
+                     )}
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 mb-1">ニックネーム (学内表示用)</label>
+                       <input 
+                          type="text" 
+                          required
+                          value={nickname}
+                          onChange={e => setNickname(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          placeholder="ZAX 太郎"
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 mb-1">大学メールアドレス</label>
+                       <input 
+                          type="email" 
+                          required
+                          value={email}
+                          onChange={e => setEmail(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          placeholder="name@musashino-u.ac.jp"
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 mb-1">パスワード</label>
+                       <input 
+                          type="password" 
+                          required
+                          minLength={6}
+                          value={password}
+                          onChange={e => setPassword(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          placeholder="6文字以上"
+                       />
+                     </div>
+                     <button 
+                        type="submit" 
+                        disabled={isRegistering}
+                        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-500 transition-colors disabled:opacity-50 mt-4"
+                     >
+                        {isRegistering ? (
+                          <><Loader2 className="w-5 h-5 animate-spin" />登録処理中...</>
+                        ) : (
+                          <>無料で登録してレポートを見る<ArrowRight className="w-5 h-5" /></>
+                        )}
+                     </button>
+                  </div>
+                </form>
+             </div>
+             {/* Decor */}
+             <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/20 blur-3xl rounded-full pointer-events-none" />
+          </section>
+        )}
 
         {/* 3. Generating Report State */}
         {isGenerating && (
@@ -203,8 +273,8 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           </section>
         )}
 
-        {/* 4. Full Report Display */}
-        {!isGenerating && (
+        {/* 4. Full Report Display (For Logged In / Newly Registered Users) */}
+        {!data.isGuest && !isGenerating && (
           <section className="bg-white text-slate-900 rounded-2xl p-8 md:p-12 shadow-xl border border-slate-200">
             <h2 className="text-3xl font-black mb-8 flex items-center gap-3 text-slate-900 border-b border-slate-100 pb-4">
               <BookOpen className="w-8 h-8 text-indigo-600" />
@@ -239,8 +309,8 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           </section>
         )}
 
-        {/* 5. Match Results Section */}
-        {!isGenerating && (
+        {/* 5. Match Results Section (Optional, keeping it below if they want to chat in the current app, but users flow ends at ZAXcampus) */}
+        {!data.isGuest && !isGenerating && (
            <MatchResults userVector={userVector6d} synthesis={data.synthesis} isGuest={data.isGuest} />
         )}
 

@@ -73,18 +73,21 @@ export async function POST(req: Request) {
         profileText += `- ${cat}: 平均 ${(data.sum / data.count).toFixed(1)}/7.0\n`;
     }
 
-    profileText += "\n指示: この人物の強み、弱み、コミュニケーションスタイル、適した環境について、プロの心理分析官としてわかりやすい言葉でシンプルなレポートを作成してください（約800〜1000文字程度）。回答には自由記述の内容も深く反映させてください。出力に「AI」という語は含めず、マークダウン（*や#）も絶対に使用しないでください。";
+    profileText += "\n指示: この人物の強み、弱み、コミュニケーションスタイル、適した環境について、プロの心理分析官として詳細なレポートを作成してください。回答には自由記述の内容も深く反映させてください。出力に「AI」という語は含めないでください。";
     
-    // 3. Call Gemini for Synthesis 
-    let synthesis = "分析エラーが発生しました。時間を置いて再試行してください。";
+    // 3. Call Gemini for Synthesis (Skip for guest to encourage registration)
+    let synthesis = "登録後にAI詳細分析レポートが生成されます。";
+    const isGuest = user?.email.startsWith("guest_");
 
-    try {
-        const result = await model.generateContent(profileText);
-        let responseText = await result.response.text();
-        responseText = responseText.replace(/[*#]/g, '').trim(); // Markdown除去
-        synthesis = responseText || synthesis;
-    } catch (e) {
-        console.warn("Gemini API Error (Synthesis):", e);
+    if (!isGuest) {
+        try {
+            const result = await model.generateContent(profileText);
+            const response = await result.response;
+            synthesis = response.text() || synthesis;
+        } catch (e) {
+            console.warn("Gemini API Error (Synthesis):", e);
+            synthesis = "分析エラーが発生しました。時間を置いて再試行してください。";
+        }
     }
 
     // 4. 6次元ベクトル (レーダーチャート用)
