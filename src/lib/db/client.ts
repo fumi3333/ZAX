@@ -86,7 +86,6 @@ try {
 
     // In-Memory Mock Store (Prisma未生成時 or ビルド時のフォールバック)
     const mockUsers: any[] = [];
-    const mockVectors: any[] = [];
     const mockDiagnostics: any[] = [];
 
     prisma = {
@@ -124,41 +123,11 @@ try {
     };
 
     vectorStore = {
-        async saveEmbedding(
-            userId: string,
-            vector: number[],
-            reasoning: string,
-            resonanceScore: number,
-            embedding?: number[]
-        ) {
-            console.log("Mock saveEmbedding:", userId, `[${vector.length}dim]`, embedding ? `[${embedding.length}dim]` : "");
-            mockVectors.push({ userId, vector, reasoning, resonanceScore, embedding });
+        async saveEmbedding() {
+            // No-op
         },
-        async searchSimilar(targetVector: number[], limit: number = 5) {
-            // モックでも最低限のコサイン類似度検索を実行
-            if (mockVectors.length === 0) return [];
-
-            const dot = (a: number[], b: number[]) =>
-                a.reduce((s, v, i) => s + v * (b[i] || 0), 0);
-            const mag = (a: number[]) =>
-                Math.sqrt(a.reduce((s, v) => s + v * v, 0));
-            const cosine = (a: number[], b: number[]) => {
-                const ma = mag(a);
-                const mb = mag(b);
-                return ma && mb ? dot(a, b) / (ma * mb) : 0;
-            };
-
-            return mockVectors
-                .map((mv) => ({
-                    id: `mock_vec_${mv.userId}`,
-                    userId: mv.userId,
-                    vectorJson: JSON.stringify(mv.vector),
-                    reasoning: mv.reasoning,
-                    resonanceScore: mv.resonanceScore,
-                    distance: 1 - cosine(targetVector, mv.vector),
-                }))
-                .sort((a, b) => a.distance - b.distance)
-                .slice(0, limit);
+        async searchSimilar() {
+            return [];
         },
     };
 }

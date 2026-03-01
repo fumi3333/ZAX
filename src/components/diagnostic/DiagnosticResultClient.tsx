@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { questions } from "@/data/questions";
-import { DIMENSION_LABELS } from "@/lib/rec/engine";
+const DIMENSION_LABELS = ["論理性", "直感力", "共感性", "意志力", "創造性", "柔軟性"];
 import ResultRadarChart from "./ResultRadarChart";
-import MatchResults from "./MatchResults";
+
 import Link from "next/link";
 import { ArrowRight, Sparkles, Loader2, BookOpen, ExternalLink } from "lucide-react";
 
@@ -340,10 +340,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           </section>
         )}
 
-        {/* 5. Match Results Section (Optional, keeping it below if they want to chat in the current app, but users flow ends at ZAXcampus) */}
-        {!data.isGuest && !isGenerating && (
-           <MatchResults userVector={userVector6d} synthesis={data.synthesis} isGuest={data.isGuest} />
-        )}
+
 
         <section className="text-center pt-8">
           <Link
