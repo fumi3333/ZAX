@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZAX — 未踏応募プレゼンテーション</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Inter:wght@300;400;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --indigo: #6366f1;
+    --violet: #7c3aed;
+    --cyan: #06b6d4;
+    --bg-dark: #0a0a1a;
+    --bg-card: #111128;
+    --text-main: #f0f0ff;
+    --text-muted: #9999cc;
+    --accent: #a78bfa;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ── スライドコンテナ ── */
+  .slides-wrapper {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 64px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s cubic-bezier(.4,0,.2,1), transform 0.6s cubic-bezier(.4,0,.2,1);
+    transform: translateY(24px);
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+
+  /* ── 枠線グロー ── */
+  .slide::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── ナビゲーション ── */
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 100;
+    background: rgba(17,17,40,0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: 999px;
+    padding: 10px 24px;
+  }
+
+  .nav button {
+    background: var(--indigo);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nav button:hover { background: var(--violet); transform: scale(1.1); }
+  .nav button:disabled { opacity: 0.3; cursor: default; }
+
+  .slide-counter {
+    font-size: 13px;
+    color: var(--text-muted);
+    min-width: 60px;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  .dot-nav {
+    display: flex;
+    gap: 6px;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(99,102,241,0.3);
+    transition: background 0.3s, transform 0.3s;
+    cursor: pointer;
+  }
+  .dot.active { background: var(--indigo); transform: scale(1.3); }
+
+  /* ── キーボードヒント ── */
+  .key-hint {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    font-size: 11px;
+    color: var(--text-muted);
+    z-index: 100;
+  }
+
+  /* ── タイポグラフィ ── */
+  .tag {
+    display: inline-block;
+    background: rgba(99,102,241,0.2);
+    border: 1px solid rgba(99,102,241,0.5);
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    padding: 4px 14px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1.title {
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+  }
+
+  h2.slide-title {
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 32px;
+    letter-spacing: -0.02em;
+  }
+
+  .gradient-text {
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  p.lead {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--text-muted);
+    line-height: 1.75;
+    text-align: center;
+    max-width: 800px;
+  }
+
+  /* ── カード ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: 20px;
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--indigo), var(--cyan));
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 1000px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; width: 100%; max-width: 1100px; }
+
+  .stat-num {
+    font-size: 48px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: 14px; color: var(--text-muted); }
+
+  /* ── パイプライン ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .pipe-step {
+    background: var(--bg-card);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: 14px;
+    padding: 14px 22px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .pipe-arrow {
+    color: var(--accent);
+    font-size: 22px;
+  }
+
+  /* ── ベクトル可視化 ── */
+  .radar-mock {
+    width: 180px;
+    height: 180px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .radar-mock svg { width: 100%; height: 100%; }
+
+  /* ── 数式ブロック ── */
+  .formula {
+    background: rgba(6,182,212,0.08);
+    border: 1px solid rgba(6,182,212,0.3);
+    border-radius: 14px;
+    padding: 20px 28px;
+    font-family: 'Inter', monospace;
+    font-size: 18px;
+    color: var(--cyan);
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── ロードマップ ── */
+  .roadmap-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .roadmap-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--indigo);
+    flex-shrink: 0;
+    margin-top: 5px;
+    box-shadow: 0 0 12px var(--indigo);
+  }
+  .roadmap-line {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    border-left: 2px solid rgba(99,102,241,0.3);
+    padding-left: 28px;
+    margin-left: 7px;
+  }
+
+  /* ── 背景装飾 ── */
+  .bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: -1;
+  }
+  .orb1 { width: 500px; height: 500px; background: rgba(99,102,241,0.08); top: -100px; right: -100px; }
+  .orb2 { width: 400px; height: 400px; background: rgba(6,182,212,0.06); bottom: -100px; left: -100px; }
+
+  /* ── スライド固有スタイル ── */
+  .s1-sub {
+    font-size: clamp(18px, 2.2vw, 26px);
+    color: var(--text-muted);
+    margin-top: 20px;
+    text-align: center;
+  }
+  .s1-meta {
+    margin-top: 48px;
+    display: flex;
+    gap: 32px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .s1-meta span { color: #fff; font-weight: 700; }
+
+  small { font-size: 12px; color: var(--text-muted); }
+
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(6,182,212,0.1));
+    border: 1px solid rgba(99,102,241,0.4);
+    border-radius: 16px;
+    padding: 20px 28px;
+  }
+
+  ul.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  ul.feature-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.6; }
+  ul.feature-list li::before { content: '▶'; color: var(--indigo); flex-shrink: 0; margin-top: 2px; }
+
+  .badge {
+    display: inline-block;
+    background: rgba(99,102,241,0.2);
+    border: 1px solid rgba(99,102,241,0.4);
+    color: var(--accent);
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .vs-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .vs-table th, .vs-table td { padding: 12px 16px; border-bottom: 1px solid rgba(99,102,241,0.15); text-align: left; }
+  .vs-table th { color: var(--text-muted); font-weight: 400; font-size: 12px; letter-spacing: 0.08em; }
+  .vs-table .good { color: #4ade80; }
+  .vs-table .bad { color: #f87171; }
+</style>
+</head>
+<body>
+
+<!-- 背景装飾 -->
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+
+<!-- キーボードヒント -->
+<div class="key-hint">← → キー or クリックで移動</div>
+
+<!-- ナビゲーション -->
+<div class="nav">
+  <button id="prev-btn" onclick="changeSlide(-1)" disabled>‹</button>
+  <div class="dot-nav" id="dots"></div>
+  <div class="slide-counter" id="counter">1 / 10</div>
+  <button id="next-btn" onclick="changeSlide(1)">›</button>
+</div>
+
+<!-- ========== SLIDE 1: タイトル ========== -->
+<div class="slide active" id="slide-1">
+  <div class="tag">未踏 2026 採択申請</div>
+  <h1 class="title">ZAX</h1>
+  <p class="s1-sub">表面的な属性ではなく「本質」でつながる<br>価値観ベクトル・マッチング OS</p>
+  <div class="s1-meta">
+    <div>申請者 <span>fumi3333</span></div>
+    <div>フェーズ <span>MVP 完成 / Phase 1</span></div>
+    <div>技術スタック <span>Next.js · Gemini AI · pgvector</span></div>
+  </div>
+</div>
+
+<!-- ========== SLIDE 2: 問題提起 ========== -->
+<div class="slide" id="slide-2">
+  <div class="tag">Problem</div>
+  <h2 class="slide-title">既存マッチングは<br><span class="gradient-text">「表面」しか見ていない</span></h2>
+  <div class="grid-2" style="max-width:900px; margin-top: 8px;">
+    <div class="card">
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">現在のマッチングアプリ</p>
+      <ul class="feature-list" style="gap:6px;">
+        <li style="color:#f87171;">年齢・年収・外見で篩い分け</li>
+        <li style="color:#f87171;">「似た者同士」を引き合わせるだけ</li>
+        <li style="color:#f87171;">エコーチェンバー → 成長が止まる</li>
+        <li style="color:#f87171;">内面・思考パターンは無視</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">本質的につながるには</p>
+      <ul class="feature-list" style="gap:6px;">
+        <li>価値観・思考パターンの可視化</li>
+        <li>共感できる + 刺激になる「適度な差異」</li>
+        <li>時間とともに変化する内面の追跡</li>
+        <li>AI による深層分析と定量化</li>
+      </ul>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:24px; font-size:16px;">
+    心理学的に「似すぎた関係は確証バイアスを強め成長を妨げる」。<br>
+    ZAX は <strong style="color:#fff;"> "適度な差異" を科学的に計算</strong>し、本質で共鳴する相手を発見する。
+  </p>
+</div>
+
+<!-- ========== SLIDE 3: ZAX の解決策 ========== -->
+<div class="slide" id="slide-3">
+  <div class="tag">Solution</div>
+  <h2 class="slide-title">ZAX の<span class="gradient-text">3つのコア</span></h2>
+  <div class="grid-3" style="margin-top:8px;">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:36px; margin-bottom:12px;">🧠</div>
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:10px;">6次元エッセンスベクトル</h3>
+      <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+        論理性 / 直感力 / 共感性 /<br>意志力 / 創造性 / 柔軟性<br>
+        の6軸で人格を定量化
+      </p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:36px; margin-bottom:12px;">🤖</div>
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:10px;">Gemini AI 深層分析</h3>
+      <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+        50問の診断回答を<br>Gemini Pro で解析し<br>768次元ベクトルに変換
+      </p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:36px; margin-bottom:12px;">📐</div>
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:10px;">補完性スコアマッチング</h3>
+      <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+        「似すぎず・違いすぎず」<br>成長を促す相手を<br>ガウス曲線で計算
+      </p>
+    </div>
+  </div>
+  <div class="highlight-box" style="max-width:900px; margin-top:24px; text-align:center;">
+    <p style="font-size:15px; line-height:1.8; color:var(--text-muted);">
+      単なる類似検索ではなく、<strong style="color:#fff;">「なぜつながるべきか」までを AI が推薦理由として生成</strong>。<br>
+      人がレーダーチャートで視覚的に差異を確認しながら選ぶ、新しいマッチング体験。
+    </p>
+  </div>
+</div>
+
+<!-- ========== SLIDE 4: 技術アーキテクチャ ========== -->
+<div class="slide" id="slide-4">
+  <div class="tag">Architecture</div>
+  <h2 class="slide-title">システム<span class="gradient-text">アーキテクチャ</span></h2>
+  <div class="pipeline" style="max-width:1000px; margin-top:8px;">
+    <div class="pipe-step">
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">フロントエンド</div>
+      Next.js 16<br>
+      <span style="font-size:11px; color:var(--text-muted);">App Router + Framer Motion</span>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">診断 API</div>
+      50問回答<br>
+      <span style="font-size:11px; color:var(--text-muted);">カテゴリ集計</span>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">Gemini Pro</div>
+      性格分析<br>
+      <span style="font-size:11px; color:var(--text-muted);">テキスト生成</span>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">text-embedding-004</div>
+      768次元<br>
+      <span style="font-size:11px; color:var(--text-muted);">ベクトル化</span>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step">
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">PostgreSQL + pgvector</div>
+      HNSW 検索<br>
+      <span style="font-size:11px; color:var(--text-muted);">コサイン距離</span>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-top:24px; max-width:900px;">
+    <div class="card">
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:12px;">🎯 技術選定の理由</h3>
+      <table class="vs-table">
+        <tr><th></th><th>pgvector</th><th>Pinecone</th></tr>
+        <tr><td>コスト</td><td class="good">無料（OSS）</td><td class="bad">月 $70〜</td></tr>
+        <tr><td>SQL 統合</td><td class="good">同一DB</td><td class="bad">分離</td></tr>
+        <tr><td>HNSW index</td><td class="good">あり</td><td class="good">あり</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:12px;">🔐 セキュリティ設計</h3>
+      <ul class="feature-list" style="font-size:13px;">
+        <li>AES-256-CBC による機密データ暗号化</li>
+        <li>bcryptjs + Cookie セッション管理</li>
+        <li>Prisma 型安全 ORM で SQL インジェクション防止</li>
+        <li>環境変数による API キー管理</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SLIDE 5: コアアルゴリズム ========== -->
+<div class="slide" id="slide-5">
+  <div class="tag">Algorithm</div>
+  <h2 class="slide-title">補完性スコア<span class="gradient-text">アルゴリズム</span></h2>
+  <div class="formula">
+    growthScore = exp( −(similarity − 0.5)² / 0.1 ) × 100
+  </div>
+  <div class="grid-3" style="margin-top:28px; max-width:1000px;">
+    <div class="card" style="text-align:center;">
+      <div class="stat-num">1.0</div>
+      <div class="stat-label">完全一致</div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">
+        エコーチェンバー形成<br>→ 成長が止まる
+      </p>
+    </div>
+    <div class="card" style="text-align:center; border-color:rgba(6,182,212,0.5);">
+      <div class="stat-num" style="background: linear-gradient(135deg,#4ade80,var(--cyan)); -webkit-background-clip:text; background-clip:text;">0.5</div>
+      <div class="stat-label">🎯 最適な差異</div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">
+        共感 + 新刺激の<br>理想的バランス
+      </p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="stat-num">0.0</div>
+      <div class="stat-label">完全に別方向</div>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">
+        価値観の衝突<br>→ 関係構築困難
+      </p>
+    </div>
+  </div>
+  <div class="highlight-box" style="max-width:900px; margin-top:24px;">
+    <p style="font-size:14px; color:var(--text-muted); line-height:1.8;">
+      <strong style="color:#fff;">設計の根拠：</strong>心理学の「至適刺激水準理論」＋コサイン類似度をベルカーブで変換。<br>
+      最も成長を促す「適度な差異のある相手」を数学的に優先。現在は 0.5 が仮説で、実データで検証予定。
+    </p>
+  </div>
+</div>
+
+<!-- ========== SLIDE 6: ユーザー体験フロー ========== -->
+<div class="slide" id="slide-6">
+  <div class="tag">User Experience</div>
+  <h2 class="slide-title">ユーザー<span class="gradient-text">体験フロー</span></h2>
+  <div class="pipeline" style="flex-direction:column; gap:0; max-width:800px; width:100%;">
+    <div style="display:flex; align-items:center; gap:20px; padding:14px 0;">
+      <div style="width:32px; height:32px; border-radius:50%; background:var(--indigo); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">1</div>
+      <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:14px 20px; border:1px solid rgba(99,102,241,0.2);">
+        <strong>50問 価値観診断</strong> <span style="font-size:12px; color:var(--text-muted); margin-left:8px;">7段階バブル選択UI / 自動進行</span>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">論理性・直感力・共感性・意志力・創造性・柔軟性 のカテゴリ別質問</p>
+      </div>
+    </div>
+    <div style="border-left:2px dashed rgba(99,102,241,0.3); height:20px; margin-left:15px;"></div>
+    <div style="display:flex; align-items:center; gap:20px; padding:14px 0;">
+      <div style="width:32px; height:32px; border-radius:50%; background:var(--violet); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">2</div>
+      <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:14px 20px; border:1px solid rgba(99,102,241,0.2);">
+        <strong>Gemini AI リアルタイム分析</strong> <span style="font-size:12px; color:var(--text-muted);">→ 768次元ベクトル生成・DB保存</span>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">性格分析レポートを生成 → text-embedding-004 でベクトル化</p>
+      </div>
+    </div>
+    <div style="border-left:2px dashed rgba(99,102,241,0.3); height:20px; margin-left:15px;"></div>
+    <div style="display:flex; align-items:center; gap:20px; padding:14px 0;">
+      <div style="width:32px; height:32px; border-radius:50%; background:var(--cyan); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; color:#000;">3</div>
+      <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:14px 20px; border:1px solid rgba(6,182,212,0.2);">
+        <strong>6次元レーダーチャート表示</strong> <span style="font-size:12px; color:var(--text-muted);">+ AI 性格分析レポート</span>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">自分のエッセンスベクトルを可視化。比較レーダーでマッチング候補と対比</p>
+      </div>
+    </div>
+    <div style="border-left:2px dashed rgba(99,102,241,0.3); height:20px; margin-left:15px;"></div>
+    <div style="display:flex; align-items:center; gap:20px; padding:14px 0;">
+      <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--indigo),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">4</div>
+      <div style="flex:1; background:var(--bg-card); border-radius:12px; padding:14px 20px; border:1px solid rgba(99,102,241,0.2);">
+        <strong>Top 3 マッチング候補表示</strong> <span style="font-size:12px; color:var(--text-muted);">+ AI 推薦理由 + フィードバック</span>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">pgvector HNSW 検索 → 補完性スコアランキング → 推薦理由を自動生成</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SLIDE 7: 独自性・新規性 ========== -->
+<div class="slide" id="slide-7">
+  <div class="tag">Novelty</div>
+  <h2 class="slide-title">ZAX の<span class="gradient-text">独自性</span></h2>
+  <div class="grid-2" style="max-width:1000px;">
+    <div class="card">
+      <h3 style="font-size:16px; font-weight:700; margin-bottom:16px; color:var(--accent);">🔬 技術的独自性</h3>
+      <ul class="feature-list" style="font-size:14px;">
+        <li><strong>補完性スコア</strong>：類似度ではなく「最適な差異」をガウス曲線で評価する世界初のアプローチ</li>
+        <li><strong>2段階ベクトル</strong>：6次元（人格軸）と768次元（意味空間）の二層構造</li>
+        <li><strong>フォールバック設計</strong>：DB不足時は50のアーキタイプで必ずマッチング成立</li>
+        <li><strong>将来の成長追跡</strong>：ベクトル差分で内面変化をタイムシリーズ分析</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px; font-weight:700; margin-bottom:16px; color:var(--accent);">💡 コンセプト的独自性</h3>
+      <ul class="feature-list" style="font-size:14px;">
+        <li><strong>エコーチェンバー回避</strong>：似た者同士を意図的に避け成長を促す設計</li>
+        <li><strong>マッチング OS</strong>：SNS・採用・チーム形成など横断適用できる基盤</li>
+        <li><strong>説明可能 AI</strong>：「なぜこの相手か」を日本語で自動生成</li>
+        <li><strong>内面の成長を追う</strong>：時間とともに変化するベクトルで自己理解を深める</li>
+      </ul>
+    </div>
+  </div>
+  <div class="highlight-box" style="max-width:1000px; margin-top:20px;">
+    <p style="font-size:14px; text-align:center; line-height:1.8; color:var(--text-muted);">
+      既存研究（コサイン類似度マッチング）の <strong style="color:#fff;">先に進む新しい仮説</strong>：<br>
+      類似度だけでは最良のマッチングにならない → <strong style="color:var(--cyan);">「差異の最適化」という新しい評価軸</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ========== SLIDE 8: 現在の実装状況 ========== -->
+<div class="slide" id="slide-8">
+  <div class="tag">Current Status</div>
+  <h2 class="slide-title">実装<span class="gradient-text">状況</span></h2>
+  <div class="grid-2" style="max-width:1000px;">
+    <div class="card">
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">✅ 完成済み（Phase 1 MVP）</h3>
+      <ul class="feature-list" style="font-size:13px; gap:8px;">
+        <li>50問 価値観診断 UI（7段階バブル選択）</li>
+        <li>Gemini Pro API による性格分析パイプライン</li>
+        <li>text-embedding-004 による 768次元ベクトル化</li>
+        <li>PostgreSQL + pgvector HNSW インデックス</li>
+        <li>補完性スコアマッチングエンジン</li>
+        <li>6次元レーダーチャート可視化</li>
+        <li>AES-256 暗号化 + セッション認証</li>
+        <li>Vercel デプロイ（<code style="font-size:11px; color:var(--accent);">zax.fumiproject.dev</code>）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:14px;">🔧 採択後に実装予定</h3>
+      <ul class="feature-list" style="font-size:13px; gap:8px;">
+        <li>RAG パイプライン（過去の思考との対話）</li>
+        <li>ベクトル差分によるリアルタイム成長追跡</li>
+        <li>TimescaleDB による時系列ベクトル分析</li>
+        <li>RLHF（フィードバック強化学習）統合</li>
+        <li>音声分析による非言語データ取り込み</li>
+        <li>マルチモーダル入力（テキスト + 音声 + 行動ログ）</li>
+      </ul>
+    </div>
+  </div>
+  <div style="display:flex; gap:32px; margin-top:24px;">
+    <div style="text-align:center;">
+      <div class="stat-num" style="font-size:36px;">50</div>
+      <div class="stat-label">診断質問数</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="stat-num" style="font-size:36px;">768</div>
+      <div class="stat-label">埋め込み次元数</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="stat-num" style="font-size:36px;">6</div>
+      <div class="stat-label">エッセンス軸</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="stat-num" style="font-size:36px;">50</div>
+      <div class="stat-label">アーキタイプ数</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SLIDE 9: ロードマップ ========== -->
+<div class="slide" id="slide-9">
+  <div class="tag">Roadmap</div>
+  <h2 class="slide-title">未踏採択後の<span class="gradient-text">ロードマップ</span></h2>
+  <div style="display:flex; gap:48px; align-items:flex-start; max-width:1000px; width:100%;">
+    <div class="roadmap-line" style="flex:1;">
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--indigo); box-shadow:0 0 12px var(--indigo);"></div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:2px;">Phase 2 ── 2026 Q3-Q4（未踏期間）</div>
+          <strong>RAG パイプライン実装</strong>
+          <p style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-top:4px;">マッチング履歴を蓄積 → pgvector で過去の類似体験を検索 → Gemini のコンテキストに注入し精度向上</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--violet); box-shadow:0 0 12px var(--violet);"></div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:2px;">Phase 3 ── 2027</div>
+          <strong>生体データ統合</strong>
+          <p style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-top:4px;">スマートウォッチ連携（心拍変動）・音声感情分析 → 非言語データでベクトルを更新</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:var(--cyan); box-shadow:0 0 12px var(--cyan);"></div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:2px;">Phase 4 ── 2028-2029</div>
+          <strong>統合モデルと仮説検証</strong>
+          <p style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-top:4px;">全ユーザーデータから「類似度0.5が最適」を実証・Federated Learning で分散学習</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot" style="background:linear-gradient(135deg,var(--indigo),var(--cyan));"></div>
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:2px;">Phase 5 ── 2030〜</div>
+          <strong>BMI 統合（長期ビジョン）</strong>
+          <p style="font-size:12px; color:var(--text-muted); line-height:1.6; margin-top:4px;">脳波・無意識データの取得 → 意識が介在しない本質レベルのマッチング。倫理委員会対応</p>
+        </div>
+      </div>
+    </div>
+    <div style="flex:0 0 240px;">
+      <div class="card">
+        <h3 style="font-size:14px; font-weight:700; margin-bottom:12px; color:var(--accent);">未踏期間の主目標</h3>
+        <ul class="feature-list" style="font-size:13px; gap:8px;">
+          <li>ユーザー 100名 以上の診断データ収集</li>
+          <li>「補完性スコア 0.5」仮説を実データで検証</li>
+          <li>フィードバックループによる精度改善</li>
+          <li>学術論文・Zenn 記事として発信</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SLIDE 10: まとめ・ビジョン ========== -->
+<div class="slide" id="slide-10">
+  <div class="tag">Vision</div>
+  <h2 class="slide-title" style="text-align:center;">ZAX が目指す世界</h2>
+  <div class="grid-3" style="margin-top:16px;">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:32px; margin-bottom:10px;">🌐</div>
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:8px;">マッチング OS</h3>
+      <p style="font-size:12px; color:var(--text-muted); line-height:1.7;">
+        SNS・採用・チーム形成・友人関係……<br>
+        あらゆる人間関係を「本質」で最適化する汎用基盤
+      </p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:32px; margin-bottom:10px;">📈</div>
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:8px;">自己成長の可視化</h3>
+      <p style="font-size:12px; color:var(--text-muted); line-height:1.7;">
+        経時的なベクトル変化で<br>「自分がどう変わったか」を<br>数値・グラフで把握できる
+      </p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:32px; margin-bottom:10px;">🔬</div>
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:8px;">価値観科学の構築</h3>
+      <p style="font-size:12px; color:var(--text-muted); line-height:1.7;">
+        「補完性スコアが最良か」の仮説を<br>実証し、人間関係の新しい<br>数理モデルを確立
+      </p>
+    </div>
+  </div>
+  <div class="highlight-box" style="max-width:900px; margin-top:28px; text-align:center;">
+    <p style="font-size:20px; font-weight:700; line-height:1.7;">
+      <span class="gradient-text">人は「本質が共鳴する出会い」で変わる</span><br>
+      <span style="font-size:14px; color:var(--text-muted); font-weight:400;">
+        ZAX は、その出会いを AI と数学で<br>誰にでも届けられるインフラを作ることを目指します
+      </span>
+    </p>
+  </div>
+  <div style="margin-top:28px; text-align:center;">
+    <p style="font-size:14px; color:var(--text-muted);">Live Demo：<a href="https://zax.fumiproject.dev" style="color:var(--accent); text-decoration:none;">zax.fumiproject.dev</a> ／ GitHub：<a href="https://github.com/fumi3333/ZAX" style="color:var(--accent); text-decoration:none;">github.com/fumi3333/ZAX</a></p>
+  </div>
+</div>
+
+<script>
+  const totalSlides = 10;
+  let current = 1;
+
+  // ドット生成
+  const dotContainer = document.getElementById('dots');
+  for (let i = 1; i <= totalSlides; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 1 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotContainer.appendChild(d);
+  }
+
+  function goTo(n) {
+    document.getElementById('slide-' + current).classList.remove('active');
+    dotContainer.children[current - 1].classList.remove('active');
+    current = Math.max(1, Math.min(totalSlides, n));
+    document.getElementById('slide-' + current).classList.add('active');
+    dotContainer.children[current - 1].classList.add('active');
+    document.getElementById('counter').textContent = current + ' / ' + totalSlides;
+    document.getElementById('prev-btn').disabled = current === 1;
+    document.getElementById('next-btn').disabled = current === totalSlides;
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+  });
+</script>
+</body>
+</html>
