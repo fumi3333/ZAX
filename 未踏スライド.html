@@ -428,177 +428,147 @@ hr.divider {
   <div style="position:absolute;width:280px;height:280px;border-radius:50%;border:1px solid rgba(34,211,238,.15);bottom:-60px;left:-60px;z-index:0;"></div>
 
   <div class="inner" style="align-items:center;text-align:center;gap:0;">
-    <div class="tag">未踏 2026 — 申請プレゼンテーション</div>
-    <div class="h-xl" style="margin-bottom:10px;">ZAX</div>
-    <p style="font-size:22px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:36px;">
-      表面的な属性ではなく「<span style="color:#fff;font-weight:700;">本質</span>」でつながる<br>
-      価値観ベクトル・マッチング OS
+    <div class="tag">未踏 2026 — 提案プロジェクト詳細資料</div>
+    <div class="h-xl" style="margin-bottom:10px; font-size: 64px;">ZAX</div>
+    <p style="font-size:24px;color:#fff;font-weight:700;line-height:1.6;margin-bottom:16px;">
+      強化学習を用いた幸福の探索と最大化を支援する<br>
+      価値観共鳴型接続OSの開発
     </p>
-    <div style="display:flex;gap:32px;border-top:1px solid var(--border);padding-top:28px;">
+    <div style="display:flex;gap:32px;border-top:1px solid var(--border);padding-top:28px;margin-top:24px;">
       <div style="text-align:center;">
-        <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px;">TECHNOLOGY</div>
-        <div style="font-size:14px;font-weight:700;">Next.js · Gemini AI · pgvector</div>
+        <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px;">PROPOSER</div>
+        <div style="font-size:15px;font-weight:700;">松田 晴史</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;">武蔵野大学 経済学部 1年</div>
       </div>
       <div style="width:1px;background:var(--border);"></div>
       <div style="text-align:center;">
-        <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px;">STATUS</div>
-        <div style="font-size:14px;font-weight:700;">MVP 完成 / Phase 1</div>
+        <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px;">CORE TECHNOLOGY</div>
+        <div style="font-size:15px;font-weight:700;">LLM × Reinforcement Learning</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;">Python / PyTorch / Pinecone</div>
       </div>
-      <div style="width:1px;background:var(--border);"></div>
-      <div style="text-align:center;">
-        <div style="font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px;">LIVE</div>
-        <div style="font-size:14px;font-weight:700;color:var(--cyan);">zax.fumiproject.dev</div>
-      </div>
+    </div>
+    
+    <div class="highlight" style="max-width:900px; margin-top:36px; padding:16px 24px; text-align:left; background: rgba(99,102,241,0.05);">
+      <strong style="color:var(--cyan); font-size:14px;">【プロジェクト概要】</strong><br>
+      <span style="font-size:14px; line-height:1.7;">学歴や経歴などの表層的な属性に依存せず、個人の内面的な価値観に基づいて共鳴を生み出す「接続OS（ZAX）」の開発。LLMによる自己対話ログの解析と、マッチング後の主観的幸福度を報酬信号とする強化学習を組み合わせ、ユーザーの長期的な幸福と自己変革を最大化するアルゴリズムを構築します。</span>
     </div>
   </div>
   <div class="page-num">01 / 10</div>
 </div>
 
 <!-- =====================================================
-     SLIDE 2 — Problem
+     SLIDE 2 — Problem (背景)
      ===================================================== -->
 <div class="slide" id="s2">
-  <div class="inner" style="gap:24px;">
-    <div style="text-align:center;">
-      <div class="tag">Problem</div>
+  <div class="inner-left" style="gap:24px;">
+    <div>
+      <div class="tag">01 / 背景：なにをつくるか</div>
       <div class="h-lg" style="margin-bottom:8px;">
-        既存マッチングは <span class="grad-warm">「表面」しか見ていない</span>
+        既存システムにおける <span class="grad-warm">構造的な課題</span>
       </div>
+      <p style="font-size:16px; color:var(--muted); line-height:1.6;">現在のSNSやマッチングアルゴリズムは、年齢・学歴・年収といった定量的で表層的な「属性情報」によるフィルタリングに依存しています。</p>
     </div>
 
-    <div class="two-col" style="gap:20px;">
+    <div class="three-col" style="gap:24px; margin-top:12px;">
       <div class="card" style="border-top:2px solid #f87171;">
-        <div style="font-size:12px;letter-spacing:.1em;color:#f87171;margin-bottom:14px;">❌ &nbsp;従来のマッチングアプリ</div>
-        <ul class="ul">
-          <li>年齢・年収・外見で機械的に篩い分け</li>
-          <li>「似た者同士」を引き合わせるだけ</li>
-          <li>エコーチェンバーで確証バイアスが強まる</li>
-          <li>内面・思考パターン・価値観は無視</li>
-        </ul>
+        <div style="font-size:24px; margin-bottom:12px;">01</div>
+        <h3 style="font-size:17px; font-weight:700; margin-bottom:10px; color:#fff;">エコーチェンバーの助長</h3>
+        <p style="font-size:14px; color:rgba(255,255,255,0.7); line-height:1.6;">
+          類似した属性を持つユーザー間での接続が優先され、価値観の多様性が損なわれる。
+        </p>
       </div>
-      <div class="card" style="border-top:2px solid #4ade80;">
-        <div style="font-size:12px;letter-spacing:.1em;color:#4ade80;margin-bottom:14px;">✅ &nbsp;本質的な出会いに必要なもの</div>
-        <ul class="ul">
-          <li>価値観・思考パターンの定量的な可視化</li>
-          <li>共感できる＋刺激になる「適度な差異」</li>
-          <li>時間とともに変化する内面の継続的な追跡</li>
-          <li>AI による深層解析と説明可能な推薦</li>
-        </ul>
+      <div class="card" style="border-top:2px solid #f87171;">
+        <div style="font-size:24px; margin-bottom:12px;">02</div>
+        <h3 style="font-size:17px; font-weight:700; margin-bottom:10px; color:#fff;">接続の質の欠如</h3>
+        <p style="font-size:14px; color:rgba(255,255,255,0.7); line-height:1.6;">
+          条件の一致は必ずしも精神的な充足を保証せず、接続後の孤独感が解消されにくい。
+        </p>
       </div>
-    </div>
-
-    <div class="highlight" style="max-width:900px;">
-      心理学的に「<strong>似すぎた関係は確証バイアスを強め、成長を妨げる</strong>」。<br>
-      ZAX は <em style="color:var(--cyan);font-style:normal;font-weight:700;">"適度な差異" を科学的に計算</em>し、本質で共鳴する相手を発見する。
+      <div class="card" style="border-top:2px solid #f87171;">
+        <div style="font-size:24px; margin-bottom:12px;">03</div>
+        <h3 style="font-size:17px; font-weight:700; margin-bottom:10px; color:#fff;">潜在的機会の損失</h3>
+        <p style="font-size:14px; color:rgba(255,255,255,0.7); line-height:1.6;">
+          「属性」という既存の社会的枠組みによって、本来共鳴し得る他者との接続が技術的に遮断されている。
+        </p>
+      </div>
     </div>
   </div>
   <div class="page-num">02 / 10</div>
 </div>
 
 <!-- =====================================================
-     SLIDE 3 — Solution
+     SLIDE 3 — Solution (目的と目標)
      ===================================================== -->
 <div class="slide" id="s3">
-  <div class="inner" style="gap:24px;">
-    <div style="text-align:center;">
-      <div class="tag">Solution</div>
-      <div class="h-lg">ZAX の <span class="grad">3つのコア</span></div>
+  <div class="inner-left" style="gap:24px;">
+    <div>
+      <div class="tag">02 / 目的と目標：なにをつくるか</div>
+      <div class="h-lg">接続の <span class="grad">再定義</span></div>
+      <p style="font-size:16px; color:var(--muted); line-height:1.6; margin-top:8px;">
+        属性による分断を解消し、個人の内面的な本質に基づいて他者と接続するインフラを構築する。
+      </p>
     </div>
 
-    <div class="three-col">
-      <div class="card" style="text-align:center;border-top:2px solid var(--indigo);">
-        <div style="font-size:38px;margin-bottom:12px;">🧠</div>
-        <div class="h-md" style="font-size:18px;margin-bottom:10px;">6次元エッセンスベクトル</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7;">
-          論理性 / 直感力 / 共感性 /<br>意志力 / 創造性 / 柔軟性<br>の6軸で人格を定量化
+    <div class="three-col" style="margin-top:16px;">
+      <div class="card card-accent">
+        <div style="font-size:32px;margin-bottom:12px;">1️⃣</div>
+        <div class="h-md" style="font-size:17px;margin-bottom:10px;">内面ベクトルの抽出</div>
+        <p style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;">
+          LLMを用い、日常の対話ログからユーザーの潜在的な価値観を多次元ベクトルとして抽出する。
         </p>
       </div>
-      <div class="card" style="text-align:center;border-top:2px solid var(--cyan);">
-        <div style="font-size:38px;margin-bottom:12px;">🤖</div>
-        <div class="h-md" style="font-size:18px;margin-bottom:10px;">Gemini AI 深層分析</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7;">
-          50問を Gemini Pro で解析<br>text-embedding-004 で<br>768次元ベクトルに変換
+      <div class="card card-cyan">
+        <div style="font-size:32px;margin-bottom:12px;">2️⃣</div>
+        <div class="h-md" style="font-size:17px;margin-bottom:10px;">RL による最適化</div>
+        <p style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;">
+          マッチング後のユーザーからのフィードバック（主観的幸福度の変化）を報酬信号として受け取り、最適な接続アルゴリズムを継続的に学習（強化学習）する。
         </p>
       </div>
-      <div class="card" style="text-align:center;border-top:2px solid #f472b6);">
-        <div style="font-size:38px;margin-bottom:12px;">📐</div>
-        <div class="h-md" style="font-size:18px;margin-bottom:10px;">補完性スコア<br>マッチング</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7;">
-          「似すぎず・違いすぎず」<br>成長を促す相手を<br>ガウス曲線で評価
+      <div class="card" style="border-top:2px solid #f472b6;">
+        <div style="font-size:32px;margin-bottom:12px;">3️⃣</div>
+        <div class="h-md" style="font-size:17px;margin-bottom:10px;">自己理解の深化</div>
+        <p style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;">
+          システムとの対話を通じてユーザーが自身の価値観を再発見し、自己変革を促すサイクルを実装する。
         </p>
       </div>
-    </div>
-
-    <div class="highlight">
-      単なる類似検索ではなく、<strong>「なぜつながるべきか」までを AI が日本語で自動生成</strong>。<br>
-      レーダーチャートで差異を視覚確認しながら選ぶ、透明性の高いマッチング体験。
     </div>
   </div>
   <div class="page-num">03 / 10</div>
 </div>
 
 <!-- =====================================================
-     SLIDE 4 — Architecture
+     SLIDE 4 — Architecture (提供形態)
      ===================================================== -->
 <div class="slide" id="s4">
-  <div class="inner" style="gap:22px;">
-    <div style="text-align:center;">
-      <div class="tag">Architecture</div>
-      <div class="h-lg">システム <span class="grad">アーキテクチャ</span></div>
+  <div class="inner-left" style="gap:24px;">
+    <div>
+      <div class="tag">03 / 実証実験と提供形態：どんな出し方を考えているか</div>
+      <div class="h-lg">提供フェーズと <span class="grad">展開戦略</span></div>
     </div>
 
-    <!-- パイプライン -->
-    <div class="flow" style="width:1140px;">
-      <div class="flow-step">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.06em;">FRONTEND</div>
-        <strong>Next.js 16</strong><br>
-        <span style="font-size:11px;color:var(--muted);">App Router<br>Framer Motion</span>
+    <div class="flow" style="margin-top:20px;">
+      <div class="flow-step" style="border-top: 2px solid var(--indigo);">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;">PHASE 1</div>
+        <strong style="font-size:15px; color:#fff;">限定コミュニティでのテスト</strong>
+        <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-top:12px; text-align:left;">
+          代表を務める学内団体やデータサイエンススクールのネットワークなど、深い対話を重視するグループ内でのクローズドβテストを実施します。
+        </p>
       </div>
       <div class="flow-arrow">→</div>
-      <div class="flow-step">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.06em;">DIAGNOSTIC API</div>
-        <strong>50問 回答</strong><br>
-        <span style="font-size:11px;color:var(--muted);">カテゴリ集計<br>プロファイル生成</span>
+      <div class="flow-step" style="border-top: 2px solid var(--violet);">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;">PHASE 2</div>
+        <strong style="font-size:15px; color:#fff;">Web/モバイルアプリ提供</strong>
+        <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-top:12px; text-align:left;">
+          PWA またはネイティブアプリとして開発し、ユーザーが日常的に思考を記録（ジャーナリング）できる、自己対話の環境を提供します。
+        </p>
       </div>
       <div class="flow-arrow">→</div>
-      <div class="flow-step" style="border-color:rgba(99,102,241,.4);">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.06em;">GEMINI PRO</div>
-        <strong>性格分析</strong><br>
-        <span style="font-size:11px;color:var(--muted);">深層レポート<br>生成</span>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step" style="border-color:rgba(34,211,238,.4);">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.06em;">EMBEDDING</div>
-        <strong>768次元</strong><br>
-        <span style="font-size:11px;color:var(--muted);">text-embedding<br>-004</span>
-      </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step" style="border-color:rgba(124,58,237,.4);">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.06em;">VECTOR DB</div>
-        <strong>pgvector</strong><br>
-        <span style="font-size:11px;color:var(--muted);">HNSW索引<br>コサイン距離</span>
-      </div>
-    </div>
-
-    <div class="two-col" style="width:1140px;">
-      <div class="card">
-        <div class="section-tag">技術選定：なぜ pgvector か</div>
-        <table class="tbl">
-          <tr><th></th><th>pgvector ✅</th><th>Pinecone</th></tr>
-          <tr><td>コスト</td><td class="ok">無料（OSS）</td><td class="ng">月 $70〜</td></tr>
-          <tr><td>SQL 統合</td><td class="ok">同一 DB</td><td class="ng">別サービス</td></tr>
-          <tr><td>HNSW</td><td class="ok">対応</td><td class="ok">対応</td></tr>
-          <tr><td>Prisma 統合</td><td class="ok">ネイティブ</td><td class="ng">手動実装</td></tr>
-        </table>
-      </div>
-      <div class="card">
-        <div class="section-tag">セキュリティ設計</div>
-        <ul class="ul" style="margin-top:6px;">
-          <li>AES-256-CBC による機密データ暗号化</li>
-          <li>bcryptjs + Cookie による セッション管理</li>
-          <li>Prisma ORM で型安全・SQL インジェクション防止</li>
-          <li>環境変数（.env）によるシークレット管理</li>
-        </ul>
+      <div class="flow-step" style="border-top: 2px solid var(--cyan);">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;">PHASE 3</div>
+        <strong style="font-size:15px; color:#fff;">モデルの公開と実用化</strong>
+        <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-top:12px; text-align:left;">
+          アルゴリズムの有効性を検証後、組織内のチームビルディングやウェルビーイング向上を目的としたソリューションとして、BtoB/BtoC展開を検討します。
+        </p>
       </div>
     </div>
   </div>
@@ -606,262 +576,226 @@ hr.divider {
 </div>
 
 <!-- =====================================================
-     SLIDE 5 — Algorithm
+     SLIDE 5 — Algorithm (新規性と効果)
      ===================================================== -->
 <div class="slide" id="s5">
-  <div class="inner" style="gap:24px;">
-    <div style="text-align:center;">
-      <div class="tag">Algorithm</div>
-      <div class="h-lg">補完性スコア <span class="grad">アルゴリズム</span></div>
+  <div class="inner-left" style="gap:24px;">
+    <div>
+      <div class="tag">04 / 斬新さの主張、期待される効果</div>
+      <div class="h-lg">静的マッチングから <span class="grad">動的探索（RL）</span>へ</div>
     </div>
 
-    <div class="formula">
-      growthScore &nbsp;=&nbsp; exp( −(similarity − <span style="color:#f472b6;">0.5</span>)² / 0.1 ) &nbsp;×&nbsp; 100
+    <div class="highlight" style="margin-top:10px; text-align:left; padding:24px;">
+      <div class="section-tag" style="color:var(--cyan); margin-bottom:8px;">技術的な新規性</div>
+      <p style="font-size:15px; color:#fff; line-height:1.7;">
+        既存のマッチングが「過去の属性」に基づく静的な処理であるのに対し、本プロジェクトは<strong style="color:var(--cyan);">「未来の幸福度」を最大化するための動的な探索（Exploration）を行う</strong>点に新規性があります。強化学習を適用することで、従来のフィルタリングでは到達できなかった「意外かつ本質的な相性」の発見が可能になります。
+      </p>
     </div>
 
-    <div class="three-col" style="width:1140px;">
-      <div class="card" style="text-align:center;">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">similarity ≈ 1.0</div>
-        <div class="stat-n" style="background:linear-gradient(135deg,#f87171,#fb923c);-webkit-background-clip:text;background-clip:text;">低スコア</div>
-        <p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6;">完全一致<br>→ エコーチェンバー形成<br>→ 成長が止まる</p>
+    <div class="two-col" style="margin-top:16px;">
+      <div class="card card-accent">
+        <div class="section-tag" style="color:#a78bfa;">期待される効果 ①</div>
+        <div style="font-size:18px; font-weight:700; margin-bottom:12px; color:#fff;">人的資本の最適配置</div>
+        <p style="font-size:14px; color:rgba(255,255,255,0.7); line-height:1.7;">
+          年齢や学歴という属性の壁を超えた接続により、適材適所のコラボレーションが自律的に発生し、イノベーションを誘発する。
+        </p>
       </div>
-      <div class="card" style="text-align:center;border:1px solid rgba(34,211,238,.4);">
-        <div style="font-size:13px;color:var(--cyan);margin-bottom:8px;">similarity ≈ 0.5 &nbsp;🎯</div>
-        <div class="stat-n" style="background:linear-gradient(135deg,#4ade80,var(--cyan));-webkit-background-clip:text;background-clip:text;">最高スコア</div>
-        <p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6;">適度な差異<br>→ 共感 + 新しい刺激<br>→ 最も成長を促す</p>
+      <div class="card card-cyan">
+        <div class="section-tag" style="color:var(--cyan);">期待される効果 ②</div>
+        <div style="font-size:18px; font-weight:700; margin-bottom:12px; color:#fff;">社会的孤立の低減</div>
+        <p style="font-size:14px; color:rgba(255,255,255,0.7); line-height:1.7;">
+          内面的な共鳴を伴う接続を提供することで、既存のSNSでは解決困難であった精神的な孤独感の本質的な解消に寄与する。
+        </p>
       </div>
-      <div class="card" style="text-align:center;">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">similarity ≈ 0.0</div>
-        <div class="stat-n" style="background:linear-gradient(135deg,#f87171,#f472b6);-webkit-background-clip:text;background-clip:text;">低スコア</div>
-        <p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6;">完全に無関係<br>→ 価値観の衝突<br>→ 関係構築困難</p>
-      </div>
-    </div>
-
-    <div class="highlight">
-      <strong>設計根拠：</strong>心理学「至適刺激水準理論」×コサイン類似度 をガウス曲線で変換。<br>
-      現在の最適点 0.5 は<em style="font-style:normal;color:var(--cyan);font-weight:700;">仮説</em>であり、実データ蓄積で継続検証予定。
     </div>
   </div>
   <div class="page-num">05 / 10</div>
 </div>
 
 <!-- =====================================================
-     SLIDE 6 — User Experience
+     SLIDE 6 — System (具体的な進め方)
      ===================================================== -->
 <div class="slide" id="s6">
-  <div class="inner" style="gap:22px;">
-    <div style="text-align:center;">
-      <div class="tag">User Experience</div>
-      <div class="h-lg">ユーザー <span class="grad">体験フロー</span></div>
+  <div class="inner-left" style="gap:24px;">
+    <div>
+      <div class="tag">05 / 具体的な進め方と予算（開発環境）</div>
+      <div class="h-lg">システム構成と <span class="grad">技術スタック</span></div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:12px;width:1140px;">
-      <!-- Step 1 -->
-      <div style="display:flex;align-items:center;gap:18px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--indigo);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">1</div>
-        <div style="flex:1;" class="card card-accent" style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <strong style="font-size:15px;">50問 価値観診断</strong>
-            <span style="font-size:12px;color:var(--muted);">7段階バブル選択UI / 回答で自動進行 / プログレスバー</span>
-          </div>
-        </div>
+    <div class="two-col" style="margin-top:16px;">
+      <div class="card card-accent">
+        <div class="section-tag" style="color:#a78bfa;">💻 開発・インフラ環境</div>
+        <table class="tbl" style="margin-top:12px;">
+          <tr><th>開発場所</th><td>自宅および大学内の研究スペース</td></tr>
+          <tr><th>計算資源</th><td>GPU搭載開発用PC、クラウドGPUサーバー</td></tr>
+          <tr><th>開発言語</th><td>Python / TypeScript (Node.js)</td></tr>
+          <tr><th>フロントエンド</th><td>Next.js または Flutter</td></tr>
+        </table>
       </div>
-      <!-- Step 2 -->
-      <div style="display:flex;align-items:center;gap:18px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--violet);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">2</div>
-        <div style="flex:1;" class="card card-accent" style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <strong style="font-size:15px;">Gemini Pro &nbsp;リアルタイム分析</strong>
-            <span style="font-size:12px;color:var(--muted);">カテゴリ別スコア集計 → 性格分析レポート生成 → 768次元ベクトル化 → DB保存</span>
-          </div>
-        </div>
-      </div>
-      <!-- Step 3 -->
-      <div style="display:flex;align-items:center;gap:18px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--cyan);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;color:#000;">3</div>
-        <div style="flex:1;" class="card card-cyan" style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <strong style="font-size:15px;">6次元レーダーチャート表示</strong>
-            <span style="font-size:12px;color:var(--muted);">自分のエッセンスベクトルを可視化 + AI 性格分析レポート</span>
-          </div>
-        </div>
-      </div>
-      <!-- Step 4 -->
-      <div style="display:flex;align-items:center;gap:18px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--cyan));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">4</div>
-        <div style="flex:1;" class="card card-accent" style="padding:14px 20px;">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <strong style="font-size:15px;">Top 3 マッチング候補表示</strong>
-            <span style="font-size:12px;color:var(--muted);">pgvector HNSW 検索 → 補完性スコアランキング → AI 推薦理由（日本語）→ フィードバック</span>
-          </div>
-        </div>
+      
+      <div class="card card-cyan">
+        <div class="section-tag" style="color:var(--cyan);">🧠 AI・データ基盤</div>
+        <table class="tbl" style="margin-top:12px;">
+          <tr><th>フレームワーク</th><td>PyTorch (強化学習実装)<br>LangChain (LLM 統合)</td></tr>
+          <tr><th>NLP 基盤</th><td>OpenAI API 等の大規模言語モデル</td></tr>
+          <tr><th>データベース</th><td>PostgreSQL<br>ベクトルDB (Pinecone 等)</td></tr>
+        </table>
       </div>
     </div>
 
-    <div style="display:flex;gap:40px;">
-      <div class="stat"><div class="stat-n">50</div><div class="stat-l">質問数</div></div>
-      <div class="stat"><div class="stat-n">768</div><div class="stat-l">埋め込み次元数</div></div>
-      <div class="stat"><div class="stat-n">6</div><div class="stat-l">エッセンス軸</div></div>
-      <div class="stat"><div class="stat-n" style="font-size:40px;">&lt;3s</div><div class="stat-l">AI分析応答時間</div></div>
+    <div class="highlight" style="margin-top:16px; text-align:left; padding:20px 24px;">
+      <div class="section-tag" style="color:var(--cyan); margin-bottom:8px;">開発体制（Solo Project）</div>
+      <p style="font-size:14px; color:#fff; line-height:1.6;">
+        松田晴史による個人提案として、システムアーキテクチャの設計からAIアルゴリズム（LLM×RL）の実装、フロントエンド開発、インフラ構築までの全工程を一貫して担当します。
+      </p>
     </div>
   </div>
   <div class="page-num">06 / 10</div>
 </div>
 
 <!-- =====================================================
-     SLIDE 7 — Novelty
+     SLIDE 7 — Schedule (開発スケジュール)
      ===================================================== -->
 <div class="slide" id="s7">
-  <div class="inner" style="gap:22px;">
-    <div style="text-align:center;">
-      <div class="tag">Novelty</div>
-      <div class="h-lg">ZAX の <span class="grad">独自性</span></div>
+  <div class="inner-left" style="gap:24px;">
+    <div>
+      <div class="tag">06 / 具体的な進め方（開発スケジュール）</div>
+      <div class="h-lg">開発線表 <span style="font-size:24px; color:var(--muted); font-weight:400; margin-left:12px;">計 400時間</span></div>
     </div>
 
-    <div class="two-col" style="width:1140px;">
-      <div class="card card-accent">
-        <div class="section-tag" style="color:#a78bfa;">🔬 &nbsp;技術的独自性</div>
-        <ul class="ul" style="margin-top:10px;">
-          <li><strong>補完性スコア</strong>：類似度ではなく「最適な差異」をガウス曲線で評価する新しいアプローチ</li>
-          <li><strong>二層ベクトル構造</strong>：6次元（人格軸）× 768次元（意味空間）の多スケール設計</li>
-          <li><strong>フォールバック設計</strong>：DB不足時でも50のアーキタイプで必ずマッチング成立</li>
-          <li><strong>成長追跡</strong>：ベクトル差分で内面変化を時系列で記録・分析</li>
-        </ul>
+    <!-- タイムライン -->
+    <div class="tl" style="margin-top:24px; margin-left:16px;">
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div class="tl-body">
+          <div class="tl-phase">6月〜7月（80時間）</div>
+          <div class="tl-title">設計フェーズ</div>
+          <div class="tl-desc">データモデルの定義、LLMを用いた価値観抽出ロジック（プロンプト・ベクトル化）の詳細設計。</div>
+        </div>
       </div>
-      <div class="card card-cyan">
-        <div class="section-tag" style="color:var(--cyan);">💡 &nbsp;コンセプト的独自性</div>
-        <ul class="ul" style="margin-top:10px;">
-          <li><strong>エコーチェンバー回避</strong>：似た者同士を意図的に弱点として評価する設計思想</li>
-          <li><strong>マッチング OS</strong>：SNS・採用・チーム形成など横断適用できる汎用基盤</li>
-          <li><strong>説明可能 AI</strong>：「なぜこの相手か」を自然言語で自動生成（XAI）</li>
-          <li><strong>自己理解ツール</strong>：他者との比較を通じて自分の強み・弱みを発見</li>
-        </ul>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:var(--violet);box-shadow:0 0 10px var(--violet);"></div><div class="tl-line"></div></div>
+        <div class="tl-body">
+          <div class="tl-phase">8月〜10月（150時間）</div>
+          <div class="tl-title">コアアルゴリズム実装</div>
+          <div class="tl-desc">内面解析エンジンの構築、幸福度を報酬とする強化学習（RL）モデルの実装とオフライン評価。</div>
+        </div>
       </div>
-    </div>
-
-    <div class="highlight">
-      <strong>既存研究との差別化：</strong>
-      従来のベクトルマッチング（コサイン類似度最大化）の先に進み、<br>
-      <em style="font-style:normal;color:var(--cyan);font-weight:700;">「差異の最適化」という新しい評価軸</em>を提案し実証する。
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:var(--cyan);box-shadow:0 0 10px var(--cyan);"></div><div class="tl-line"></div></div>
+        <div class="tl-body">
+          <div class="tl-phase">11月〜12月（100時間）</div>
+          <div class="tl-title">システム統合</div>
+          <div class="tl-desc">API開発、ユーザーインターフェースの実装とバックエンド（推論・学習パイプライン）との結合。</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:#f472b6;box-shadow:0 0 10px #f472b6;"></div><div class="tl-line"></div></div>
+        <div class="tl-body">
+          <div class="tl-phase">1月〜2月（50時間）</div>
+          <div class="tl-title">テスト・評価</div>
+          <div class="tl-desc">クローズドβテストの実施と、得られた実データ・フィードバックに基づくアルゴリズムの調整。</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot" style="background:linear-gradient(135deg,var(--indigo),var(--cyan));"></div></div>
+        <div class="tl-body" style="padding-bottom:0;">
+          <div class="tl-phase">3月（20時間）</div>
+          <div class="tl-title">成果報告準備</div>
+          <div class="tl-desc">開発成果および実証実験データの整理、最終報告書の作成。</div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="page-num">07 / 10</div>
 </div>
 
 <!-- =====================================================
-     SLIDE 8 — Current Status
+     SLIDE 8 — Budget (予算提案)
      ===================================================== -->
 <div class="slide" id="s8">
-  <div class="inner" style="gap:22px;">
-    <div style="text-align:center;">
-      <div class="tag">Current Status</div>
-      <div class="h-lg">実装 <span class="grad">状況</span></div>
+  <div class="inner-left" style="gap:24px;">
+    <div>
+      <div class="tag">07 / 支出内訳</div>
+      <div class="h-lg">申請金額：<span class="grad">1,200,000円</span></div>
     </div>
 
-    <div class="two-col" style="width:1140px;">
-      <div class="card card-accent">
-        <div class="section-tag" style="color:#4ade80;">✅ &nbsp;完成済み（Phase 1 MVP）</div>
-        <ul class="ul" style="margin-top:10px;font-size:13px;">
-          <li>50問 価値観診断 UI（7段階バブル選択・自動進行）</li>
-          <li>Gemini Pro API 性格分析パイプライン</li>
-          <li>text-embedding-004 による 768次元ベクトル化</li>
-          <li>PostgreSQL + pgvector HNSW インデックス</li>
-          <li>補完性スコアマッチングエンジン</li>
-          <li>6次元レーダーチャート可視化</li>
-          <li>AES-256-CBC 暗号化 + セッション認証</li>
-          <li>Vercel 本番デプロイ（CI/CD 自動化）</li>
-        </ul>
-      </div>
-      <div class="card card-cyan">
-        <div class="section-tag" style="color:var(--cyan);">🔧 &nbsp;採択後に実装予定</div>
-        <ul class="ul" style="margin-top:10px;font-size:13px;">
-          <li>RAG パイプライン（過去の思考データとの対話）</li>
-          <li>ベクトル差分によるリアルタイム自己成長追跡</li>
-          <li>TimescaleDB 時系列ベクトル変化分析</li>
-          <li>RLHF（フィードバック強化学習）統合</li>
-          <li>音声分析による非言語データ取り込み</li>
-          <li>マルチモーダル対応（音声 + 行動ログ + テキスト）</li>
-        </ul>
-      </div>
+    <div class="card card-accent" style="width:100%; margin-top:24px; padding:0; overflow:hidden;">
+      <table class="tbl" style="width:100%;">
+        <thead style="background:rgba(255,255,255,0.05);">
+          <tr>
+            <th style="padding:16px 24px; font-size:13px; font-weight:700;">項目</th>
+            <th style="padding:16px 24px; font-size:13px; font-weight:700; width:20%;">金額（円）</th>
+            <th style="padding:16px 24px; font-size:13px; font-weight:700; width:60%;">備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:24px; font-weight:700; font-size:15px; vertical-align:top; color:#fff;">
+              開発人件費
+            </td>
+            <td style="padding:24px; font-size:16px; font-weight:700; color:var(--cyan); vertical-align:top;">
+              1,200,000
+            </td>
+            <td style="padding:24px; font-size:14px; color:rgba(255,255,255,0.7); line-height:1.7; vertical-align:top;">
+              個人事業主（免税事業者）。<br>
+              時間単価 3,000円 × 400時間 ＝ 1,200,000円。<br><br>
+              要件定義、強化学習およびLLMを用いたアルゴリズム設計、バックエンド・フロントエンドの実装、インフラ構築、テスト運用の<strong>全工程に対する対価</strong>として計上。
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <div style="display:flex;gap:48px;justify-content:center;">
-      <div class="stat"><div class="stat-n">50</div><div class="stat-l">診断質問数</div></div>
-      <div class="stat"><div class="stat-n">768</div><div class="stat-l">埋め込み次元</div></div>
-      <div class="stat"><div class="stat-n">6</div><div class="stat-l">エッセンス軸</div></div>
-      <div class="stat"><div class="stat-n">50</div><div class="stat-l">アーキタイプ数</div></div>
+    <div class="highlight" style="margin-top:24px; text-align:left; padding:20px 24px;">
+      <p style="font-size:14px; color:rgba(255,255,255,0.8); line-height:1.6;">
+        ※クラウドリソース代（GPUサーバー、LLM API利用料）等、上記以外の開発にかかる諸経費については、自己資金（または別途確保する資金）にて充当する前提での申請構成です。
+      </p>
     </div>
   </div>
   <div class="page-num">08 / 10</div>
 </div>
 
 <!-- =====================================================
-     SLIDE 9 — Roadmap
+     SLIDE 9 — Profile (提案者の実績)
      ===================================================== -->
 <div class="slide" id="s9">
-  <div class="inner" style="gap:22px;">
-    <div style="text-align:center;">
-      <div class="tag">Roadmap</div>
-      <div class="h-lg">未踏採択後の <span class="grad">ロードマップ</span></div>
+  <div class="inner-left" style="gap:24px;">
+    <div>
+      <div class="tag">08 / 提案者の腕前を証明するもの・特記事項</div>
+      <div class="h-lg">技術実績と <span class="grad">知見の活用</span></div>
     </div>
 
-    <div class="two-col" style="width:1140px;align-items:start;">
-      <!-- タイムライン -->
-      <div class="tl">
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-dot" style="background:var(--indigo);box-shadow:0 0 12px var(--indigo);"></div>
-            <div class="tl-line"></div>
-          </div>
-          <div class="tl-body">
-            <div class="tl-phase">Phase 2 ── 2026 Q3–Q4（未踏期間）</div>
-            <div class="tl-title">RAG パイプライン実装</div>
-            <div class="tl-desc">マッチング履歴を pgvector で検索し Gemini のコンテキストへ注入。精度の飛躍的向上。</div>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-dot" style="background:var(--violet);box-shadow:0 0 12px var(--violet);"></div>
-            <div class="tl-line"></div>
-          </div>
-          <div class="tl-body">
-            <div class="tl-phase">Phase 3 ── 2027</div>
-            <div class="tl-title">生体データ統合</div>
-            <div class="tl-desc">スマートウォッチ（心拍変動）・音声感情分析により、非言語データでベクトルを更新。</div>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-dot" style="background:var(--cyan);box-shadow:0 0 12px var(--cyan);"></div>
-            <div class="tl-line"></div>
-          </div>
-          <div class="tl-body">
-            <div class="tl-phase">Phase 4 ── 2028–2029</div>
-            <div class="tl-title">統合モデル × 仮説検証</div>
-            <div class="tl-desc">「類似度 0.5 が最適」を実データで実証。Federated Learning で分散プライバシー学習。</div>
-          </div>
-        </div>
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-dot" style="background:linear-gradient(135deg,var(--indigo),var(--cyan));"></div>
-          </div>
-          <div class="tl-body" style="padding-bottom:0;">
-            <div class="tl-phase">Phase 5 ── 2030〜</div>
-            <div class="tl-title">BMI 統合（長期ビジョン）</div>
-            <div class="tl-desc">脳波データから無意識レベルの価値観を取得。意識が介在しない本質マッチング。</div>
-          </div>
-        </div>
+    <div class="two-col" style="margin-top:16px;">
+      <div class="card card-accent" style="height:100%;">
+        <div class="section-tag" style="color:#a78bfa;">💻 &nbsp;これまでの技術実績</div>
+        <ul class="ul" style="margin-top:16px; gap:16px;">
+          <li>
+            <strong>データサイエンスの習得</strong><br>
+            <span style="font-size:13px; color:rgba(255,255,255,0.7); display:block; margin-top:4px;">東大GCI（グローバル消費インテリジェンス寄付講座）にて、Pythonによるデータ分析と機械学習の実践的な技術を習得。</span>
+          </li>
+          <li>
+            <strong>プロダクト開発の経験</strong><br>
+            <span style="font-size:13px; color:rgba(255,255,255,0.7); display:block; margin-top:4px;">学内フリマアプリ「musalink」を独自開発。ユーザーニーズの抽出から要件定義、デプロイまでの全工程を個人で経験。</span>
+          </li>
+          <li>
+            <strong>起業家活動とリーダーシップ</strong><br>
+            <span style="font-size:13px; color:rgba(255,255,255,0.7); display:block; margin-top:4px;">個人事業主として開業。大学内で投資・IT技術研究団体を設立し、代表としてプロジェクトを推進。</span>
+          </li>
+        </ul>
       </div>
 
-      <!-- 未踏期間目標 -->
-      <div class="card card-accent" style="height:100%;">
-        <div class="section-tag" style="color:#a78bfa;">🎯 &nbsp;未踏期間（1年間）の目標</div>
-        <ul class="ul" style="margin-top:14px;gap:14px;">
-          <li>ユーザー <strong>100名以上</strong>の診断データ収集</li>
-          <li>「補完性スコア 0.5」仮説を実データで<strong>定量検証</strong></li>
-          <li>フィードバックループによる<strong>継続的精度改善</strong></li>
-          <li>研究成果を<strong>学術論文・Zenn 記事</strong>として発信</li>
-          <li><strong>RAG パイプライン</strong>の設計・実装・評価</li>
+      <div class="card card-cyan" style="height:100%;">
+        <div class="section-tag" style="color:var(--cyan);">🔑 &nbsp;特記事項（他分野知見の統合）</div>
+        <ul class="ul" style="margin-top:16px; gap:16px;">
+          <li>
+            <strong>経済学 × 強化学習</strong><br>
+            <span style="font-size:13px; color:rgba(255,255,255,0.7); display:block; margin-top:4px;">武蔵野大学経済学部に在籍。経済学における「インセンティブ設計」の知見を、強化学習アルゴリズムの報酬関数設計に直接的に活用します。</span>
+          </li>
+          <li>
+            <strong>フィールドワーク × 特徴量設計</strong><br>
+            <span style="font-size:13px; color:rgba(255,255,255,0.7); display:block; margin-top:4px;">「幸福度」に関する実地フィールドワーク調査（デンマーク・インド等を計画中）。そこで得られる定性的な知見を、アルゴリズムの特徴量抽出ロジックに反映し、モデルの現実妥当性を高めます。</span>
+          </li>
         </ul>
       </div>
     </div>
@@ -870,7 +804,7 @@ hr.divider {
 </div>
 
 <!-- =====================================================
-     SLIDE 10 — Vision
+     SLIDE 10 — Vision (将来のソフトウェア技術)
      ===================================================== -->
 <div class="slide" id="s10">
   <!-- 装飾 -->
@@ -878,40 +812,26 @@ hr.divider {
   <div style="position:absolute;width:400px;height:400px;border-radius:50%;border:1px solid rgba(34,211,238,.1);bottom:-120px;left:-120px;z-index:0;"></div>
 
   <div class="inner" style="gap:24px;text-align:center;">
-    <div class="tag">Vision</div>
-    <div class="h-lg">ZAX が目指す世界</div>
+    <div class="tag">09 / 将来のソフトウェア技術について思うこと</div>
+    <div class="h-lg" style="margin-bottom:16px;">ソフトウェアによる <span class="grad">人間本質の解放</span></div>
 
-    <div class="three-col" style="width:1140px;">
-      <div class="card" style="text-align:center;border-top:2px solid var(--indigo);">
-        <div style="font-size:36px;margin-bottom:12px;">🌐</div>
-        <div style="font-size:17px;font-weight:700;margin-bottom:8px;">マッチング OS</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7;">SNS・採用・チーム形成・友人関係……<br>あらゆる人間関係を「本質」で最適化する汎用基盤</p>
-      </div>
-      <div class="card" style="text-align:center;border-top:2px solid var(--cyan);">
-        <div style="font-size:36px;margin-bottom:12px;">📈</div>
-        <div style="font-size:17px;font-weight:700;margin-bottom:8px;">自己成長の可視化</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7;">時系列ベクトル変化で「自分がどう変わったか」を数値・グラフで客観的に把握</p>
-      </div>
-      <div class="card" style="text-align:center;border-top:2px solid #f472b6;">
-        <div style="font-size:36px;margin-bottom:12px;">🔬</div>
-        <div style="font-size:17px;font-weight:700;margin-bottom:8px;">価値観科学の構築</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7;">「補完性スコアが最良か」の仮説を実証し 人間関係の新しい数理モデルを確立</p>
-      </div>
+    <div class="highlight" style="max-width:1000px; padding:32px 40px; text-align:left;">
+      <p style="font-size:16px; color:#fff; line-height:1.9; margin-bottom:16px;">
+        将来のソフトウェア技術は、人間を効率化の道具にするのではなく、<strong>「属性という既存の枠組みから個人を解放し、内面的な価値を最大化する」</strong>役割を担うべきだと考えます。
+      </p>
+      <p style="font-size:16px; color:#fff; line-height:1.9;">
+        大規模言語モデル（LLM）と強化学習（RL）の発展は、人間が自覚できていない「内面的な志向性」をデータとして捉え、本質的な接続を支援することを技術的に可能にしました。
+      </p>
     </div>
 
-    <div class="highlight" style="max-width:900px;">
-      <div style="font-size:22px;font-weight:900;margin-bottom:8px;">
-        <span class="grad">人は「本質が共鳴する出会い」で変わる</span>
-      </div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.8;">
-        ZAX は、その出会いを AI と数学で誰にでも届けられる<strong style="color:#fff;">インフラ</strong>を作ることを目指します。
-      </div>
-    </div>
-
-    <div style="font-size:13px;color:var(--muted);">
-      Live Demo：<span style="color:var(--cyan);font-weight:700;">zax.fumiproject.dev</span>
-      &nbsp;／&nbsp;
-      GitHub：<span style="color:#a78bfa;font-weight:700;">github.com/fumi3333/ZAX</span>
+    <div class="card card-cyan" style="max-width:1000px; padding:24px 40px; background:transparent;">
+      <p style="font-size:18px; font-weight:700; color:var(--cyan); line-height:1.7;">
+        ZAXを通じて、表層的な情報に左右されない新しいコミュニケーションの形を提示し、<br>
+        個人の幸福が技術的に支援される社会基盤を構築することを目指します。
+      </p>
+      <p style="font-size:14px; color:rgba(255,255,255,0.7); line-height:1.6; margin-top:12px;">
+        未踏事業の支援を得て、この構想を実装段階へ引き上げ、実社会への寄与を自らの手で実証したいと考えています。
+      </p>
     </div>
   </div>
   <div class="page-num">10 / 10</div>
