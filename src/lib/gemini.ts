@@ -33,10 +33,10 @@ export async function analyzeEssence(inputs: string[], biases: number[] = [50, 5
     Analyze the following three personal fragments to construct a 6-dimensional "Essence Vector".
     
     User Goal/Purpose: "${sanitize(purpose)}"
-    * Important: The user is seeking "${sanitize(purpose)}" functionality to maximize their life happiness. 
-    * If purpose is "romance", prioritize Empathy and Chemistry cues.
-    * If "happiness" (growth), prioritize Determination and Creativity.
-    * If "friendship", prioritize Flexibility and Intuition.
+    * Important: The user is seeking "${sanitize(purpose)}" functionality to maximize their life happiness.
+    * NOTE: "romance" purpose is disabled in Phase 1 for legal compliance (出会い系サイト規制法).
+    * If purpose is "happiness" (growth), prioritize Determination and Creativity.
+    * If "friendship" (default), prioritize Flexibility and Empathy. All other purposes default to "friendship".
 
     Fragments:
     1. ${safeInputs[0]}

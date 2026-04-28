@@ -1,10 +1,28 @@
 import { NextResponse } from 'next/server';
 import { prisma, vectorStore } from '@/lib/db/client';
 import { questions } from '@/data/questions';
-import { model, embeddingModel } from '@/lib/gemini'; // Import shared instances
+import { model, embeddingModel } from '@/lib/gemini';
 import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 
-export const maxDuration = 60; // タイムアウトを60秒に延長
+export const maxDuration = 60;
+
+// IPアドレスごとのゲスト作成回数を一時管理（1時間ウィンドウ）
+const guestCreationLog = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX = 10;     // 1IPあたりの最大リクエスト数
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1時間（ミリ秒）
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = guestCreationLog.get(ip);
+  if (!record || now > record.resetAt) {
+    guestCreationLog.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true; // OK
+  }
+  if (record.count >= RATE_LIMIT_MAX) return false; // NG: 制限超過
+  record.count++;
+  return true; // OK
+}
 
 export async function POST(req: Request) {
   try {
@@ -19,6 +37,13 @@ export async function POST(req: Request) {
     let sessionId = cookieStore.get('zax-session')?.value;
 
     if (!sessionId) {
+      // IPレート制限チェック（ゲスト作成の無限生成を防ぐ）
+      const headerList = await headers();
+      const ip = headerList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+      if (!checkRateLimit(ip)) {
+        return NextResponse.json({ success: false, error: 'Too many requests. Please try again later.' }, { status: 429 });
+      }
+
       sessionId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
       cookieStore.set('zax-session', sessionId, {
         httpOnly: true,
@@ -153,7 +178,8 @@ export async function POST(req: Request) {
     });
 
   } catch (error: any) {
+    // 内部エラーの詳細は外部に漏洩させない（セキュリティ対策）
     console.error('Diagnostic Error:', error);
-    return NextResponse.json({ success: false, error: error.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

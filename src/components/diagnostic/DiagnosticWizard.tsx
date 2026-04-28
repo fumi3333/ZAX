@@ -12,6 +12,9 @@ export default function DiagnosticWizard() {
   const [freetext, setFreetext] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
+  // Gemini API送信に対する同意フラグ（個人情報保護法 第21条対応）
+  const [hasConsented, setHasConsented] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -119,6 +122,45 @@ export default function DiagnosticWizard() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 min-h-[600px] flex flex-col justify-center">
+
+      {/* 同意画面: 未同意の場合は診断を開始できない */}
+      {!hasConsented ? (
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 sm:p-12 space-y-6">
+          <div className="space-y-2 text-center">
+            <span className="text-xs font-bold text-indigo-500 tracking-widest uppercase">プライバシーについて</span>
+            <h2 className="text-2xl font-bold text-slate-900">診断を開始する前に</h2>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-sm text-slate-600 leading-relaxed space-y-3">
+            <p>本診断における回答内容および自由記述は、性格特性の分析のために<strong className="text-slate-800">Google Gemini API</strong>に送信されます。</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>APIに送信されるデータは分析目的のみに使用します。</li>
+              <li>メールアドレスはハッシュ化され、特定に使えない形式でのみ保管します。</li>
+              <li>詳細は<a href="/privacy" className="text-indigo-600 underline" target="_blank">プライバシーポリシー</a>をご確認ください。</li>
+            </ul>
+          </div>
+
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={consentChecked}
+              onChange={(e) => setConsentChecked(e.target.checked)}
+              className="mt-1 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer flex-shrink-0"
+            />
+            <span className="text-sm text-slate-700 leading-relaxed">
+              上記の内容を理解し、<strong>Gemini APIへの回答データの送信</strong>に同意します。
+            </span>
+          </label>
+
+          <button
+            onClick={() => { if (consentChecked) setHasConsented(true); }}
+            disabled={!consentChecked}
+            className="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            同意して診断を始める
+          </button>
+        </div>
+      ) : (
       <div className="relative perspective-1000">
           <Card 
             ref={cardRef}
@@ -232,6 +274,7 @@ export default function DiagnosticWizard() {
           </div>
         )}
       </div>
+      )} {/* hasConsented の三項演算子の閉じ */}
     </div>
   );
 }
