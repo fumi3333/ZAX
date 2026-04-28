@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
+import { signSession } from '@/lib/crypto'
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next()
@@ -11,9 +12,11 @@ export function middleware(request: NextRequest) {
   if (!sessionCookie) {
     // Create new session ID
     const newSessionId = uuidv4()
+    // Sign the session ID to prevent tampering
+    const signedSession = signSession(newSessionId)
     
     // Set cookie
-    response.cookies.set('zax-session', newSessionId, {
+    response.cookies.set('zax-session', signedSession, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

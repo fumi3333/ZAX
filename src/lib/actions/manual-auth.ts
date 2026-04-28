@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db/client';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { hashEmail, signSession } from '@/lib/crypto';
 
 const schema = z.object({
   email: z.string().email(),
@@ -21,9 +22,10 @@ export async function manualLogin(prevState: any, formData: FormData) {
         return { message: "無効な入力データです。" };
     }
 
-    // 2. ユーザー検索
+    // 2. ユーザー検索 (ハッシュ化したメールで照合)
+    const hashedEmail = hashEmail(email);
     const user = await prisma.user.findUnique({
-        where: { email }
+        where: { email: hashedEmail }
     });
 
     if (!user) {
@@ -37,9 +39,9 @@ export async function manualLogin(prevState: any, formData: FormData) {
         return { message: "メールアドレスまたはパスワードが間違っています。" };
     }
 
-    // 4. セッション発行 (HTTP-only Cookie)
-    // 注意: 本番環境ではJWTやLucia Auth等のライブラリ推奨だが、ここでは簡易実装
-    (await cookies()).set('zax-session', user.id, { 
+    // 4. セッション発行 (署名付きID)
+    const signedSession = signSession(user.id);
+    (await cookies()).set('zax-session', signedSession, { 
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 7 // 1週間
@@ -62,7 +64,8 @@ export async function manualRegister(prevState: any, formData: FormData) {
         return { message: "武蔵野大学のメールアドレスのみ登録可能です。" };
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const hashedEmail = hashEmail(email);
+    const existingUser = await prisma.user.findUnique({ where: { email: hashedEmail } });
     if (existingUser) {
         return { message: "このメールアドレスは既に登録されています。" };
     }
@@ -72,7 +75,7 @@ export async function manualRegister(prevState: any, formData: FormData) {
 
     await prisma.user.create({
         data: {
-            email,
+            email: hashedEmail,
             password: hashedPassword
         }
     });

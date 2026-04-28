@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma, vectorStore } from '@/lib/db/client';
 import { questions } from '@/data/questions';
 import { model, embeddingModel } from '@/lib/gemini';
-import { cookies } from 'next/headers';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { signSession, verifySession } from '@/lib/crypto';
 
 export const maxDuration = 60;
 
@@ -34,7 +34,8 @@ export async function POST(req: Request) {
 
     // 1. Authenticate User (or create guest session)
     const cookieStore = await cookies();
-    let sessionId = cookieStore.get('zax-session')?.value;
+    const sessionCookie = cookieStore.get('zax-session')?.value;
+    let sessionId = verifySession(sessionCookie);
 
     if (!sessionId) {
       // IPレート制限チェック（ゲスト作成の無限生成を防ぐ）
@@ -44,8 +45,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, error: 'Too many requests. Please try again later.' }, { status: 429 });
       }
 
-      sessionId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
-      cookieStore.set('zax-session', sessionId, {
+      const newId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+      sessionId = newId;
+      const signedSession = signSession(newId);
+      
+      cookieStore.set('zax-session', signedSession, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
