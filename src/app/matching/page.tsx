@@ -70,11 +70,11 @@ export default function MatchingPage() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight sm:text-4xl">
-            あなたと<span className="text-slate-900">価値観の合う</span>仲間たち
+            今週の<span className="text-slate-900">運命の相手</span>
           </h1>
           <div className="mt-4 space-y-4">
-            <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-              学内であなたと感性が近く、気の合う友達やプロジェクトメンバーになれる可能性が高いユーザーを提案します。
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium">
+              あなたの「おみくじ（深層データ）」に基づき、学内の全データから最も衝突・補完し合える<strong className="text-slate-800">上位3名</strong>のみを厳選しました。
             </p>
             <div className="bg-slate-100/50 rounded-xl p-4 max-w-2xl mx-auto border border-slate-200">
               <p className="text-xs text-slate-500 font-bold leading-relaxed text-left">
@@ -91,7 +91,7 @@ export default function MatchingPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {candidates.map((candidate, idx) => {
+            {candidates.slice(0, 3).map((candidate, idx) => {
                // Calculate a pseudo-compatibility score just for UI (100 - (distance / 2) * 100 scaled)
                // pgvector cosine distance: 0 (exact match) to 2 (exact opposite).
                const compatibility = Math.max(0, Math.min(100, Math.round((1 - candidate.distance / 2) * 100)));
@@ -125,17 +125,17 @@ export default function MatchingPage() {
                   </CardContent>
                   <CardFooter className="pt-2 pb-6 px-6">
                     <a 
-                      href={candidate.contactEmail ? `mailto:${candidate.contactEmail}` : '#'} 
+                      href={candidate.contactEmail ? `mailto:${candidate.contactEmail}?subject=${encodeURIComponent('【ZAX】AIの指示により連絡しました')}&body=${encodeURIComponent('初めまして。\nZAXのAIから「二人は価値観の衝突と補完が起きる」とマッチングされたため連絡しました。\nシステムから「一度15分だけ学内のカフェでお話しせよ」というミッションが出ているので、もしよろしければ今週の空きコマなどでお話ししませんか？\nよろしくお願いいたします。')}` : '#'} 
                       onClick={(e) => {
                         if (!candidate.contactEmail) {
                           e.preventDefault();
                           alert('相手の連絡先メールアドレスが設定されていません。');
                         }
                       }}
-                      className="w-full"
+                      className="w-full group"
                     >
                       <Button className="w-full bg-black hover:bg-gray-800 text-white transition-colors py-6 rounded-none font-bold uppercase tracking-widest text-xs shadow-none">
-                        大学メールで連絡をとる
+                        AIの言い訳を使ってメールする
                       </Button>
                     </a>
                   </CardFooter>
