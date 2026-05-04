@@ -161,6 +161,7 @@ export default function DiagnosticWizard() {
           </button>
         </div>
       ) : (
+        <>
       <div className="relative perspective-1000">
           <Card 
             ref={cardRef}
@@ -274,6 +275,7 @@ export default function DiagnosticWizard() {
           </div>
         )}
       </div>
+        </>
       )} {/* hasConsented の三項演算子の閉じ */}
     </div>
   );
