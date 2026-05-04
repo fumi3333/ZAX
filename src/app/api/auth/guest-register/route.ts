@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
+import { hashEmail } from '@/lib/crypto';
 
 export async function POST(req: Request) {
   try {
@@ -28,7 +29,8 @@ export async function POST(req: Request) {
     }
 
     // Check if email already used by a REAL user
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const hashedEmail = hashEmail(email);
+    const existing = await prisma.user.findUnique({ where: { email: hashedEmail } });
     if (existing && !existing.email.startsWith('guest_')) {
        return NextResponse.json({ success: false, error: 'このメールアドレスは既に登録されています' }, { status: 400 });
     }
@@ -39,7 +41,7 @@ export async function POST(req: Request) {
     await prisma.user.update({
       where: { id: sessionId },
       data: {
-        email,
+        email: hashedEmail,
         password: hashedPassword,
         nickname
       }

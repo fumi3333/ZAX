@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
 };
 
-import CorporateHeader from "@/components/CorporateHeader";
+
 
 export default function RootLayout({
   children,
@@ -42,7 +42,7 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased bg-slate-50`}
         suppressHydrationWarning
       >
-        <CorporateHeader />
+
         {children}
       </body>
     </html>

@@ -15,10 +15,7 @@ export default function AppNavigation() {
   const pathSegments = pathname.split('/').filter(Boolean);
 
   const navLinks = [
-    { href: '/about', label: 'About' },
-    { href: '/philosophy', label: 'Vision' },
-    { href: '/technology', label: 'Product' },
-    { href: '/diagnostic', label: 'Diagnostic' },
+    { href: '/', label: 'HOME' },
   ];
   
   return (

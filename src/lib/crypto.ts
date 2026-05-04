@@ -81,3 +81,11 @@ export function verifySession(signedSession: string | undefined | null): string 
     }
     return null;
 }
+/**
+ * メールアドレスをSHA-256でハッシュ化し、匿名化する
+ * プライバシーポリシーに則り、生データをDBに保存しないために使用
+ */
+export function hashEmail(email: string): string {
+    const normalizedEmail = email.toLowerCase().trim();
+    return crypto.createHash('sha256').update(normalizedEmail).digest('hex');
+}
