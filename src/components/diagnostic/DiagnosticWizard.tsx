@@ -111,13 +111,13 @@ export default function DiagnosticWizard() {
   };
 
   const options = [
-    { value: 1, label: '同意しない', color: 'bg-red-500', size: 'w-16 h-16', border: 'border-red-500' },
-    { value: 2, label: '', color: 'bg-red-400', size: 'w-12 h-12', border: 'border-red-400' },
-    { value: 3, label: '', color: 'bg-red-300', size: 'w-8 h-8', border: 'border-red-300' },
+    { value: 1, label: '同意しない', color: 'bg-slate-800', size: 'w-16 h-16', border: 'border-slate-800' },
+    { value: 2, label: '', color: 'bg-slate-600', size: 'w-12 h-12', border: 'border-slate-600' },
+    { value: 3, label: '', color: 'bg-slate-400', size: 'w-8 h-8', border: 'border-slate-400' },
     { value: 4, label: '中立', color: 'bg-slate-200', size: 'w-6 h-6', border: 'border-slate-300' },
-    { value: 5, label: '', color: 'bg-green-300', size: 'w-8 h-8', border: 'border-green-300' },
-    { value: 6, label: '', color: 'bg-green-400', size: 'w-12 h-12', border: 'border-green-400' },
-    { value: 7, label: '同意する', color: 'bg-green-500', size: 'w-16 h-16', border: 'border-green-500' },
+    { value: 5, label: '', color: 'bg-slate-400', size: 'w-8 h-8', border: 'border-slate-400' },
+    { value: 6, label: '', color: 'bg-slate-600', size: 'w-12 h-12', border: 'border-slate-600' },
+    { value: 7, label: '同意する', color: 'bg-slate-800', size: 'w-16 h-16', border: 'border-slate-800' },
   ];
 
   return (
@@ -125,18 +125,18 @@ export default function DiagnosticWizard() {
 
       {/* 同意画面: 未同意の場合は診断を開始できない */}
       {!hasConsented ? (
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 sm:p-12 space-y-6">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 sm:p-12 space-y-6 border border-slate-100">
           <div className="space-y-2 text-center">
-            <span className="text-xs font-bold text-indigo-500 tracking-widest uppercase">プライバシーについて</span>
+            <span className="text-xs font-bold text-slate-500 tracking-widest uppercase">プライバシーについて</span>
             <h2 className="text-2xl font-bold text-slate-900">診断を開始する前に</h2>
           </div>
 
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-sm text-slate-600 leading-relaxed space-y-3">
-            <p>本診断における回答内容および自由記述は、性格特性の分析のために<strong className="text-slate-800">Google Gemini API</strong>に送信されます。</p>
+            <p>本診断における回答内容および自由記述は、性格特性の分析のためにシステムへ送信されます。</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>APIに送信されるデータは分析目的のみに使用します。</li>
+              <li>送信されるデータは分析目的のみに使用します。</li>
               <li>メールアドレスはハッシュ化され、特定に使えない形式でのみ保管します。</li>
-              <li>詳細は<a href="/privacy" className="text-indigo-600 underline" target="_blank">プライバシーポリシー</a>をご確認ください。</li>
+              <li>詳細は<a href="/privacy" className="text-slate-900 underline font-semibold" target="_blank">プライバシーポリシー</a>をご確認ください。</li>
             </ul>
           </div>
 
@@ -145,17 +145,17 @@ export default function DiagnosticWizard() {
               type="checkbox"
               checked={consentChecked}
               onChange={(e) => setConsentChecked(e.target.checked)}
-              className="mt-1 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer flex-shrink-0"
+              className="mt-1 w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer flex-shrink-0"
             />
             <span className="text-sm text-slate-700 leading-relaxed">
-              上記の内容を理解し、<strong>Gemini APIへの回答データの送信</strong>に同意します。
+              上記の内容を理解し、<strong>回答データの送信</strong>に同意します。
             </span>
           </label>
 
           <button
             onClick={() => { if (consentChecked) setHasConsented(true); }}
             disabled={!consentChecked}
-            className="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             同意して診断を始める
           </button>
@@ -165,14 +165,14 @@ export default function DiagnosticWizard() {
       <div className="relative perspective-1000">
           <Card 
             ref={cardRef}
-            className="border-none shadow-xl bg-white/80 backdrop-blur-sm overflow-visible transition-all duration-500"
+            className="border-slate-200 shadow-xl bg-white overflow-visible transition-all duration-500"
           >
             <CardContent className="p-8 sm:p-12 text-center space-y-10">
               
               {!isFinalStep && currentQuestion ? (
                 <>
                   <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300" key={currentQuestionIndex}>
-                    <span className="text-sm font-bold text-indigo-500 tracking-widest uppercase">
+                    <span className="text-sm font-bold text-slate-500 tracking-widest uppercase">
                         質問 {currentQuestion.id} / {totalQuestions}
                     </span>
                     <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 leading-tight">
@@ -181,7 +181,7 @@ export default function DiagnosticWizard() {
                   </div>
 
                   <div className="flex items-center justify-center gap-3 sm:gap-6 py-4">
-                    <div className="hidden sm:block text-xs font-bold text-red-500/80 mr-2">同意しない</div>
+                    <div className="hidden sm:block text-xs font-bold text-slate-400 mr-2">同意しない</div>
                     {options.map((opt) => {
                       const isSelected = answers[currentQuestion.id] === opt.value;
                       const isAnswered = answers[currentQuestion.id] !== undefined;
@@ -193,7 +193,7 @@ export default function DiagnosticWizard() {
                             rounded-full transition-all duration-300 flex items-center justify-center
                             ${opt.size}
                             ${isSelected 
-                              ? `${opt.color} ring-4 ring-offset-2 ring-indigo-100 scale-110` 
+                              ? `${opt.color} ring-4 ring-offset-2 ring-slate-200 scale-110` 
                               : `bg-transparent border-2 ${opt.border} hover:bg-slate-50`
                             }
                             ${!isSelected && isAnswered ? 'opacity-40 hover:opacity-100' : 'opacity-100'}
@@ -204,7 +204,7 @@ export default function DiagnosticWizard() {
                         </button>
                       );
                     })}
-                    <div className="hidden sm:block text-xs font-bold text-green-600/80 ml-2">同意する</div>
+                    <div className="hidden sm:block text-xs font-bold text-slate-400 ml-2">同意する</div>
                   </div>
                 </>
               ) : (
@@ -219,26 +219,26 @@ export default function DiagnosticWizard() {
                     value={freetext}
                     onChange={(e) => setFreetext(e.target.value)}
                     placeholder="例：もっと論理的な思考を身につけたい。自分の直感をもっと信じて動けるようになりたい。"
-                    className="w-full min-h-[150px] p-4 rounded-xl border-2 border-slate-100 focus:border-indigo-500 focus:ring-0 transition-all resize-none bg-white text-slate-700 font-medium"
+                    className="w-full min-h-[150px] p-4 rounded-xl border-2 border-slate-200 focus:border-slate-800 focus:ring-0 transition-all resize-none bg-white text-slate-700 font-medium"
                   />
                   {answeredCount < totalQuestions ? (
-                    <div className="flex flex-col items-center gap-2 mt-4 p-4 bg-red-50 rounded-lg">
-                      <p className="text-sm text-red-600 font-bold">
+                    <div className="flex flex-col items-center gap-2 mt-4 p-4 bg-slate-50 rounded-lg">
+                      <p className="text-sm text-slate-600 font-bold">
                         ⚠️ 未回答の質問が {totalQuestions - answeredCount} 問あります
                       </p>
-                      <Button variant="outline" onClick={handleJumpToUnanswered} className="text-red-500 border-red-200 hover:bg-red-100">
+                      <Button variant="outline" onClick={handleJumpToUnanswered} className="text-slate-500 border-slate-300 hover:bg-slate-100">
                         未回答の質問に戻る
                       </Button>
                     </div>
                   ) : !allAnswered ? (
-                    <p className="text-xs text-amber-500 font-bold">分析を開始するには、自由記述を入力してください（5文字以上）。</p>
+                    <p className="text-xs text-slate-500 font-bold">分析を開始するには、自由記述を入力してください（5文字以上）。</p>
                   ) : null}
                 </div>
               )}
 
               <div className="flex sm:hidden justify-between text-xs font-bold text-slate-400 px-2">
-                <span className="text-red-500">同意しない</span>
-                <span className="text-green-600">同意する</span>
+                <span>同意しない</span>
+                <span>同意する</span>
               </div>
 
             </CardContent>
@@ -260,7 +260,7 @@ export default function DiagnosticWizard() {
           <Button 
             onClick={handleSubmit} 
             disabled={isSubmitting || !allAnswered}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-6 rounded-full font-bold shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-6 rounded-full font-bold shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
           >
             {isSubmitting ? '分析中...' : (
               <>
@@ -270,7 +270,7 @@ export default function DiagnosticWizard() {
             )}
           </Button>
         ) : (
-          <div className="text-xs text-slate-300">
+          <div className="text-xs text-slate-400">
             {answeredCount} / {totalQuestions} 問回答済み
           </div>
         )}
