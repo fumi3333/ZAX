@@ -195,7 +195,7 @@ export default function DiagnosticWizard() {
                   </div>
 
                   <div className="flex items-center justify-center gap-3 sm:gap-6 py-4">
-                    <div className="hidden sm:block text-xs font-bold text-slate-400 mr-2">同意しない</div>
+                    <div className="hidden sm:flex text-xs font-bold text-slate-400 mr-2 whitespace-nowrap items-center h-full">同意しない</div>
                     {options.map((opt) => {
                       const isSelected = answers[currentQuestion.id] === opt.value;
                       const isAnswered = answers[currentQuestion.id] !== undefined;
@@ -218,7 +218,7 @@ export default function DiagnosticWizard() {
                         </button>
                       );
                     })}
-                    <div className="hidden sm:block text-xs font-bold text-slate-400 ml-2">同意する</div>
+                    <div className="hidden sm:flex text-xs font-bold text-slate-400 ml-2 whitespace-nowrap items-center h-full">同意する</div>
                   </div>
                 </>
               ) : (
@@ -250,7 +250,7 @@ export default function DiagnosticWizard() {
                 </div>
               )}
 
-              <div className="flex sm:hidden justify-between text-xs font-bold text-slate-400 px-2">
+              <div className="flex sm:hidden justify-between text-xs font-bold text-slate-400 px-2 whitespace-nowrap">
                 <span>同意しない</span>
                 <span>同意する</span>
               </div>
@@ -284,9 +284,7 @@ export default function DiagnosticWizard() {
             )}
           </Button>
         ) : (
-          <div className="text-xs text-slate-400">
-            {answeredCount} / {totalQuestions} 問回答済み
-          </div>
+          <div className="w-[100px]"></div>
         )}
       </div>
         </>

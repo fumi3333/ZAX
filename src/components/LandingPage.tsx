@@ -19,16 +19,7 @@ export default function LandingPage() {
           ZAX
         </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.12, duration: 0.5 }}
-          className="text-base md:text-xl text-slate-600 leading-relaxed mb-4 max-w-2xl"
-        >
-          対話とフィードバックを繰り返し、精度を高め
-          <br />
-          <span className="font-bold text-slate-900">本当に波長の合う相手と繋がる</span>
-        </motion.p>
+
 
         <motion.div
           initial={{ opacity: 0, y: 12 }}

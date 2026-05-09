@@ -120,30 +120,36 @@ export async function POST(req: Request) {
     }
 
     // 4. 6次元ベクトル (レーダーチャート用)
-    // 診断カテゴリ: Social(外向性), Empathy(協調性), Discipline(誠実性), Openness(開放性), Emotional(情緒安定性)
-    const categoryOrder = ['Social', 'Empathy', 'Discipline', 'Openness', 'Emotional'] as const;
-    const jaMap: Record<string, string> = { 'Social': '外向性', 'Empathy': '協調性', 'Discipline': '誠実性', 'Openness': '開放性', 'Emotional': '情緒安定性' };
+    // 診断カテゴリ: Lifestyle(ライフスタイル), Values(価値観・社会), Romance(恋愛・親密さ), Conflict(コンフリクト解決), Ambition(野心・キャリア)
+    const categoryOrder = ['Lifestyle', 'Values', 'Romance', 'Conflict', 'Ambition'] as const;
+    const jaMap: Record<string, string> = { 
+      'Lifestyle': 'ライフスタイル', 
+      'Values': '価値観・社会', 
+      'Romance': '恋愛・親密さ', 
+      'Conflict': 'コンフリクト解決', 
+      'Ambition': '野心・キャリア' 
+    };
     const rawByCat = categoryOrder.map(c => {
         const d = categoryScores[jaMap[c]];
         const avg = d && d.count > 0 ? d.sum / d.count : 4;
         return Math.round(((avg - 1) / 6) * 100);
     });
-    const [social, empathy, discipline, openness, emotional] = rawByCat;
+    const [lifestyle, values, romance, conflict, ambition] = rawByCat;
 
-    // 6次元それぞれを独立した意味で計算（バグ修正: discipline/opennessの重複を解消）
-    // 論理性 = 誠実性（構造的・計画的思考）
-    // 直感力 = 開放性（新しいアイデアへの感度）
-    // 共感性 = 協調性（他者への感情的理解）
-    // 意志力 = 誠実性×情緒安定性の組み合わせ（粘り強さ・継続力）
-    // 創造性 = 開放性×外向性の組み合わせ（発散思考・表現力）
-    // 柔軟性 = 情緒安定性×開放性の組み合わせ（変化への適応力）
+    // 6次元それぞれをマリッジパクトデータから算出
+    // 1. 生活基盤 (ライフスタイルのスコア)
+    // 2. 社会意識 (価値観のスコア)
+    // 3. 親密性 (恋愛・パートナーシップのスコア)
+    // 4. 対話力 (コンフリクト解決のスコア)
+    // 5. 熱量・野心 (キャリア・野心のスコア)
+    // 6. 寛容性 (コンフリクト解決と価値観の複合)
     const vector6d = [
-        discipline,                                    // 論理性
-        openness,                                      // 直感力
-        empathy,                                       // 共感性
-        Math.round((discipline + emotional) / 2),      // 意志力
-        Math.round((openness + social) / 2),           // 創造性
-        Math.round((emotional + openness) / 2),        // 柔軟性
+        lifestyle,                                    
+        values,                                      
+        romance,                                       
+        conflict,      
+        ambition,           
+        Math.round((conflict + values) / 2),        
     ];
 
     // 4.5. 768次元ベクトル (セマンティック検索用)

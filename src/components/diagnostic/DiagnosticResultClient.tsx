@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { questions } from "@/data/questions";
-const DIMENSION_LABELS = ["論理性", "直感力", "共感性", "意志力", "創造性", "柔軟性"];
+const DIMENSION_LABELS = ["生活基盤", "社会意識", "親密性", "対話力", "野心", "寛容性"];
 import ResultRadarChart from "./ResultRadarChart";
 
 import Link from "next/link";

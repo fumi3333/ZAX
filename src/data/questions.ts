@@ -1,85 +1,73 @@
 export type Question = {
   id: number;
   text: string;
-  category: 'Social' | 'Empathy' | 'Discipline' | 'Openness' | 'Emotional';
+  category: 'Lifestyle' | 'Values' | 'Romance' | 'Conflict' | 'Ambition';
   categoryJa: string;
   reverse?: boolean;
 };
 
 export const questions: Question[] = [
-  // Social Interaction (外向性・コミュニケーション)
-  { id: 1, text: "初対面の人と会話を始めるのは得意な方だ。", category: 'Social', categoryJa: '外向性' },
-  { id: 2, text: "週末は家で一人で過ごすよりも、友人と出かけたりイベントに参加したい。", category: 'Social', categoryJa: '外向性' },
-  { id: 3, text: "グループの中では、聞き役よりも話し役になることが多い。", category: 'Social', categoryJa: '外向性' },
-  { id: 4, text: "注目を浴びることに抵抗がない、むしろ好きだ。", category: 'Social', categoryJa: '外向性' },
-  { id: 5, text: "自分の感情や考えを、すぐに言葉にして表現する方だ。", category: 'Social', categoryJa: '外向性' },
-  { id: 6, text: "パーティーや交流会など、人が多い場所に行くとエネルギーをもらえる。", category: 'Social', categoryJa: '外向性' },
-  { id: 7, text: "電話よりもテキストメッセージでのやり取りを好む。", category: 'Social', categoryJa: '外向性' }, // Note: Reverse score logic will be handled in analysis if needed, but for vectorization raw score + text is fine.
-  { id: 8, text: "誰かと一緒にいるとき、沈黙が続くと気まずいと感じる。", category: 'Social', categoryJa: '外向性' },
-  { id: 9, text: "浅く広い付き合いよりも、狭く深い付き合いを好む。", category: 'Social', categoryJa: '外向性' },
-  { id: 10, text: "他人の意見に流されず、自分の主張をはっきりと伝えることができる。", category: 'Social', categoryJa: '外向性' },
+  // --- Lifestyle (ライフスタイル) ---
+  { id: 1, text: "休日は家でリラックスするより、外に出かけてアクティブに過ごしたい。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
+  { id: 2, text: "金銭感覚は、節約よりも「今の経験」にお金を使いたい派だ。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
+  { id: 3, text: "将来、都会のど真ん中よりも、静かな郊外や自然の近くで暮らしたい。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
+  { id: 4, text: "家事は分担するより、得意な方がまとめてやるべきだと思う。", category: 'Lifestyle', categoryJa: 'ライフスタイル', reverse: true },
+  { id: 5, text: "定期的な運動や健康的な食生活を、何よりも優先して維持したい。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
+  { id: 6, text: "自分の部屋や生活空間は、常にきれいに整頓されていないと落ち着かない。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
+  { id: 7, text: "夜型よりも朝型であり、午前中から活動を開始したい。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
+  { id: 8, text: "旅行は無計画で行き当たりばったり楽しむのが好きだ。", category: 'Lifestyle', categoryJa: 'ライフスタイル', reverse: true },
+  { id: 9, text: "パートナーとは、趣味や休日の過ごし方をなるべく共有したい。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
+  { id: 10, text: "一人の時間を毎日確保できないと、かなりのストレスを感じる。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
 
-  // Empathy & Harmony (協調性・共感性)
-  { id: 11, text: "他人の感情の変化に敏感で、すぐ気がつく方だ。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 12, text: "困っている人がいると、自分のことを後回しにしてでも助けたくなる。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 13, text: "議論で勝つことよりも、相手との調和を保つことの方が重要だと思う。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 14, text: "人を批判するよりも、良いところを見つけて褒めるようにしている。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 15, text: "自分の利益よりも、チームやコミュニティ全体の利益を優先する。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 16, text: "映画や小説の登場人物に感情移入して泣いてしまうことがある。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 17, text: "他人の失敗に対して寛容であり、すぐに許すことができる。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 18, text: "嘘をつくことは、どんな理由があっても良くないと思う。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 19, text: "人からの頼み事を断るのが苦手だ。", category: 'Empathy', categoryJa: '協調性' },
-  { id: 20, text: "競争する環境よりも、協力し合う環境の方が能力を発揮できる。", category: 'Empathy', categoryJa: '協調性' },
+  // --- Values & Politics (価値観・政治) ---
+  { id: 11, text: "伝統や社会的規範よりも、個人の自由な選択が何より尊重されるべきだ。", category: 'Values', categoryJa: '価値観・社会' },
+  { id: 12, text: "政治的な意見や価値観が大きく異なる人とは、深い関係を築くのは難しい。", category: 'Values', categoryJa: '価値観・社会' },
+  { id: 13, text: "社会の不平等に対して、自分自身が何らかのアクションを起こすべきだと思う。", category: 'Values', categoryJa: '価値観・社会' },
+  { id: 14, text: "宗教やスピリチュアルな信念は、自分の人生において重要な位置を占めている。", category: 'Values', categoryJa: '価値観・社会' },
+  { id: 15, text: "子供を持つことは、人生において必須、あるいは非常に重要だと考えている。", category: 'Values', categoryJa: '価値観・社会' },
+  { id: 16, text: "性別による役割分担（男は仕事、女は家庭など）には強く反対する。", category: 'Values', categoryJa: '価値観・社会' },
+  { id: 17, text: "社会の安定よりも、急進的な革新や変化を支持する。", category: 'Values', categoryJa: '価値観・社会' },
+  { id: 18, text: "地球環境保護のためなら、自分の生活水準を下げることも厭わない。", category: 'Values', categoryJa: '価値観・社会' },
+  { id: 19, text: "「努力すれば必ず報われる」という考え方は、現代でも正しいと思う。", category: 'Values', categoryJa: '価値観・社会', reverse: true },
+  { id: 20, text: "資本主義の利益追求よりも、社会福祉や富の再分配を重視すべきだ。", category: 'Values', categoryJa: '価値観・社会' },
 
-  // Discipline & Order (誠実性・規律)
-  { id: 21, text: "部屋や机の上は常に整理整頓されている。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 22, text: "計画を立ててから行動する方で、行き当たりばったりの行動は避ける。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 23, text: "期限や約束の時間は必ず守る。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 24, text: "一度始めたことは、どんなに困難でも最後までやり遂げる。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 25, text: "細かい部分まで注意を払い、ミスがないよう徹底するタイプだ。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 26, text: "ルールや規則は、社会秩序のために厳格に守るべきだと思う。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 27, text: "衝動買いをすることはほとんどなく、慎重にお金を使う。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 28, text: "目標達成のためなら、目先の快楽を我慢できる。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 29, text: "効率性を重視し、無駄な作業は極力省きたい。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 30, text: "何事も準備不足だと不安を感じる。", category: 'Discipline', categoryJa: '誠実性' },
+  // --- Romance & Intimacy (恋愛・親密さ) ---
+  { id: 21, text: "愛情表現は、言葉よりもスキンシップなどの行動で示してほしい。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  { id: 22, text: "パートナーとは、すべてを共有するより、ある程度の秘密やプライバシーを持っていたい。", category: 'Romance', categoryJa: '恋愛・親密さ', reverse: true },
+  { id: 23, text: "記念日やイベント（誕生日、クリスマスなど）は、特別に祝うことが大切だ。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  { id: 24, text: "体の相性（性的魅力や価値観）は、長期的な関係において非常に重要だ。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  { id: 25, text: "パートナーからの連絡には、できるだけ早く（数時間以内に）返信したいし、相手にもそうしてほしい。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  { id: 26, text: "関係が安定した後も、定期的にデートをしてロマンチックな雰囲気を楽しみたい。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  { id: 27, text: "過去の恋愛について、お互いに隠し事なくすべて話せる関係が理想だ。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  { id: 28, text: "パートナーの異性の友人と二人きりで遊ぶことには、抵抗を感じる。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  { id: 29, text: "愛情を感じる瞬間は、相手が自分のために何かしてくれた（尽くしてくれた）時だ。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  { id: 30, text: "結婚の形式（事実婚や別姓など）にはこだわらず、二人の繋がりを重視したい。", category: 'Romance', categoryJa: '恋愛・親密さ' },
 
-  // Openness & Curiosity (開放性・知的好奇心)
-  { id: 31, text: "抽象的な概念や哲学的な議論をするのが好きだ。", category: 'Openness', categoryJa: '開放性' },
-  { id: 32, text: "伝統や慣習よりも、新しい方法や革新的なアイデアに惹かれる。", category: 'Openness', categoryJa: '開放性' },
-  { id: 33, text: "美術館に行ったり、芸術作品に触れたりするのが好きだ。", category: 'Openness', categoryJa: '開放性' },
-  { id: 34, text: "予測可能な日常よりも、変化に富んだ刺激的な毎日を求めている。", category: 'Openness', categoryJa: '開放性' },
-  { id: 35, text: "未知の分野や新しい趣味に挑戦することにワクワクする。", category: 'Openness', categoryJa: '開放性' },
-  { id: 36, text: "物事を多角的な視点から見るのが得意だ。", category: 'Openness', categoryJa: '開放性' },
-  { id: 37, text: "「なぜ？」と根本的な理由を考えることがよくある。", category: 'Openness', categoryJa: '開放性' },
-  { id: 38, text: "SF映画やファンタジー小説など、現実離れした世界観が好きだ。", category: 'Openness', categoryJa: '開放性' },
-  { id: 39, text: "自分の価値観が絶対だとは思わず、多様な考え方を受け入れられる。", category: 'Openness', categoryJa: '開放性' },
-  { id: 40, text: "クリエイティブな活動（執筆、描画、制作など）に時間を費やすのが好きだ。", category: 'Openness', categoryJa: '開放性' },
+  // --- Conflict & Dealbreakers (コンフリクト・許容範囲) ---
+  { id: 31, text: "喧嘩をしたときは、一旦距離を置くより、その場ですぐに話し合って解決したい。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
+  { id: 32, text: "パートナーの欠点を直そうとするより、そのまま受け入れる方が大切だ。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
+  { id: 33, text: "自分が間違っていたと感じたら、プライドを捨ててすぐに謝ることができる。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
+  { id: 34, text: "感情的になっている相手に対しては、論理的な正論で返すことが多い。", category: 'Conflict', categoryJa: 'コンフリクト解決', reverse: true },
+  { id: 35, text: "過去の過ちを許すことができるタイプであり、後から蒸し返すことはしない。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
+  { id: 36, text: "タバコを吸う人、またはギャンブルをする人とは、パートナーになれない。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
+  { id: 37, text: "自分の家族とパートナーの仲が悪くても、パートナーの意見を優先する。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
+  { id: 38, text: "ストレスが溜まると、人に当たるのではなく、一人で塞ぎ込んでしまう。", category: 'Conflict', categoryJa: 'コンフリクト解決', reverse: true },
+  { id: 39, text: "話し合いで意見が対立した際、相手を論破することに快感を感じることがある。", category: 'Conflict', categoryJa: 'コンフリクト解決', reverse: true },
+  { id: 40, text: "意見の相違があっても、「相手には相手の正義がある」と完全に割り切れる。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
 
-  // Emotional Logic / Stability (情緒安定性・メンタル)
-  { id: 41, text: "プレッシャーのかかる状況でも、冷静に対処できる。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 42, text: "些細なことでイライラしたり、落ち込んだりすることは少ない。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 43, text: "将来に対して不安を感じるより、楽観的に考えることが多い。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 44, text: "失敗しても、すぐに気持ちを切り替えて次の行動に移せる。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 45, text: "他人からの批判を個人的な攻撃として受け取らず、冷静に分析できる。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 46, text: "感情の起伏が激しい方ではない。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 47, text: "リラックスする時間を意識的に確保している。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 48, text: "自分の弱みを見せることに抵抗がない。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 49, text: "予期せぬトラブルが起きてもパニックにならずに対応できる。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 50, text: "自分自身に対して自信を持っており、自己肯定感が高い。", category: 'Emotional', categoryJa: '情緒安定性' },
-
-  // -- 追加質問 --
-  { id: 51, text: "自分と異なる意見を持つ相手とも、深い信頼関係を築ける。", category: 'Openness', categoryJa: '開放性' },
-  { id: 52, text: "ストレスが溜まったときは、誰かに話すより一人で静かに過ごしたい。", category: 'Social', categoryJa: '外向性', reverse: true },
-  { id: 53, text: "人生において安定よりも刺激や挑戦を常に求めていたい。", category: 'Openness', categoryJa: '開放性' },
-  { id: 54, text: "自分の志や目的のためなら、周囲の環境が変わることも厭わない。", category: 'Discipline', categoryJa: '誠実性' },
-  { id: 55, text: "広く浅い人脈よりも、深く狭い信頼関係の方が価値がある。", category: 'Social', categoryJa: '外向性', reverse: true },
-  { id: 56, text: "物事を判断する基準は、社会的な常識よりも自分の信念に基づいている。", category: 'Discipline', categoryJa: '誠実性', reverse: true },
-  { id: 57, text: "何か問題が起きたとき、感情に寄り添うよりも先に解決策を提示してほしい。", category: 'Empathy', categoryJa: '協調性', reverse: true },
-  { id: 58, text: "自分に自信がある方だ。", category: 'Emotional', categoryJa: '情緒安定性' },
-  { id: 59, text: "どんなに親しい間柄でも、踏み込ませないパーソナルスペースが必要だ。", category: 'Social', categoryJa: '外向性', reverse: true },
+  // --- Future & Ambition (将来・野心) ---
+  { id: 41, text: "安定した職業に就くことより、リスクを取ってでも自分のやりたいことに挑戦したい。", category: 'Ambition', categoryJa: '野心・キャリア' },
+  { id: 42, text: "仕事での成功や社会的地位の向上が、人生の幸福において最重要だ。", category: 'Ambition', categoryJa: '野心・キャリア' },
+  { id: 43, text: "将来、海外に移住するか、複数の拠点を持って生活してみたい。", category: 'Ambition', categoryJa: '野心・キャリア' },
+  { id: 44, text: "パートナーには、自分と同じくらい高い野心や目標を持っていてほしい。", category: 'Ambition', categoryJa: '野心・キャリア' },
+  { id: 45, text: "人生のゴールは、財産を築くことよりも、人に影響を与えたり世界を良くすることだ。", category: 'Ambition', categoryJa: '野心・キャリア' },
+  { id: 46, text: "もしパートナーの転勤や挑戦のために引っ越す必要があるなら、自分のキャリアを犠牲にできる。", category: 'Ambition', categoryJa: '野心・キャリア', reverse: true },
+  { id: 47, text: "一生学び続ける姿勢を持ち、自己研鑽を怠らない人生でありたい。", category: 'Ambition', categoryJa: '野心・キャリア' },
+  { id: 48, text: "ワークライフバランスよりも、今は仕事やプロジェクトに100%打ち込みたい時期がある。", category: 'Ambition', categoryJa: '野心・キャリア' },
+  { id: 49, text: "人生の大きな決断をするときは、直感よりも緻密なデータや計画を信用する。", category: 'Ambition', categoryJa: '野心・キャリア', reverse: true },
+  { id: 50, text: "「何者かになりたい」という強い欲望が、常に自分を突き動かしている。", category: 'Ambition', categoryJa: '野心・キャリア' },
 ];
 
-/** 1-7スケールで逆転項目の場合は 8 - score を返す */
 export function effectiveScore(question: Question, rawScore: number): number {
   if (question.reverse) return 8 - rawScore;
   return rawScore;

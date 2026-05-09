@@ -72,15 +72,19 @@ export default function FeedbackLoopDiagram() {
 
         </div>
 
-        {/* Loop Back Arrow for Desktop */}
+        {/* Loop Back Arrow for Desktop (Visual only, no text) */}
         <motion.div 
           variants={arrowVariants} 
-          className="hidden md:block w-full max-w-2xl mt-1.5 relative h-8"
+          className="hidden md:block w-full max-w-2xl mt-4 relative h-8"
         >
-          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-50 px-2.5 py-0.5 text-[9px] font-bold text-slate-600 flex items-center gap-1 rounded-full border border-slate-200">
-            精度向上ループ
-          </div>
+          {/* Main horizontal line */}
+          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200"></div>
+          {/* Left vertical drop */}
+          <div className="absolute top-0 left-0 w-[1px] h-4 bg-gradient-to-b from-transparent to-slate-200"></div>
+          {/* Right vertical drop */}
+          <div className="absolute top-0 right-0 w-[1px] h-4 bg-gradient-to-b from-transparent to-slate-200"></div>
+          {/* Arrow heads (pointing left) */}
+          <div className="absolute top-[16px] left-[10%] w-2 h-2 border-l border-b border-slate-300 transform rotate-45"></div>
         </motion.div>
       </motion.div>
     </div>
