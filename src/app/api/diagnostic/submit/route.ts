@@ -120,36 +120,37 @@ export async function POST(req: Request) {
     }
 
     // 4. 6次元ベクトル (レーダーチャート用)
-    // 診断カテゴリ: Lifestyle(ライフスタイル), Values(価値観・社会), Trust(信頼・協働), Conflict(コンフリクト解決), Ambition(野心・キャリア)
-    const categoryOrder = ['Lifestyle', 'Values', 'Trust', 'Conflict', 'Ambition'] as const;
+    // 診断カテゴリ: Lifestyle(ライフスタイル), Values(価値観・社会), Trust(信頼・協働), Conflict(コンフリクト解決), Ambition(野心・キャリア), Tolerance(寛容性・多様性)
+    const categoryOrder = ['Lifestyle', 'Values', 'Trust', 'Conflict', 'Ambition', 'Tolerance'] as const;
     const jaMap: Record<string, string> = { 
       'Lifestyle': 'ライフスタイル', 
       'Values': '価値観・社会', 
       'Trust': '信頼・協働', 
       'Conflict': 'コンフリクト解決', 
-      'Ambition': '野心・キャリア' 
+      'Ambition': '野心・キャリア',
+      'Tolerance': '寛容性・多様性'
     };
     const rawByCat = categoryOrder.map(c => {
         const d = categoryScores[jaMap[c]];
         const avg = d && d.count > 0 ? d.sum / d.count : 4;
         return Math.round(((avg - 1) / 6) * 100);
     });
-    const [lifestyle, values, trust, conflict, ambition] = rawByCat;
+    const [lifestyle, values, trust, conflict, ambition, tolerance] = rawByCat;
 
-    // 6次元それぞれをマリッジパクトデータから算出
-    // 1. 生活基盤 (ライフスタイルのスコア)
-    // 2. 社会意識 (価値観のスコア)
-    // 3. 信頼構築 (信頼・協働のスコア)
-    // 4. 対話力 (コンフリクト解決のスコア)
-    // 5. 熱量・野心 (キャリア・野心のスコア)
-    // 6. 寛容性 (コンフリクト解決と価値観の複合)
+    // 6次元それぞれをカテゴリデータから直接算出
+    // 1. 生活基盤 (Lifestyle)
+    // 2. 社会意識 (Values)
+    // 3. 信頼構築 (Trust)
+    // 4. 対話力 (Conflict)
+    // 5. 熱量・野心 (Ambition)
+    // 6. 寛容性 (Tolerance)
     const vector6d = [
         lifestyle,                                    
         values,                                      
         trust,                                       
         conflict,      
         ambition,           
-        Math.round((conflict + values) / 2),        
+        tolerance,        
     ];
 
     // 4.5. 768次元ベクトル (セマンティック検索用)

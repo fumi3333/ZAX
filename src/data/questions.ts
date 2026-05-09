@@ -1,7 +1,7 @@
 export type Question = {
   id: number;
   text: string;
-  category: 'Lifestyle' | 'Values' | 'Trust' | 'Conflict' | 'Ambition';
+  category: 'Lifestyle' | 'Values' | 'Trust' | 'Conflict' | 'Ambition' | 'Tolerance';
   categoryJa: string;
   reverse?: boolean;
 };
@@ -66,6 +66,18 @@ export const questions: Question[] = [
   { id: 48, text: "ワークライフバランスよりも、今は仕事やプロジェクトに100%打ち込みたい時期がある。", category: 'Ambition', categoryJa: '野心・キャリア' },
   { id: 49, text: "人生の大きな決断をするときは、直感よりも緻密なデータや計画を信用する。", category: 'Ambition', categoryJa: '野心・キャリア', reverse: true },
   { id: 50, text: "「何者かになりたい」という強い欲望が、常に自分を突き動かしている。", category: 'Ambition', categoryJa: '野心・キャリア' },
+
+  // --- Tolerance & Openness (寛容性・多様性) ---
+  { id: 51, text: "自分とは全く異なる文化的背景や価値観を持つ人に対しても、偏見なく接することができる。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 52, text: "他人のちょっとしたミスや遅刻に対して、イライラせずに許容できる方だ。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 53, text: "議論において、自分の意見が論破されたとしても、素直に相手の正しさを認められる。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 54, text: "「普通はこうするべき」という一般常識やマナーに縛られず、個人の自由なスタイルを尊重したい。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 55, text: "過去に自分を深く傷つけた相手であっても、時間が経てば許すことができる。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 56, text: "友人や同僚が、自分には全く理解できない趣味を持っていたとしても、否定せずに尊重できる。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 57, text: "「絶対に許せない行動・地雷」の数は、他の人に比べて少ない方だと思う。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 58, text: "予想外のトラブルや計画の変更が起きても、不満を言わずに柔軟に受け入れてその場を楽しめる。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 59, text: "自分にとっての正義と他人の正義が衝突したとき、相手の状況を汲み取って譲ることができる。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
+  { id: 60, text: "自分の考え方が「絶対的な真理」ではなく、環境や時代によって変わるものだと常に認識している。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
 ];
 
 export function effectiveScore(question: Question, rawScore: number): number {
