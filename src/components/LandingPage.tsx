@@ -27,7 +27,7 @@ export default function LandingPage() {
         >
           対話とフィードバックを繰り返し、精度を高め
           <br />
-          <span className="font-bold text-slate-900">真に共鳴する相手と繋がる</span>
+          <span className="font-bold text-slate-900">本当に波長の合う相手と繋がる</span>
         </motion.p>
 
         <motion.div

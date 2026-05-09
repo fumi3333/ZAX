@@ -7,15 +7,8 @@ export const metadata = {
 
 export default function DiagnosticPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-4xl space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
-            ZAX 性格・価値観診断
-          </h1>
-
-        </div>
-
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-4xl">
         <DiagnosticWizard />
       </div>
     </div>

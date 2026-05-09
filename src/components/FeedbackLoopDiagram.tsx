@@ -54,7 +54,7 @@ export default function FeedbackLoopDiagram() {
               <MessageSquare size={18} />
             </div>
             <h3 className="text-xs font-bold text-slate-900 mb-0.5">対話・交流</h3>
-            <p className="text-[10px] text-slate-500">ブラインドでの共鳴</p>
+            <p className="text-[10px] text-slate-500">ブラインドでの匿名対話</p>
           </motion.div>
 
           <motion.div variants={arrowVariants} className="hidden md:flex justify-center text-slate-300">
@@ -79,19 +79,9 @@ export default function FeedbackLoopDiagram() {
         >
           <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-50 px-2.5 py-0.5 text-[9px] font-bold text-slate-600 flex items-center gap-1 rounded-full border border-slate-200">
-            <Sparkles size={10} className="text-slate-800" />
             精度向上ループ
-            <Sparkles size={10} className="text-slate-800" />
           </div>
         </motion.div>
-
-        <motion.p 
-          variants={itemVariants}
-          className="mt-2 text-[11px] text-slate-500 max-w-lg text-center leading-relaxed"
-        >
-          マッチングとフィードバックを繰り返すことでシステムが学習。
-          <br />回数を重ねるごとに、<span className="font-bold text-slate-900">本当に波長の合う相手とのつながり</span>の精度が高まります。
-        </motion.p>
       </motion.div>
     </div>
   );
