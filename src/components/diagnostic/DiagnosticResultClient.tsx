@@ -116,7 +116,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-600 font-semibold">結果を読み込み中...</p>
         </div>
       </div>
@@ -196,7 +196,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
           <section className="bg-slate-900 text-white rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden border border-slate-800">
              <div className="max-w-md mx-auto relative z-10 text-center space-y-6">
                 <div className="inline-block p-4 rounded-full bg-slate-800 mb-2">
-                  <BookOpen className="w-12 h-12 text-indigo-400" />
+                  <BookOpen className="w-12 h-12 text-slate-400" />
                 </div>
                 <h3 className="text-2xl font-bold text-white">分析レポート</h3>
                 <p className="text-slate-300 text-sm leading-relaxed">
@@ -217,7 +217,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                           required
                           value={nickname}
                           onChange={e => setNickname(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-slate-400"
                           placeholder="ZAX 太郎"
                        />
                      </div>
@@ -228,7 +228,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                           required
                           value={email}
                           onChange={e => setEmail(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-slate-400"
                           placeholder="name@musashino-u.ac.jp"
                        />
                      </div>
@@ -240,14 +240,14 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                           minLength={6}
                           value={password}
                           onChange={e => setPassword(e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-slate-400"
                           placeholder="6文字以上"
                        />
                      </div>
                      <button 
                         type="submit" 
                         disabled={isRegistering}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-500 transition-colors disabled:opacity-50 mt-4"
+                        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-white text-slate-950 rounded-xl font-bold hover:bg-slate-100 transition-colors disabled:opacity-50 mt-4"
                      >
                         {isRegistering ? (
                           <><Loader2 className="w-5 h-5 animate-spin" />登録処理中...</>
@@ -259,16 +259,15 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                 </form>
              </div>
              {/* Decor */}
-             <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-600/20 blur-3xl rounded-full pointer-events-none" />
+             <div className="absolute -top-24 -right-24 w-64 h-64 bg-slate-200/10 blur-3xl rounded-full pointer-events-none" />
           </section>
         )}
 
         {/* 3. Generating Report State */}
         {isGenerating && (
           <section className="bg-slate-900 text-white rounded-2xl p-12 md:p-20 shadow-2xl text-center space-y-8 border border-slate-800">
-             <div className="inline-block p-6 rounded-full bg-indigo-900/30 border border-indigo-500/20 mb-4 relative">
-                <Loader2 className="w-16 h-16 text-indigo-400 animate-spin absolute inset-0 m-auto" />
-                <Sparkles className="w-8 h-8 text-indigo-300 opacity-50 absolute -top-2 -right-2 animate-pulse" />
+             <div className="inline-block p-6 rounded-full bg-slate-800 border border-slate-700 mb-4 relative">
+                <Loader2 className="w-16 h-16 text-slate-100 animate-spin absolute inset-0 m-auto" />
              </div>
              <h3 className="text-2xl font-bold text-white">分析レポートを生成中...</h3>
              <div className="max-w-md mx-auto text-slate-400 text-sm space-y-2 font-medium">
@@ -282,7 +281,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         {!data.isGuest && !isGenerating && (
           <section className="bg-white text-slate-900 rounded-2xl p-8 md:p-12 shadow-xl border border-slate-200">
             <h2 className="text-3xl font-black mb-8 flex items-center gap-3 text-slate-900 border-b border-slate-100 pb-4">
-              <BookOpen className="w-8 h-8 text-indigo-600" />
+              <BookOpen className="w-8 h-8 text-slate-900" />
               分析レポート
             </h2>
             
@@ -306,7 +305,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                            }
                          } finally { setIsGenerating(false); }
                        }}
-                       className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 font-bold shadow-md hover:shadow-lg transition-all"
+                       className="px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 font-bold shadow-md hover:shadow-lg transition-all"
                     >
                        レポートを再生成する
                     </button>
@@ -320,7 +319,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
             {/* ZAXcampus CTA - At the bottom of the long report */}
             <div className="mt-16 pt-12 border-t border-slate-100 text-center space-y-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-indigo-600 to-purple-600 text-white rounded-2xl shadow-lg mb-4 transform rotate-3 hover:rotate-6 transition-transform">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-900 text-white rounded-2xl shadow-lg mb-4 transform rotate-3 hover:rotate-6 transition-transform">
                    <span className="font-black text-2xl">Z</span>
                 </div>
                 <h3 className="text-2xl font-black text-slate-900">さらなる出会いと挑戦へ</h3>
@@ -331,10 +330,10 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                    href="https://zax-campus.com" // Placeholder external link
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl font-bold text-lg hover:from-black hover:to-black transition-all shadow-xl hover:-translate-y-1 mx-auto"
+                   className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl hover:-translate-y-1 mx-auto"
                 >
                    ZAXcampusを始める
-                   <ExternalLink className="w-5 h-5 text-indigo-300" />
+                   <ExternalLink className="w-5 h-5 text-slate-400" />
                 </a>
             </div>
           </section>
@@ -345,7 +344,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         <section className="text-center pt-8">
           <Link
             href="/diagnostic"
-            className="text-slate-400 text-sm font-bold hover:text-indigo-500 transition-colors uppercase tracking-widest"
+            className="text-slate-400 text-sm font-bold hover:text-slate-900 transition-colors uppercase tracking-widest"
           >
             やり直す
           </Link>
