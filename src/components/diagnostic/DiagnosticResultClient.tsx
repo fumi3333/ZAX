@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { questions } from "@/data/questions";
-const DIMENSION_LABELS = ["生活基盤", "社会意識", "親密性", "対話力", "野心", "寛容性"];
+const DIMENSION_LABELS = ["生活基盤", "社会意識", "信頼構築", "対話力", "野心", "寛容性"];
 import ResultRadarChart from "./ResultRadarChart";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles, Loader2, BookOpen, ExternalLink } from "lucide-react";
+import { ArrowRight, Sparkles, Loader2, BookOpen, ExternalLink, Copy, CheckCircle2 } from "lucide-react";
 
 interface ResultData {
   id: string;
@@ -34,6 +34,16 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
   // Report Generation State
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Copy State
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    if (!data) return;
+    const url = `${window.location.origin}/diagnostic/result/${data.id}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     const key = `diagnostic_result_${resultId}`;
@@ -188,6 +198,25 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                 <div className="text-2xl font-black text-slate-900">{item.A}</div>
               </div>
             ))}
+          </div>
+
+          {/* Share Button for External Users */}
+          <div className="mt-10 flex flex-col items-center justify-center space-y-3 border-t border-slate-100 pt-8">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Share Your ZAX Vector</p>
+            <button
+              onClick={handleCopy}
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all duration-300 border-2 ${
+                copied 
+                ? 'bg-slate-900 text-white border-slate-900' 
+                : 'bg-transparent text-slate-900 border-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              {copied ? (
+                <><CheckCircle2 className="w-4 h-4" />コピー完了</>
+              ) : (
+                <><Copy className="w-4 h-4" />診断結果URLをコピー</>
+              )}
+            </button>
           </div>
         </section>
 

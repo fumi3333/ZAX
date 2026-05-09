@@ -19,7 +19,7 @@ interface CompareRadarChartProps {
 export default function CompareRadarChart({
   myVector,
   partnerVector,
-  labels = ["生活基盤", "社会意識", "親密性", "対話力", "野心", "寛容性"],
+  labels = ["生活基盤", "社会意識", "信頼構築", "対話力", "野心", "寛容性"],
 }: CompareRadarChartProps) {
   const data = labels.map((label, i) => ({
     subject: label,

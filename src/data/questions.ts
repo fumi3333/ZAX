@@ -1,7 +1,7 @@
 export type Question = {
   id: number;
   text: string;
-  category: 'Lifestyle' | 'Values' | 'Romance' | 'Conflict' | 'Ambition';
+  category: 'Lifestyle' | 'Values' | 'Trust' | 'Conflict' | 'Ambition';
   categoryJa: string;
   reverse?: boolean;
 };
@@ -31,17 +31,17 @@ export const questions: Question[] = [
   { id: 19, text: "「努力すれば必ず報われる」という考え方は、現代でも正しいと思う。", category: 'Values', categoryJa: '価値観・社会', reverse: true },
   { id: 20, text: "資本主義の利益追求よりも、社会福祉や富の再分配を重視すべきだ。", category: 'Values', categoryJa: '価値観・社会' },
 
-  // --- Romance & Intimacy (恋愛・親密さ) ---
-  { id: 21, text: "愛情表現は、言葉よりもスキンシップなどの行動で示してほしい。", category: 'Romance', categoryJa: '恋愛・親密さ' },
-  { id: 22, text: "パートナーとは、すべてを共有するより、ある程度の秘密やプライバシーを持っていたい。", category: 'Romance', categoryJa: '恋愛・親密さ', reverse: true },
-  { id: 23, text: "記念日やイベント（誕生日、クリスマスなど）は、特別に祝うことが大切だ。", category: 'Romance', categoryJa: '恋愛・親密さ' },
-  { id: 24, text: "体の相性（性的魅力や価値観）は、長期的な関係において非常に重要だ。", category: 'Romance', categoryJa: '恋愛・親密さ' },
-  { id: 25, text: "パートナーからの連絡には、できるだけ早く（数時間以内に）返信したいし、相手にもそうしてほしい。", category: 'Romance', categoryJa: '恋愛・親密さ' },
-  { id: 26, text: "関係が安定した後も、定期的にデートをしてロマンチックな雰囲気を楽しみたい。", category: 'Romance', categoryJa: '恋愛・親密さ' },
-  { id: 27, text: "過去の恋愛について、お互いに隠し事なくすべて話せる関係が理想だ。", category: 'Romance', categoryJa: '恋愛・親密さ' },
-  { id: 28, text: "パートナーの異性の友人と二人きりで遊ぶことには、抵抗を感じる。", category: 'Romance', categoryJa: '恋愛・親密さ' },
-  { id: 29, text: "愛情を感じる瞬間は、相手が自分のために何かしてくれた（尽くしてくれた）時だ。", category: 'Romance', categoryJa: '恋愛・親密さ' },
-  { id: 30, text: "結婚の形式（事実婚や別姓など）にはこだわらず、二人の繋がりを重視したい。", category: 'Romance', categoryJa: '恋愛・親密さ' },
+  // --- Trust & Collaboration (信頼・協働) ---
+  { id: 21, text: "チームで動くより、個人の裁量で進められる環境の方が高いパフォーマンスを出せる。", category: 'Trust', categoryJa: '信頼・協働', reverse: true },
+  { id: 22, text: "他人を完全に信用するまでには、かなりの時間と実績の証明が必要だ。", category: 'Trust', categoryJa: '信頼・協働' },
+  { id: 23, text: "自分がリーダーシップを取るよりも、優秀なリーダーの右腕として立ち回る方が得意だ。", category: 'Trust', categoryJa: '信頼・協働' },
+  { id: 24, text: "約束の時間や期限を守れない人とは、どれだけ優秀でも一緒に仕事をしたくない。", category: 'Trust', categoryJa: '信頼・協働' },
+  { id: 25, text: "仕事やプロジェクトにおいて、プロセス（過程）よりも結果（成果）が全てだと思う。", category: 'Trust', categoryJa: '信頼・協働' },
+  { id: 26, text: "他人に自分の弱みや失敗を見せることに、強い抵抗を感じる。", category: 'Trust', categoryJa: '信頼・協働', reverse: true },
+  { id: 27, text: "仲間が困っているときは、自分のタスクを後回しにしてでも助けるべきだ。", category: 'Trust', categoryJa: '信頼・協働' },
+  { id: 28, text: "人を評価するとき、能力の高さよりも、誠実さや人柄を重視する。", category: 'Trust', categoryJa: '信頼・協働' },
+  { id: 29, text: "目標達成のためなら、時に冷酷な決断や切り捨ても辞さない。", category: 'Trust', categoryJa: '信頼・協働' },
+  { id: 30, text: "初対面の人に対しても、警戒心を持たずにオープンに接することができる。", category: 'Trust', categoryJa: '信頼・協働', reverse: true },
 
   // --- Conflict & Dealbreakers (コンフリクト・許容範囲) ---
   { id: 31, text: "喧嘩をしたときは、一旦距離を置くより、その場ですぐに話し合って解決したい。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
