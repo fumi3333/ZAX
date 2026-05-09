@@ -10,17 +10,6 @@ export default function LandingPage() {
     <main className="w-full h-screen bg-slate-50 text-slate-900 font-sans overflow-hidden flex flex-col items-center justify-center">
       {/* ─── HERO ─── */}
       <div className="relative z-10 w-full max-w-4xl px-6 flex flex-col items-center text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.06, duration: 0.5 }}
-          className="text-5xl md:text-6xl font-bold tracking-tight mb-4"
-        >
-          ZAX
-        </motion.h1>
-
-
-
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
