@@ -25,9 +25,22 @@ export default function DiagnosticWizard() {
     if (saved) {
       try {
         const { answers: sAnswers, freetext: sFreetext, index: sIndex } = JSON.parse(saved);
-        if (sAnswers) setAnswers(sAnswers);
+        if (sAnswers) {
+          // Filter to only keep valid active question ids to avoid legacy state corruption
+          const validQuestionIds = new Set(questions.map(q => q.id));
+          const filteredAnswers: Record<number, number> = {};
+          for (const [idStr, val] of Object.entries(sAnswers)) {
+            const id = Number(idStr);
+            if (validQuestionIds.has(id)) {
+              filteredAnswers[id] = val as number;
+            }
+          }
+          setAnswers(filteredAnswers);
+        }
         if (sFreetext) setFreetext(sFreetext);
-        if (typeof sIndex === 'number') setCurrentQuestionIndex(sIndex);
+        if (typeof sIndex === 'number') {
+          setCurrentQuestionIndex(Math.min(sIndex, questions.length));
+        }
       } catch (e) {
         console.warn('Failed to parse diagnostic draft:', e);
       }
@@ -44,8 +57,9 @@ export default function DiagnosticWizard() {
   const isFinalStep = currentQuestionIndex === totalQuestions;
   const currentQuestion = !isFinalStep ? questions[currentQuestionIndex] : null;
   
-  const answeredCount = Object.keys(answers).length;
-  const allAnswered = answeredCount === totalQuestions && freetext.trim().length > 5;
+  // Calculate answered count based only on currently active questions
+  const answeredCount = questions.filter(q => answers[q.id] !== undefined).length;
+  const allAnswered = answeredCount === totalQuestions && freetext.trim().length >= 5;
 
   const handleAnswer = (value: number) => {
     if (!currentQuestion) return;
