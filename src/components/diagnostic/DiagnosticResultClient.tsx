@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { questions } from "@/data/questions";
 const DIMENSION_LABELS = ["生活基盤", "社会意識", "信頼構築", "対話力", "野心", "寛容性"];
 import ResultRadarChart from "./ResultRadarChart";
-
 import Link from "next/link";
-import { ArrowRight, Sparkles, Loader2, BookOpen, ExternalLink, Copy, CheckCircle2, Mail } from "lucide-react";
+import { Loader2, BookOpen, Copy, CheckCircle2, Mail } from "lucide-react";
 
 interface ResultData {
   id: string;
@@ -25,16 +24,16 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Email-only registration state
+  // Email registration state
   const [email, setEmail] = useState("");
   const [isSavingEmail, setIsSavingEmail] = useState(false);
   const [emailSaved, setEmailSaved] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
-  // Report Generation State
+  // Report regeneration state
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Copy State
+  // Copy URL state
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     if (!data) return;
@@ -71,29 +70,41 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     }
   };
 
-
+  const handleRegenerate = async () => {
+    if (!data) return;
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/diagnostic/generate-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resultId: data.id }),
+      });
+      const d = await res.json();
+      if (d.success) {
+        setData({ ...data, synthesis: d.synthesis });
+        sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify({ ...data, synthesis: d.synthesis }));
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   useEffect(() => {
-    const key = `diagnostic_result_${resultId}`;
-    const cached = sessionStorage.getItem(key);
-    // When updating from guest to real, we might need fresh data from server, 
-    // so we always fetch to be safe if not generating right now.
+    const cached = sessionStorage.getItem(`diagnostic_result_${resultId}`);
     fetch(`/api/diagnostic/result/${resultId}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Not found"))))
       .then((json) => setData(json))
       .catch(() => {
-          if (cached) {
-            setData(JSON.parse(cached));
-          } else {
-            setError("結果の取得に失敗しました。もう一度診断をお試しください。");
-          }
+        if (cached) {
+          setData(JSON.parse(cached));
+        } else {
+          setError("結果の取得に失敗しました。もう一度診断をお試しください。");
+        }
       })
       .finally(() => setLoading(false));
   }, [resultId]);
 
-
-
-  if (loading && !isGenerating) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -107,30 +118,25 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
   if (error || !data) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center max-w-md px-6">
-          <p className="text-slate-600 mb-6">{error || "結果が見つかりませんでした"}</p>
+        <div className="text-center max-w-md px-6 space-y-6">
+          <p className="text-slate-600">{error || "結果が見つかりませんでした"}</p>
           <Link
             href="/diagnostic"
             className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800"
           >
             もう一度診断する
-            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
     );
   }
 
-  // Determine vector
+  // Parse vector
   let userVector6d: number[] = [50, 50, 50, 50, 50, 50];
   if (data.vector && Array.isArray(data.vector)) {
     userVector6d = data.vector;
-  } else if (data.vector && typeof data.vector === 'string') {
-    try {
-        userVector6d = JSON.parse(data.vector);
-    } catch {
-        console.warn("Failed to parse vector string");
-    }
+  } else if (data.vector && typeof data.vector === "string") {
+    try { userVector6d = JSON.parse(data.vector); } catch { /* use default */ }
   }
 
   const chartData = DIMENSION_LABELS.map((label, i) => ({
@@ -143,20 +149,24 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     .split("\n")
     .filter((p: string) => p.trim() !== "");
 
+  const hasValidSynthesis = data.synthesis && !data.synthesis.includes("分析エラー") && synthesisParagraphs.length > 0;
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
       <div className="h-16" />
 
-      <main className="max-w-4xl mx-auto px-6 py-12 space-y-16">
-        <section className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+      <main className="max-w-4xl mx-auto px-6 py-12 space-y-12">
+        {/* ヘッダー */}
+        <section className="text-center space-y-2">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
             分析結果
           </h1>
+          <p className="text-slate-400 text-sm">6次元ベクトルによる価値観マッピング</p>
         </section>
 
-        {/* 1. Radar Chart Section */}
-        <section className="bg-white/70 backdrop-blur-md rounded-2xl p-8 shadow-xl shadow-slate-200/30 border border-slate-200/60">
-          <h2 className="text-2xl font-bold mb-8 text-center">特性レーダーチャート</h2>
+        {/* レーダーチャート: 常時表示 */}
+        <section className="bg-white/70 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-slate-200/60">
+          <h2 className="text-xs font-bold mb-8 text-center text-slate-400 uppercase tracking-widest">特性ベクトル</h2>
           <div className="flex justify-center">
             <div className="w-full max-w-md">
               <ResultRadarChart data={chartData} />
@@ -170,119 +180,134 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
               </div>
             ))}
           </div>
-
-          {/* Share Button for External Users */}
-          <div className="mt-10 flex flex-col items-center justify-center space-y-3 border-t border-slate-100 pt-8">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Share Your ZAX Vector</p>
+          <div className="mt-8 flex justify-center border-t border-slate-100 pt-6">
             <button
               onClick={handleCopy}
-              className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all duration-300 border-2 ${
-                copied 
-                ? 'bg-slate-900 text-white border-slate-900' 
-                : 'bg-transparent text-slate-900 border-slate-900 hover:bg-slate-50'
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300 border-2 ${
+                copied
+                  ? "bg-slate-900 text-white border-slate-900"
+                  : "bg-transparent text-slate-900 border-slate-900 hover:bg-slate-50"
               }`}
             >
-              {copied ? (
-                <><CheckCircle2 className="w-4 h-4" />コピー完了</>
-              ) : (
-                <><Copy className="w-4 h-4" />診断結果URLをコピー</>
-              )}
+              {copied
+                ? <><CheckCircle2 className="w-4 h-4" />コピー完了</>
+                : <><Copy className="w-4 h-4" />結果URLをコピー</>
+              }
             </button>
           </div>
         </section>
 
-        {/* 4. Full Report Display (For All Users) */}
-        {!isGenerating && (
-          <section className="bg-white text-slate-900 rounded-2xl p-8 md:p-12 shadow-xl border border-slate-200">
-            <h2 className="text-3xl font-black mb-8 flex items-center gap-3 text-slate-900 border-b border-slate-100 pb-4">
-              <BookOpen className="w-8 h-8 text-slate-900" />
-              分析レポート
-            </h2>
-            
-            <div className="space-y-6 text-base md:text-lg leading-loose text-slate-700 font-medium">
-              {data.synthesis.includes("登録後にAI詳細分析レポートが生成されます") || data.synthesis.includes("分析エラーが発") ? (
-                 <div className="bg-slate-50 border border-slate-200 p-8 rounded-xl flex flex-col items-center text-center space-y-4">
-                    <p className="text-slate-600 font-bold">レポートデータがまだ生成されていないか、エラーが発生しました。</p>
-                    <button 
-                       onClick={async () => {
-                         setIsGenerating(true);
-                         try {
-                           const res = await fetch("/api/diagnostic/generate-report", {
-                             method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ resultId: data.id })
-                           });
-                           const d = await res.json();
-                           if (d.success) {
-                              setData({...data, synthesis: d.synthesis});
-                              sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify({...data, synthesis: d.synthesis}));
-                           } else {
-                              alert("生成に失敗しました。時間をおいてお試しください。");
-                           }
-                         } finally { setIsGenerating(false); }
-                       }}
-                       className="px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 font-bold shadow-md hover:shadow-lg transition-all"
-                    >
-                       レポートを再生成する
-                    </button>
-                 </div>
-              ) : (
-                synthesisParagraphs.map((para: string, i: number) => (
-                  <p key={i} className="text-left">{para}</p>
-                ))
-              )}
-            </div>
+        {/* AIレポートセクション: メール登録でアンロック */}
+        <section className="relative">
+          {emailSaved ? (
+            /* 登録済み: フルレポート表示 */
+            <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl border border-slate-200 space-y-8">
+              <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+                <BookOpen className="w-6 h-6 text-slate-900" />
+                <h2 className="text-2xl font-black text-slate-900">分析レポート</h2>
+              </div>
 
-            {/* Email Registration CTA — Save history & report */}
-            <div className="mt-16 pt-12 border-t border-slate-100">
-              {emailSaved ? (
-                <div className="text-center space-y-3 py-4">
-                  <CheckCircle2 className="w-10 h-10 text-slate-900 mx-auto" />
-                  <p className="text-xl font-black text-slate-900">登録しました</p>
-                  <p className="text-slate-500 text-sm">次回の診断から、あなたの変遷が記録されます。</p>
+              {isGenerating ? (
+                <div className="flex flex-col items-center gap-4 py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+                  <p className="text-slate-500 font-medium">Geminiが分析中...</p>
+                </div>
+              ) : hasValidSynthesis ? (
+                <div className="space-y-5 text-base leading-loose text-slate-700">
+                  {synthesisParagraphs.map((para: string, i: number) => (
+                    <p key={i}>{para}</p>
+                  ))}
                 </div>
               ) : (
-                <div className="space-y-6">
-                  <div className="text-center space-y-2">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Save & Track</span>
-                    <h3 className="text-2xl font-black text-slate-900">このレポートを保存する</h3>
-                    <p className="text-slate-500 max-w-sm mx-auto text-sm leading-relaxed">
-                      メールアドレスを登録すると、診断の変遷を記録し、次回以降のレポートと比較できるようになります。
+                <div className="flex flex-col items-center gap-4 py-8">
+                  <p className="text-slate-500 font-medium">レポートの生成中にエラーが発生しました。</p>
+                  <button
+                    onClick={handleRegenerate}
+                    className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all"
+                  >
+                    レポートを再生成する
+                  </button>
+                </div>
+              )}
+
+              <div className="pt-6 border-t border-slate-100 text-center">
+                <p className="text-xs text-slate-400 font-medium">
+                  このレポートは保存されました。
+                  <a href="/mypage" className="text-slate-900 font-bold underline ml-1">
+                    変遷ログ（mypage）
+                  </a>
+                  からいつでも見返せます。
+                </p>
+              </div>
+            </div>
+          ) : (
+            /* 未登録: ぼかしプレビュー + メール入力ゲート */
+            <div className="relative overflow-hidden rounded-2xl shadow-xl border border-slate-200">
+              {/* ぼかされたレポートプレビュー */}
+              <div className="bg-white p-8 md:p-12 select-none pointer-events-none">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-8">
+                  <BookOpen className="w-6 h-6 text-slate-200" />
+                  <h2 className="text-2xl font-black text-slate-200">分析レポート</h2>
+                </div>
+                <div className="space-y-4 blur-md opacity-50">
+                  {hasValidSynthesis ? (
+                    synthesisParagraphs.slice(0, 4).map((para: string, i: number) => (
+                      <p key={i} className="text-slate-400 text-base leading-loose">{para}</p>
+                    ))
+                  ) : (
+                    <>
+                      <p className="text-slate-300 text-base leading-loose">あなたは高い自律性を持ち、知的探求を重視する人物です。信頼の構築に時間をかける傾向があり、一度築いた関係は深く長続きします。</p>
+                      <p className="text-slate-300 text-base leading-loose">価値観のコアには本質への誠実さがあり、表面的な合意よりも深い理解を求める姿勢が際立ちます。</p>
+                      <p className="text-slate-300 text-base leading-loose">コミュニケーションにおいては、感情より論理を優先する傾向があり、議論を通じて関係を深めていきます...</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* ゲートオーバーレイ */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white/10 via-white/85 to-white rounded-2xl">
+                <div className="text-center max-w-sm mx-auto px-6 space-y-6 pt-24 pb-10">
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-black text-slate-900">レポートを読む</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                      メールアドレスを登録するとAIレポートが解禁されます。
+                      同じアドレスで再診断すると変遷ログが蓄積されます。
                     </p>
                   </div>
-                  <form onSubmit={handleSaveEmail} className="max-w-sm mx-auto flex flex-col gap-3">
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <input
-                          type="email"
-                          placeholder="your@email.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full pl-9 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-slate-800 focus:outline-none text-sm font-medium transition-colors"
-                          required
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        disabled={isSavingEmail}
-                        className="px-5 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all disabled:opacity-50 whitespace-nowrap"
-                      >
-                        {isSavingEmail ? "保存中..." : "保存"}
-                      </button>
+                  <form onSubmit={handleSaveEmail} className="flex flex-col gap-3 w-full">
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full pl-9 pr-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-slate-900 focus:outline-none text-sm font-medium transition-colors bg-white"
+                        required
+                      />
                     </div>
                     {emailError && (
                       <p className="text-red-500 text-xs font-bold text-center">{emailError}</p>
                     )}
-                    <p className="text-center text-xs text-slate-400">大学メール以外でもOK。パスワード不要。</p>
+                    <button
+                      type="submit"
+                      disabled={isSavingEmail}
+                      className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all disabled:opacity-50 shadow-lg"
+                    >
+                      {isSavingEmail ? "登録中..." : "レポートを解禁する →"}
+                    </button>
+                    <p className="text-center text-xs text-slate-400">
+                      大学メール以外でもOK。パスワード不要。
+                    </p>
                   </form>
                 </div>
-              )}
+              </div>
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
-
-
-        <section className="text-center pt-8">
+        {/* やり直す */}
+        <section className="text-center pt-4">
           <Link
             href="/diagnostic"
             className="text-slate-400 text-sm font-bold hover:text-slate-900 transition-colors uppercase tracking-widest"
