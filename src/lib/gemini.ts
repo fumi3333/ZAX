@@ -104,7 +104,7 @@ export async function generateMatchReasoning(
     similarityPercent: number,
     growthScore: number
 ): Promise<string> {
-    if (!API_KEY) return `${partnerName}さんは${partnerBio} 共鳴度${similarityPercent}%、成長ポテンシャル${growthScore}%です。`;
+    if (!process.env.GOOGLE_API_KEY) return `${partnerName}さんは${partnerBio} 共鳴度${similarityPercent}%、成長ポテンシャル${growthScore}%です。`;
     const prompt = `
 あなたはマッチングアドバイザーです。以下の情報をもとに、なぜこの2人が相性が良いか、50文字以内の日本語で簡潔に説明してください。
 
@@ -138,7 +138,7 @@ export interface DeltaResult {
 }
 
 export async function calculateDeltaVector(feedback: string, currentVector: number[] = [50, 50, 50, 50, 50, 50], tags: string[] = []): Promise<DeltaResult> {
-    if (!API_KEY) {
+    if (!process.env.GOOGLE_API_KEY) {
         return {
             delta_vector: [5, -2, 10, 0, 5, 5],
             new_vector: currentVector.map((v, i) => Math.min(100, Math.max(0, v + (i % 2 === 0 ? 5 : -2)))),
@@ -179,7 +179,7 @@ export async function calculateDeltaVector(feedback: string, currentVector: numb
 
 /** インタビュー回答から「あなたの変化」サマリーを生成 */
 export async function generateReflectionSummary(interviewText: string): Promise<string> {
-    if (!API_KEY) return "あなたの振り返りが記録されました。";
+    if (!process.env.GOOGLE_API_KEY) return "あなたの振り返りが記録されました。";
     const prompt = `
 以下の振り返り回答をもとに、「あなたがどう変わったか」を50文字以内の日本語で要約してください。
 温かく、前向きな表現で。
