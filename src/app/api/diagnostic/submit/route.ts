@@ -26,7 +26,7 @@ function checkRateLimit(ip: string): boolean {
 
 export async function POST(req: Request) {
   try {
-    const { answers, freetext } = await req.json();
+    const { answers, freetext, email: submittedEmail } = await req.json();
 
     if (!answers || Object.keys(answers).length === 0) {
       return NextResponse.json({ success: false, error: 'No answers provided' }, { status: 400 });
@@ -74,6 +74,27 @@ export async function POST(req: Request) {
         }
     }
     if (user) userId = user.id;
+
+    // 2a. メールアドレスが提供されていたらユーザーに紐付けて保存
+    if (submittedEmail && submittedEmail.includes('@') && user) {
+      try {
+        const { hashEmail } = await import('@/lib/crypto');
+        const hashedEmail = hashEmail(submittedEmail);
+        // 既に別のユーザーが使っていなければ更新
+        const emailExists = await prisma.user.findUnique({ where: { email: hashedEmail } });
+        if (!emailExists) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { email: hashedEmail }
+          });
+        } else if (emailExists.id !== user.id) {
+          // 既存ユーザーがいれば、そちらのIDを使う（診断結果をそちらに紐付け）
+          userId = emailExists.id;
+        }
+      } catch (e) {
+        console.warn('Email save error (non-fatal):', e);
+      }
+    }
 
     // 2. Construct Analysis Prompt
     let profileText = "以下の性格診断（1-7尺度）の回答と自由記述に基づき、深い分析を行ってください。\n\n";

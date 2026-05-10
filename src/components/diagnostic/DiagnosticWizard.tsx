@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { questions } from '@/data/questions';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Mail } from 'lucide-react';
 
 export default function DiagnosticWizard() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -15,6 +15,9 @@ export default function DiagnosticWizard() {
   // Gemini API送信に対する同意フラグ（個人情報保護法 第21条対応）
   const [hasConsented, setHasConsented] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
+  // オプショナルなメールアドレス登録（変遷記録用）
+  const [email, setEmail] = useState('');
+
 
   const cardRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -109,7 +112,7 @@ export default function DiagnosticWizard() {
       const response = await fetch('/api/diagnostic/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers, freetext }),
+        body: JSON.stringify({ answers, freetext, email: email.trim() || undefined }),
       });
       const data = await response.json();
       if (response.ok && data.success) {
@@ -158,6 +161,22 @@ export default function DiagnosticWizard() {
               <li>メールアドレスはハッシュ化され、特定に使えない形式でのみ保管します。</li>
               <li>詳細は<a href="/privacy" className="text-slate-900 underline font-semibold" target="_blank">プライバシーポリシー</a>をご確認ください。</li>
             </ul>
+          </div>
+
+          {/* オプショナル メール入力 */}
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-bold text-slate-700">
+              <Mail className="w-4 h-4 text-slate-400" />
+              変遷を記録する（任意）
+            </label>
+            <input
+              type="email"
+              placeholder="メールアドレスを入力（省略可）"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-slate-800 focus:outline-none text-sm font-medium transition-colors bg-white"
+            />
+            <p className="text-xs text-slate-400">入力すると、マイページ（/mypage）で過去の診断レポートと変遷を閲覧できます。大学メール以外でもOK、パスワード不要。</p>
           </div>
 
           <label className="flex items-start gap-3 cursor-pointer group">
