@@ -21,7 +21,7 @@ export default function DiagnosticWizard() {
 
   // 1. 初回ロード: localStorageからデータを復旧
   useEffect(() => {
-    const saved = localStorage.getItem('zax_diagnostic_draft');
+    const saved = localStorage.getItem('zax_diagnostic_draft_v2');
     if (saved) {
       try {
         const { answers: sAnswers, freetext: sFreetext, index: sIndex } = JSON.parse(saved);
@@ -50,7 +50,7 @@ export default function DiagnosticWizard() {
   // 2. 変更時に自動保存
   useEffect(() => {
     const data = { answers, freetext, index: currentQuestionIndex };
-    localStorage.setItem('zax_diagnostic_draft', JSON.stringify(data));
+    localStorage.setItem('zax_diagnostic_draft_v2', JSON.stringify(data));
   }, [answers, freetext, currentQuestionIndex]);
 
   const totalQuestions = questions.length;
@@ -108,7 +108,7 @@ export default function DiagnosticWizard() {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        localStorage.removeItem('zax_diagnostic_draft'); // 成功したら下書きを消去
+        localStorage.removeItem('zax_diagnostic_draft_v2'); // 成功したら下書きを消去
         const resultData = { id: data.id, synthesis: data.synthesis, answers: data.answers };
         sessionStorage.setItem(`diagnostic_result_${data.id}`, JSON.stringify(resultData));
         window.location.href = `/diagnostic/result/${data.id}`;
@@ -233,7 +233,7 @@ export default function DiagnosticWizard() {
                   <textarea
                     value={freetext}
                     onChange={(e) => setFreetext(e.target.value)}
-                    placeholder="例：もっと論理的な思考を身につけたい。自分の直感をもっと信じて動けるようになりたい。"
+                    placeholder="例：友人関係でよくモヤモヤすること、家族関係での悩み、仕事で大切にしている価値観など、今のあなたの頭の中をそのまま書き出してみてください。"
                     className="w-full min-h-[150px] p-4 rounded-xl border-2 border-slate-200 focus:border-slate-800 focus:ring-0 transition-all resize-none bg-white text-slate-700 font-medium"
                   />
                   {answeredCount < totalQuestions ? (
