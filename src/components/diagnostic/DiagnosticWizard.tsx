@@ -152,11 +152,11 @@ export default function DiagnosticWizard() {
           </div>
 
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 text-sm text-slate-600 leading-relaxed space-y-3">
-            <p>本診断における回答内容および自由記述は、あなたの「取扱説明書（おみくじ）」生成とマッチングのためにシステムへ送信されます。</p>
+            <p>本診断における回答内容および自由記述は、あなたの「取扱説明書（おみくじ）」レポート生成のために使用されます。</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li><strong>本診断には、個人の価値観や仕事観に関する深い質問が含まれます。</strong></li>
-              <li>送信されるデータは分析およびマッチング目的のみに使用します。</li>
-              <li>メールアドレスはハッシュ化され、特定に使えない形式でのみ保管します。</li>
+              <li><strong>本診断には、個人の価値観や仕事観に関する質問が含まれます。</strong></li>
+              <li>送信されるデータは安全に分析され、レポート生成のみに使用されます。</li>
+              <li>診断完了後に、結果の保存やマッチングへの参加（任意）が可能です。</li>
               <li>詳細は<a href="/privacy" className="text-slate-900 underline font-semibold" target="_blank">プライバシーポリシー</a>をご確認ください。</li>
             </ul>
           </div>
