@@ -95,6 +95,8 @@ ${answersText ? `診断スコア傾向:\n${answersText}` : ''}
   } catch (error: any) {
     console.error('Report Generation Error:', error);
     // DEBUG: Return the error message directly to the frontend so we can see it
-    return NextResponse.json({ success: false, error: error.message || 'Internal Server Error' }, { status: 500 });
+    const hasKey = !!process.env.GOOGLE_API_KEY;
+    const errorMsg = error.message || String(error);
+    return NextResponse.json({ success: true, synthesis: `エラー詳細: ${errorMsg} (Vercel API Key Exists: ${hasKey})` });
   }
 }
