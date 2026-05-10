@@ -90,3 +90,14 @@
 - **背景**: 「変なデータが入っているなら完全に消してほしい」という要望への対応。
 - **実装内容**: DiagnosticWizard.tsx がロードされた瞬間に、過去の開発（プロトタイプ期）で使用されていた全ての古いキャッシュキー（zax-diagnostic-answers, zax-diagnostic-step, 旧 zax_diagnostic_draft）を localStorage.removeItem() で強制消去するパージ処理を組み込んだ。
 - これにより、本番環境にアクセスした全ユーザーのブラウザから、過去のテストデータやゴミデータが一掃される。
+
+### 追加アップデート: レガシーファイル・テストデータの完全削除
+- **背景**: システムの「Connection OS」としての整合性とクリーンさを保つため、以前の検討段階のテストデータや、禁止ワード「Resonance（共鳴）」等を含んでいた旧コンポーネントを一掃。
+- **削除ファイル**:
+  - src/app/input/（旧インプット画面、手動ベクトルスライダー。不要なResonance表現の温床となっていたため削除）
+  - src/components/EssenceInput.tsx, VectorTransformationVisual.tsx（旧画面の付属コンポーネント。現在の洗練された診断UI・レーダーチャートに代替されているため削除）
+  - dev.db（SQLite。Postgresに一本化したため削除）
+  - 	est_minimal.prisma, prisma/schema_minimal.prisma（初期の実験用Prisma定義。不要なため削除）
+  - 	est_diagnostic_submit.js（初期の疎通確認用テストコード。APIが安定稼働しているため削除）
+  - eslint-report.json（巨大なESLintのビルドゴミファイル。リポジトリ軽量化のため削除）
+- **メリット**: リポジトリが極めて軽量・ノイズレスになり、デバッグや今後の拡張の際に、古いゴミコードに悩まされることが100%なくなりました。
