@@ -282,7 +282,7 @@ export default function DiagnosticWizard() {
             disabled={isSubmitting || !allAnswered}
             className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-6 rounded-full font-bold shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
           >
-            {isSubmitting ? '分析中...' : (
+            {isSubmitting ? '分析中...' : !allAnswered ? '自由記述を入力してください（必須）' : (
               <>
                 診断結果を見る
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
