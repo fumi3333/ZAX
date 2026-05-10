@@ -19,14 +19,12 @@ if (!useRealDb) {
 try {
     if (!useRealDb) throw new Error("Using mock DB");
     const { PrismaClient } = require("@prisma/client");
-    
     let dbUrl = process.env.DATABASE_URL;
-    // Vercel等のサーバーレス環境でPostgreSQLのコネクションプーラー（PgBouncer等）を使う場合
-    // prepared statementの競合エラー (42P05) を防ぐために pgbouncer=true を付与する
-    if (dbUrl && !dbUrl.includes("pgbouncer=true") && !dbUrl.includes("localhost")) {
-        const sep = dbUrl.includes("?") ? "&" : "?";
-        dbUrl += `${sep}pgbouncer=true`;
+    // Supabaseのコネクションプーラー(6543)でtenantエラーが発生するバグを回避するため、ダイレクト接続(5432)に強制置換
+    if (dbUrl) {
+        dbUrl = dbUrl.replace(":6543", ":5432").replace("pgbouncer=true", "");
     }
+    // 既存のDATABASE_URLをそのまま使用する（置換済み）
 
     const globalForPrisma = global as unknown as { prisma: any };
     prisma = globalForPrisma.prisma || new PrismaClient({ 
