@@ -1,10 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const API_KEY = process.env.GOOGLE_API_KEY || "";
+// 実行時にAPIキーを取得するためのGetter関数を用意（ビルド時の空文字キャッシュを回避）
+export const getGenAI = () => new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
+export const getModel = () => getGenAI().getGenerativeModel({ model: "gemini-2.5-flash" });
+export const getEmbeddingModel = () => getGenAI().getGenerativeModel({ model: "text-embedding-004" });
 
-export const genAI = new GoogleGenerativeAI(API_KEY);
-export const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-export const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+// 下位互換性のためにプロキシオブジェクトとしてエクスポート（既存コードの修正を最小限に）
+export const genAI = new Proxy({}, { get: (t, p) => (getGenAI() as any)[p] }) as GoogleGenerativeAI;
+export const model = new Proxy({}, { get: (t, p) => (getModel() as any)[p] }) as ReturnType<typeof getModel>;
+export const embeddingModel = new Proxy({}, { get: (t, p) => (getEmbeddingModel() as any)[p] }) as ReturnType<typeof getEmbeddingModel>;
 
 export interface AnalysisResult {
     vector: number[]; // 6-dim radar chart stats (0-100) -> V_display
