@@ -94,6 +94,6 @@ ${answersText ? `診断スコア傾向:\n${answersText}` : ''}
 
   } catch (error: any) {
     console.error('Report Generation Error:', error);
-    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
