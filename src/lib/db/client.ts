@@ -22,9 +22,16 @@ try {
     let dbUrl = process.env.DATABASE_URL;
     // Supabaseのコネクションプーラー(6543)でtenantエラーが発生するバグを回避するため、ダイレクト接続(5432)に強制置換
     if (dbUrl) {
-        dbUrl = dbUrl.replace(":6543", ":5432").replace("pgbouncer=true", "");
+        try {
+            const urlObj = new URL(dbUrl);
+            urlObj.port = "5432";
+            urlObj.searchParams.delete("pgbouncer");
+            urlObj.username = "postgres"; // Supavisorテナント問題を回避するため強制的にpostgresにする
+            dbUrl = urlObj.toString();
+        } catch (e) {
+            console.warn("Invalid DB URL format", e);
+        }
     }
-    // 既存のDATABASE_URLをそのまま使用する（置換済み）
 
     const globalForPrisma = global as unknown as { prisma: any };
     prisma = globalForPrisma.prisma || new PrismaClient({ 
