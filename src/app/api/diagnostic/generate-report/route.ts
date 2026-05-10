@@ -1,19 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { model } from '@/lib/gemini';
-import { cookies } from 'next/headers';
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const sessionId = cookieStore.get('zax-session')?.value;
-
-    if (!sessionId) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { resultId } = await req.json();
     if (!resultId) {
       return NextResponse.json({ success: false, error: 'Result ID is required' }, { status: 400 });
@@ -28,23 +20,44 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Result not found' }, { status: 404 });
     }
 
-    // Security check: Make sure user is not a guest anymore
-    if (diagnosticResult.user.email.startsWith('guest_')) {
-      return NextResponse.json({ success: false, error: 'Registration required to generate full report' }, { status: 403 });
-    }
+    // Parse the 6D vector
+    let vector6d: number[] = [50, 50, 50, 50, 50, 50];
+    try {
+      const parsed = JSON.parse(diagnosticResult.vector);
+      if (Array.isArray(parsed)) vector6d = parsed;
+    } catch { /* use default */ }
 
-    const vector6d = JSON.parse(diagnosticResult.vector);
+    // Parse answers to include score tendencies in the prompt
+    let answersText = '';
+    try {
+      const answers = JSON.parse(diagnosticResult.answers as string);
+      const { questions } = await import('@/data/questions');
+      const categoryScores: Record<string, { sum: number; count: number }> = {};
+      for (const [idStr, score] of Object.entries(answers)) {
+        const q = questions.find(q => q.id === Number(idStr));
+        if (q) {
+          if (!categoryScores[q.categoryJa]) categoryScores[q.categoryJa] = { sum: 0, count: 0 };
+          categoryScores[q.categoryJa].sum += score as number;
+          categoryScores[q.categoryJa].count += 1;
+        }
+      }
+      for (const [cat, d] of Object.entries(categoryScores)) {
+        answersText += `- ${cat}: 平均 ${(d.sum / d.count).toFixed(1)}/7.0\n`;
+      }
+    } catch { /* skip if unavailable */ }
 
     const prompt = `
 あなたは人間の深層心理と運命を読み解く、鋭くも詩的なアナリスト（現代の神官）です。
 対象者の深層意識が以下の6次元の数値（0-100）で算出されました。
 
-論理性: ${vector6d[0]}
-直感力: ${vector6d[1]}
-共感性: ${vector6d[2]}
-意志力: ${vector6d[3]}
-創造性: ${vector6d[4]}
-柔軟性: ${vector6d[5]}
+生活基盤: ${vector6d[0]}
+社会意識: ${vector6d[1]}
+信頼構築: ${vector6d[2]}
+対話力: ${vector6d[3]}
+野心: ${vector6d[4]}
+寛容性: ${vector6d[5]}
+
+${answersText ? `診断スコア傾向:\n${answersText}` : ''}
 
 【指示】
 この数値を元に、無難な性格分析ではなく、相手の心を鋭く見透かすような「魂の取扱説明書（デジタルおみくじ）」を作成してください。
@@ -52,15 +65,12 @@ export async function POST(req: Request) {
 
 【御告げ（総評）】
 対象者が無意識に隠している本性や、現在のエネルギー状態を見抜く、鋭く詩的な文章。
-（例：あなたは論理の盾で直感を隠そうとしていますが、本質的には激しいカオスの波を持っています。）
 
 【待ち人（出会うべき人）】
-対象者が「欲しいと思っている人」ではなく、この数値を補完するために「本当に衝突・共鳴すべき相手」の描写。
-（例：あなたに必要なのは計画を褒める人ではなく、あなたの予定を突然破壊してくれる非常識な人間です。）
+対象者が「欲しいと思っている人」ではなく、この数値を補完するために「本当に衝突・知的摩擦を生むべき相手」の描写。
 
 【学問・行動（今のあなたへ）】
 大学生活や日常において、今のエネルギー状態を最大限に活かす（または守る）ための具体的なアクションや身を置くべき環境。
-（例：大勢でのブレストはあなたのエネルギーを削ります。今は1対1の深い対話か、完全に孤独な環境が吉です。）
 
 * 出力はプレーンテキストで行い、Markdownの記号（*や#）は一切使わないでください。
 * 各項目の見出し（【御告げ】など）はそのままテキストとして含めてください。
@@ -68,10 +78,13 @@ export async function POST(req: Request) {
 `;
 
     const result = await model.generateContent(prompt);
-    let fullReport = await result.response.text();
-    fullReport = fullReport.replace(/[*#]/g, '').trim(); // Fallback sanitation
+    let fullReport = (await result.response.text()).replace(/[*#]/g, '').trim();
 
-    // Update the DB with the long synthesis
+    if (!fullReport) {
+      return NextResponse.json({ success: false, error: 'Report generation returned empty' }, { status: 500 });
+    }
+
+    // Update the DB with the generated synthesis
     await prisma.diagnosticResult.update({
       where: { id: resultId },
       data: { synthesis: fullReport }

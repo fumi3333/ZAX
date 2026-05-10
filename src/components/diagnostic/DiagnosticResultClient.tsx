@@ -49,7 +49,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Step 1: Register email → unlock report
+  // Step 1: Register email → unlock report (and trigger generation if needed)
   const handleSaveEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes("@")) {
@@ -67,6 +67,26 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
       const json = await res.json();
       if (json.success) {
         setEmailSaved(true);
+        // レポートが未生成またはエラーの場合、自動で生成開始
+        const needsGeneration = !data?.synthesis ||
+          data.synthesis.includes("分析エラー") ||
+          data.synthesis.includes("分析中") ||
+          data.synthesis.trim() === "";
+        if (needsGeneration && data?.id) {
+          setIsGenerating(true);
+          try {
+            const rRes = await fetch("/api/diagnostic/generate-report", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ resultId: data.id }),
+            });
+            const rData = await rRes.json();
+            if (rData.success && rData.synthesis) {
+              setData(prev => prev ? { ...prev, synthesis: rData.synthesis } : prev);
+            }
+          } catch { /* silent fail — user can press regenerate */ }
+          finally { setIsGenerating(false); }
+        }
       } else {
         setEmailError(json.error || "登録に失敗しました");
       }
