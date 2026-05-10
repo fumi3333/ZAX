@@ -19,8 +19,13 @@ export default function DiagnosticWizard() {
   const cardRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 1. 初回ロード: localStorageからデータを復旧
+  // 1. 初回ロード: localStorageからデータを復旧＆旧世代データの完全パージ
   useEffect(() => {
+    // 古いテストデータ・レガシーキャッシュを強制消去
+    localStorage.removeItem('zax-diagnostic-answers');
+    localStorage.removeItem('zax-diagnostic-step');
+    localStorage.removeItem('zax_diagnostic_draft');
+
     const saved = localStorage.getItem('zax_diagnostic_draft_v2');
     if (saved) {
       try {
