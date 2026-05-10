@@ -20,17 +20,11 @@ try {
     if (!useRealDb) throw new Error("Using mock DB");
     const { PrismaClient } = require("@prisma/client");
     let dbUrl = process.env.DATABASE_URL;
-    // Supabaseのコネクションプーラー(6543)でtenantエラーが発生するバグを回避するため、ダイレクト接続(5432)に強制置換
-    if (dbUrl) {
-        try {
-            const urlObj = new URL(dbUrl);
-            urlObj.port = "5432";
-            urlObj.searchParams.delete("pgbouncer");
-            urlObj.username = "postgres"; // Supavisorテナント問題を回避するため強制的にpostgresにする
-            dbUrl = urlObj.toString();
-        } catch (e) {
-            console.warn("Invalid DB URL format", e);
-        }
+    // Vercel等のサーバーレス環境でPostgreSQLのコネクションプーラー（PgBouncer等）を使う場合
+    // prepared statementの競合エラー (42P05) を防ぐために pgbouncer=true を付与する
+    if (dbUrl && !dbUrl.includes("pgbouncer=true") && !dbUrl.includes("localhost")) {
+        const sep = dbUrl.includes("?") ? "&" : "?";
+        dbUrl += `${sep}pgbouncer=true`;
     }
 
     const globalForPrisma = global as unknown as { prisma: any };
