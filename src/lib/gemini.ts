@@ -18,7 +18,7 @@ export interface AnalysisResult {
 }
 
 export async function analyzeEssence(inputs: string[], biases: number[] = [50, 50, 50], purpose: string = "general"): Promise<AnalysisResult> {
-    if (!API_KEY) {
+    if (!process.env.GOOGLE_API_KEY) {
         console.warn("GOOGLE_API_KEY not found. Using mock data.");
         return {
             vector: [80, 60, 90, 45, 70, 85],
