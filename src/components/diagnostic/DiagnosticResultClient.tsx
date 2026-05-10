@@ -316,10 +316,9 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
             {/* ─── STEP 2: マッチング登録 ─── */}
             <section className="space-y-4">
               <div className="text-center space-y-1">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Next Step</span>
                 <h2 className="text-2xl font-black text-slate-900">マッチングに参加する</h2>
-                <p className="text-slate-500 text-sm">ベクトルが近い人と繋がりましょう。</p>
               </div>
+
 
               {/* キャンパスマッチ（大学生向け） */}
               <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
