@@ -61,30 +61,62 @@ ${answersText ? `診断スコア傾向:\n${answersText}` : ''}
 
 【指示】
 この数値を元に、無難な性格分析ではなく、相手の心を鋭く見透かすような「魂の取扱説明書（デジタルおみくじ）」を作成してください。
-以下の3つの項目に分けて記述してください。
+以下の3つのセクションを、正確にJSONフォーマットで出力してください。
 
-【御告げ（総評）】
-対象者が無意識に隠している本性や、現在のエネルギー状態を見抜く、鋭く詩的な文章。
+セクション1「otsuge」（御告げ・総評）:
+対象者が無意識に隠している本性や、現在のエネルギー状態を見抜く、鋭く詩的な文章。150〜200文字。
 
-【待ち人（出会うべき人）】
-対象者が「欲しいと思っている人」ではなく、この数値を補完するために「本当に衝突・知的摩擦を生むべき相手」の描写。
+セクション2「machihito」（待ち人・出会うべき人）:
+対象者が「欲しいと思っている人」ではなく、この数値を補完するために「本当に衝突・知的摩擦を生むべき相手」の描写。100〜150文字。
 
-【学問・行動（今のあなたへ）】
-大学生活や日常において、今のエネルギー状態を最大限に活かす（または守る）ための具体的なアクションや身を置くべき環境。
+セクション3「koudou」（学問・行動・今のあなたへ）:
+大学生活や日常において、今のエネルギー状態を最大限に活かす（または守る）ための具体的なアクションや身を置くべき環境。100〜150文字。
 
-* 出力はプレーンテキストで行い、Markdownの記号（*や#）は一切使わないでください。
-* 各項目の見出し（【御告げ】など）はそのままテキストとして含めてください。
-* 人工知能っぽさや、一般的な性格診断のような解説は排除し、対象者個人に宛てた手紙や御告げのような、重みのあるトーンで記述してください。
+出力ルール:
+- 必ずJSONのみを出力してください。余計な説明文や前置き、コードブロックは一切不要。
+- MarkdownのアスタリスクやシャープやHTMLタグは一切含めないでください。
+- 角括弧や【】などの記号もテキスト内に含めないでください。
+- 人工知能っぽさや一般的な性格診断のような解説は排除し、対象者個人に宛てた手紙や御告げのような重みのあるトーンで。
+
+出力形式（このフォーマット厳守）:
+{"otsuge": "御告げのテキスト", "machihito": "待ち人のテキスト", "koudou": "行動のテキスト"}
 `;
 
     const result = await model.generateContent(prompt);
-    let fullReport = (await result.response.text()).replace(/[*#]/g, '').trim();
+    let rawText = (await result.response.text()).trim();
+
+    // Strip any markdown code fences and stray symbols
+    rawText = rawText
+      .replace(/```json\s*/gi, '')
+      .replace(/```\s*/g, '')
+      .replace(/[*#]/g, '')
+      .trim();
+
+    // Try to parse as structured JSON
+    let structured: { otsuge: string; machihito: string; koudou: string } | null = null;
+    try {
+      const parsed = JSON.parse(rawText);
+      if (parsed.otsuge && parsed.machihito && parsed.koudou) {
+        structured = {
+          otsuge: parsed.otsuge.replace(/[*#\[\]【】]/g, '').trim(),
+          machihito: parsed.machihito.replace(/[*#\[\]【】]/g, '').trim(),
+          koudou: parsed.koudou.replace(/[*#\[\]【】]/g, '').trim(),
+        };
+      }
+    } catch { /* fall through to plain text */ }
+
+    let fullReport: string;
+    if (structured) {
+      fullReport = JSON.stringify(structured);
+    } else {
+      // Fallback: store as plain text with markdown stripped
+      fullReport = rawText.replace(/[*#\[\]【】]/g, '').trim();
+    }
 
     if (!fullReport) {
       return NextResponse.json({ success: false, error: 'Report generation returned empty' }, { status: 500 });
     }
 
-    // Update the DB with the generated synthesis
     await prisma.diagnosticResult.update({
       where: { id: resultId },
       data: { synthesis: fullReport }
