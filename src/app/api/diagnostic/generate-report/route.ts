@@ -85,11 +85,15 @@ ${answersText ? `診断スコア傾向:\n${answersText}` : ''}
     const result = await model.generateContent(prompt);
     let rawText = (await result.response.text()).trim();
 
-    // Strip any markdown code fences and stray symbols
+    // Strip ALL markdown and formatting symbols aggressively
     rawText = rawText
       .replace(/```json\s*/gi, '')
       .replace(/```\s*/g, '')
-      .replace(/[*#]/g, '')
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/#{1,6}\s/g, '')
+      .replace(/#/g, '')
+      .replace(/_{1,2}/g, '')
       .trim();
 
     // Try to parse as structured JSON
