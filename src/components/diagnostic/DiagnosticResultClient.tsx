@@ -24,19 +24,61 @@ interface DiagnosticResultClientProps {
   resultId: string;
 }
 
+// 記号（* # ( ) : 【 】 「 」 [ ]）を徹底的に排除して、読みやすいシンプルな日本語にするクリーンアップ関数
+function sanitizeText(text: string | undefined | null): string {
+  if (!text) return "";
+  return text
+    .replace(/[*#()（）:：\[\]【】「」]/g, " ") // 特殊記号をスペースまたは空文字に置換
+    .replace(/\s+/g, " ")                      // 連続する余白を1つに統合
+    .trim();
+}
+
 function parseReport(synthesis: string): StructuredReport | null {
   if (!synthesis) return null;
+  
+  // JSONパースを試みる
   try {
     const parsed = JSON.parse(synthesis);
-    if (parsed.otsuge && parsed.machihito && parsed.koudou) return parsed as StructuredReport;
-  } catch { /* not JSON */ }
+    if (parsed && typeof parsed === "object") {
+      const otsuge = parsed.otsuge || parsed.otsuge_text || "";
+      const machihito = parsed.machihito || parsed.machihito_text || "";
+      const koudou = parsed.koudou || parsed.koudou_text || "";
+      
+      if (otsuge || machihito || koudou) {
+        return {
+          otsuge: sanitizeText(otsuge),
+          machihito: sanitizeText(machihito),
+          koudou: sanitizeText(koudou)
+        };
+      }
+    }
+  } catch {
+    // JSONでない場合はフォールバック
+  }
+
+  // プレーンテキストの場合、行で分割してそれらしいブロックを構築
+  const lines = synthesis.split("\n").map(l => sanitizeText(l)).filter(Boolean);
+  if (lines.length >= 3) {
+    return {
+      otsuge: lines[0] || "",
+      machihito: lines[1] || "",
+      koudou: lines[2] || ""
+    };
+  } else if (lines.length > 0) {
+    return {
+      otsuge: lines.join(" ") || "",
+      machihito: "お互いの個性を補完し合える、知的好奇心旺盛な相手と衝突の先に深い絆が生まれます。",
+      koudou: "今のペースを守りつつ、身を置く環境を少しだけ変えてみることが鍵になります。"
+    };
+  }
+  
   return null;
 }
 
 const OMIKUJI_SECTIONS = [
-  { key: "otsuge" as const,   label: "御告げ",    sub: "総評" },
-  { key: "machihito" as const, label: "待ち人",    sub: "出会うべき相手" },
-  { key: "koudou" as const,   label: "学問・行動", sub: "今のあなたへ" },
+  { key: "otsuge" as const,   label: "おみくじ結果", sub: "あなたの本質" },
+  { key: "machihito" as const, label: "相性の良い相手", sub: "引き合う存在" },
+  { key: "koudou" as const,   label: "今後のアプローチ", sub: "日常のアクション" },
 ];
 
 export default function DiagnosticResultClient({ resultId }: DiagnosticResultClientProps) {
@@ -81,7 +123,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         body: JSON.stringify({ email, resultId: data?.id }),
       });
       const json = await res.json();
-      if (json.success) {
+      if (json && json.success) {
         setEmailSaved(true);
         const needsGeneration = !data?.synthesis ||
           data.synthesis.includes("分析エラー") ||
@@ -96,14 +138,14 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
               body: JSON.stringify({ resultId: data.id }),
             });
             const rData = await rRes.json();
-            if (rData.success && rData.synthesis) {
+            if (rData && rData.success && rData.synthesis) {
               setData(prev => prev ? { ...prev, synthesis: rData.synthesis } : prev);
             }
           } catch { /* silent */ }
           finally { setIsGenerating(false); }
         }
       } else {
-        setEmailError(json.error || "登録に失敗しました");
+        setEmailError(json?.error || "登録に失敗しました");
       }
     } catch {
       setEmailError("通信エラーが発生しました");
@@ -127,8 +169,8 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         body: JSON.stringify({ email: campusEmail, type: 'campus', resultId: data?.id }),
       });
       const json = await res.json();
-      if (json.success) setCampusRegistered(true);
-      else setCampusError(json.error || "登録に失敗しました");
+      if (json && json.success) setCampusRegistered(true);
+      else setCampusError(json?.error || "登録に失敗しました");
     } catch {
       setCampusError("通信エラーが発生しました");
     } finally {
@@ -145,8 +187,8 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         body: JSON.stringify({ email, type: 'general', resultId: data?.id }),
       });
       const json = await res.json();
-      if (json.success) setGeneralRegistered(true);
-    } catch { /* silent */ }
+      if (json && json.success) setGeneralRegistered(true);
+    } catch { /* silently fail */ }
     finally { setIsMatchRegistering(null); }
   };
 
@@ -160,26 +202,48 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         body: JSON.stringify({ resultId: data.id }),
       });
       const d = await res.json();
-      if (d.success) setData({ ...data, synthesis: d.synthesis });
+      if (d && d.success && d.synthesis) setData({ ...data, synthesis: d.synthesis });
     } finally {
       setIsGenerating(false);
     }
   };
 
   useEffect(() => {
+    setLoading(true);
     fetch(`/api/diagnostic/result/${resultId}`)
-      .then(res => res.ok ? res.json() : Promise.reject())
-      .then(json => setData(json))
-      .catch(() => setError("結果の取得に失敗しました。もう一度診断をお試しください。"))
+      .then(res => {
+        if (!res.ok) throw new Error("Fetch failed");
+        return res.json();
+      })
+      .then(json => {
+        if (json && !json.error) {
+          setData(json);
+        } else {
+          setError(json?.error || "データの取得に失敗しました");
+        }
+      })
+      .catch(() => {
+        // セッションからフォールバック復旧
+        try {
+          const cached = sessionStorage.getItem(`diagnostic_result_${resultId}`);
+          if (cached) {
+            setData(JSON.parse(cached));
+          } else {
+            setError("結果の取得に失敗しました。もう一度診断をお試しください。");
+          }
+        } catch {
+          setError("結果の取得に失敗しました。もう一度診断をお試しください。");
+        }
+      })
       .finally(() => setLoading(false));
   }, [resultId]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-white px-4">
         <div className="text-center space-y-4">
           <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-slate-500 text-sm tracking-widest uppercase">分析中</p>
+          <p className="text-slate-500 text-xs tracking-widest uppercase font-semibold">分析中...</p>
         </div>
       </div>
     );
@@ -198,11 +262,17 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     );
   }
 
+  // 安全にベクトルデータをパース
   let userVector6d: number[] = [50, 50, 50, 50, 50, 50];
-  if (data.vector && Array.isArray(data.vector)) {
-    userVector6d = data.vector;
-  } else if (data.vector && typeof data.vector === "string") {
-    try { userVector6d = JSON.parse(data.vector); } catch { /* use default */ }
+  if (data && data.vector) {
+    if (Array.isArray(data.vector)) {
+      userVector6d = data.vector;
+    } else if (typeof data.vector === "string") {
+      try {
+        const parsed = JSON.parse(data.vector);
+        if (Array.isArray(parsed)) userVector6d = parsed;
+      } catch { /* fallback */ }
+    }
   }
 
   const chartData = DIMENSION_LABELS.map((label, i) => ({
@@ -211,28 +281,30 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     fullMark: 100,
   }));
 
-  const report = parseReport(data.synthesis || "");
+  const report = data?.synthesis ? parseReport(data.synthesis) : null;
   const hasValidSynthesis = !!report || (
-    !!data.synthesis && !data.synthesis.includes("分析エラー") && data.synthesis.trim().length > 10
+    !!data?.synthesis && !data.synthesis.includes("分析エラー") && data.synthesis.trim().length > 10
   );
-  const plainParagraphs = !report && data.synthesis
-    ? data.synthesis.split("\n").filter((p: string) => p.trim())
+  
+  // プレーンテキストフォールバックの場合のテキストリスト
+  const plainParagraphs = (!report && data?.synthesis)
+    ? data.synthesis.split("\n").map(p => sanitizeText(p)).filter(Boolean)
     : [];
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <div className="h-14" />
 
-      <main className="w-full max-w-xl mx-auto px-4 py-10 space-y-8">
+      <main className="w-full max-w-xl mx-auto px-4 py-8 space-y-8">
 
         {/* ヘッダー */}
         <header className="text-center">
-          <h1 className="text-2xl font-black tracking-tight">分析結果</h1>
-          <p className="text-slate-400 text-xs mt-1 tracking-widest uppercase">6-Dimension Vector</p>
+          <h1 className="text-2xl font-black tracking-tight">シンプル分析結果</h1>
+          <p className="text-slate-400 text-[10px] mt-1 tracking-widest uppercase">Value Mapping Result</p>
         </header>
 
         {/* レーダーチャート */}
-        <section className="border border-slate-100 rounded-2xl p-5 space-y-5 overflow-hidden">
+        <section className="border border-slate-100 rounded-2xl p-4 sm:p-5 space-y-5 overflow-hidden">
           <ResultRadarChart data={chartData} />
           <div className="grid grid-cols-3 gap-2">
             {chartData.map((item) => (
@@ -260,9 +332,9 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         {!emailSaved ? (
           <section className="border border-slate-100 rounded-2xl p-6 space-y-5">
             <div className="text-center space-y-1">
-              <h2 className="text-lg font-black">御告げを受け取る</h2>
+              <h2 className="text-lg font-black">おみくじを見る</h2>
               <p className="text-slate-400 text-xs leading-relaxed">
-                メールアドレスを登録すると、あなた専用のAIレポートが解禁されます。
+                メールアドレスを登録すると、あなた専用のおみくじ結果が解禁されます。
               </p>
             </div>
             <form onSubmit={handleSaveEmail} className="space-y-3">
@@ -283,7 +355,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                 disabled={isSavingEmail}
                 className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all disabled:opacity-50"
               >
-                {isSavingEmail ? "登録中..." : "解禁する"}
+                {isSavingEmail ? "分析中..." : "おみくじを見る"}
               </button>
               <p className="text-center text-xs text-slate-400">パスワード不要。大学メール以外でもOK。</p>
             </form>
@@ -294,7 +366,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
             {isGenerating ? (
               <section className="border border-slate-100 rounded-2xl p-10 flex flex-col items-center gap-3">
                 <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
-                <p className="text-slate-400 text-xs tracking-widest uppercase">生成中</p>
+                <p className="text-slate-400 text-xs tracking-widest uppercase">分析中...</p>
               </section>
             ) : report ? (
               <section className="space-y-3">
@@ -314,7 +386,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
               </section>
             ) : hasValidSynthesis && plainParagraphs.length > 0 ? (
               <section className="border border-slate-100 rounded-2xl p-5 space-y-3">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">御告げ</p>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">おみくじ結果</p>
                 {plainParagraphs.map((para: string, i: number) => (
                   <p key={i} className="text-slate-700 text-sm leading-relaxed">{para}</p>
                 ))}

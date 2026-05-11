@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Radar,
   RadarChart,
@@ -18,6 +19,21 @@ interface ResultRadarChartProps {
 }
 
 export default function ResultRadarChart({ data }: ResultRadarChartProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // クライアントサイドでのマウント前はスケルトンを表示してHydration Errorを防ぐ
+    return (
+      <div className="w-full h-[260px] sm:h-[340px] flex items-center justify-center bg-slate-50/50 rounded-2xl animate-pulse">
+        <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Chart Loading...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-[260px] sm:h-[340px]">
       <ResponsiveContainer width="100%" height="100%">

@@ -101,10 +101,11 @@ ${answersText ? `診断スコア傾向:\n${answersText}` : ''}
     try {
       const parsed = JSON.parse(rawText);
       if (parsed.otsuge && parsed.machihito && parsed.koudou) {
+        const cleanPattern = /[*#\[\]【】()（）:：]/g;
         structured = {
-          otsuge: parsed.otsuge.replace(/[*#\[\]【】]/g, '').trim(),
-          machihito: parsed.machihito.replace(/[*#\[\]【】]/g, '').trim(),
-          koudou: parsed.koudou.replace(/[*#\[\]【】]/g, '').trim(),
+          otsuge: parsed.otsuge.replace(cleanPattern, ' ').replace(/\s+/g, ' ').trim(),
+          machihito: parsed.machihito.replace(cleanPattern, ' ').replace(/\s+/g, ' ').trim(),
+          koudou: parsed.koudou.replace(cleanPattern, ' ').replace(/\s+/g, ' ').trim(),
         };
       }
     } catch { /* fall through to plain text */ }
@@ -113,8 +114,8 @@ ${answersText ? `診断スコア傾向:\n${answersText}` : ''}
     if (structured) {
       fullReport = JSON.stringify(structured);
     } else {
-      // Fallback: store as plain text with markdown stripped
-      fullReport = rawText.replace(/[*#\[\]【】]/g, '').trim();
+      // Fallback: store as plain text with markdown and symbols stripped
+      fullReport = rawText.replace(/[*#\[\]【】()（）:：]/g, ' ').replace(/\s+/g, ' ').trim();
     }
 
     if (!fullReport) {
