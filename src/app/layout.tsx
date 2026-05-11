@@ -37,9 +37,10 @@ export default function RootLayout({
       <head>
         <meta name="color-scheme" content="only light" />
         <meta name="theme-color" content="#ffffff" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body
-        className={`${inter.variable} font-sans antialiased bg-slate-50`}
+        className={`${inter.variable} font-sans antialiased bg-slate-50 overflow-x-hidden`}
         suppressHydrationWarning
       >
 

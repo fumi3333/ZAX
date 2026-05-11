@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 const DIMENSION_LABELS = ["生活基盤", "社会意識", "信頼構築", "対話力", "野心", "寛容性"];
 import ResultRadarChart from "./ResultRadarChart";
 import Link from "next/link";
-import { Loader2, BookOpen, Copy, CheckCircle2, Mail, GraduationCap, Users } from "lucide-react";
+import { Loader2, Copy, CheckCircle2, Mail, GraduationCap, Users } from "lucide-react";
 
 interface ResultData {
   id: string;
@@ -32,6 +32,12 @@ function parseReport(synthesis: string): StructuredReport | null {
   } catch { /* not JSON */ }
   return null;
 }
+
+const OMIKUJI_SECTIONS = [
+  { key: "otsuge" as const,   label: "御告げ",    sub: "総評" },
+  { key: "machihito" as const, label: "待ち人",    sub: "出会うべき相手" },
+  { key: "koudou" as const,   label: "学問・行動", sub: "今のあなたへ" },
+];
 
 export default function DiagnosticResultClient({ resultId }: DiagnosticResultClientProps) {
   const [data, setData] = useState<ResultData | null>(null);
@@ -93,7 +99,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
             if (rData.success && rData.synthesis) {
               setData(prev => prev ? { ...prev, synthesis: rData.synthesis } : prev);
             }
-          } catch { /* silent fail */ }
+          } catch { /* silent */ }
           finally { setIsGenerating(false); }
         }
       } else {
@@ -140,7 +146,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
       });
       const json = await res.json();
       if (json.success) setGeneralRegistered(true);
-    } catch { /* silently fail */ }
+    } catch { /* silent */ }
     finally { setIsMatchRegistering(null); }
   };
 
@@ -154,9 +160,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         body: JSON.stringify({ resultId: data.id }),
       });
       const d = await res.json();
-      if (d.success) {
-        setData({ ...data, synthesis: d.synthesis });
-      }
+      if (d.success) setData({ ...data, synthesis: d.synthesis });
     } finally {
       setIsGenerating(false);
     }
@@ -164,18 +168,18 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
   useEffect(() => {
     fetch(`/api/diagnostic/result/${resultId}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Not found"))))
-      .then((json) => setData(json))
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(json => setData(json))
       .catch(() => setError("結果の取得に失敗しました。もう一度診断をお試しください。"))
       .finally(() => setLoading(false));
   }, [resultId]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-slate-600 font-semibold">分析中...</p>
+          <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-500 text-sm tracking-widest uppercase">分析中</p>
         </div>
       </div>
     );
@@ -183,10 +187,10 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-md space-y-6">
-          <p className="text-slate-600">{error || "結果が見つかりませんでした"}</p>
-          <Link href="/diagnostic" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800">
+      <div className="min-h-screen flex items-center justify-center bg-white px-6">
+        <div className="text-center space-y-6 max-w-sm">
+          <p className="text-slate-600 text-sm">{error || "結果が見つかりませんでした"}</p>
+          <Link href="/diagnostic" className="inline-block px-6 py-3 bg-slate-900 text-white text-sm font-bold rounded-lg">
             もう一度診断する
           </Link>
         </div>
@@ -194,7 +198,6 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     );
   }
 
-  // Parse vector
   let userVector6d: number[] = [50, 50, 50, 50, 50, 50];
   if (data.vector && Array.isArray(data.vector)) {
     userVector6d = data.vector;
@@ -208,223 +211,198 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     fullMark: 100,
   }));
 
-  const structuredReport = parseReport(data.synthesis || "");
-  const hasValidSynthesis = !!structuredReport || (
-    data.synthesis &&
-    !data.synthesis.includes("分析エラー") &&
-    data.synthesis.trim().length > 10
+  const report = parseReport(data.synthesis || "");
+  const hasValidSynthesis = !!report || (
+    !!data.synthesis && !data.synthesis.includes("分析エラー") && data.synthesis.trim().length > 10
   );
-
-  // Fallback plain-text paragraphs (for legacy/non-JSON synthesis)
-  const plainParagraphs = (!structuredReport && data.synthesis)
-    ? data.synthesis.split("\n").filter((p: string) => p.trim() !== "")
+  const plainParagraphs = !report && data.synthesis
+    ? data.synthesis.split("\n").filter((p: string) => p.trim())
     : [];
 
-  const omikujiCards = structuredReport ? [
-    { label: "御告げ", emoji: "⛩", text: structuredReport.otsuge },
-    { label: "待ち人", emoji: "🌙", text: structuredReport.machihito },
-    { label: "学問・行動", emoji: "🔥", text: structuredReport.koudou },
-  ] : [];
-
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      <div className="h-16" />
+    <div className="min-h-screen bg-white text-slate-900">
+      <div className="h-14" />
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 py-10 space-y-10">
+      <main className="w-full max-w-xl mx-auto px-4 py-10 space-y-8">
 
         {/* ヘッダー */}
-        <section className="text-center space-y-1">
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">分析結果</h1>
-          <p className="text-slate-400 text-sm">6次元ベクトルによる価値観マッピング</p>
-        </section>
+        <header className="text-center">
+          <h1 className="text-2xl font-black tracking-tight">分析結果</h1>
+          <p className="text-slate-400 text-xs mt-1 tracking-widest uppercase">6-Dimension Vector</p>
+        </header>
 
         {/* レーダーチャート */}
-        <section className="bg-white rounded-2xl p-5 sm:p-8 shadow border border-slate-200">
-          <h2 className="text-xs font-bold mb-6 text-center text-slate-400 uppercase tracking-widest">特性ベクトル</h2>
-          <div className="flex justify-center">
-            <div className="w-full max-w-xs sm:max-w-sm">
-              <ResultRadarChart data={chartData} />
-            </div>
-          </div>
-          <div className="mt-6 grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
+        <section className="border border-slate-100 rounded-2xl p-5 space-y-5 overflow-hidden">
+          <ResultRadarChart data={chartData} />
+          <div className="grid grid-cols-3 gap-2">
             {chartData.map((item) => (
-              <div key={item.subject} className="p-2 bg-slate-50 rounded-xl">
-                <div className="text-xs text-slate-500 font-bold mb-1">{item.subject}</div>
-                <div className="text-xl font-black text-slate-900">{item.A}</div>
+              <div key={item.subject} className="text-center py-2 px-1 bg-slate-50 rounded-lg">
+                <div className="text-[10px] text-slate-400 font-bold mb-0.5">{item.subject}</div>
+                <div className="text-lg font-black text-slate-900">{item.A}</div>
               </div>
             ))}
           </div>
-          <div className="mt-6 flex justify-center border-t border-slate-100 pt-5">
+          <div className="flex justify-center pt-1 border-t border-slate-100">
             <button
               onClick={handleCopy}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300 border-2 ${
-                copied ? "bg-slate-900 text-white border-slate-900" : "bg-transparent text-slate-900 border-slate-900 hover:bg-slate-50"
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold border transition-all ${
+                copied
+                  ? "bg-slate-900 text-white border-slate-900"
+                  : "text-slate-500 border-slate-200 hover:border-slate-900 hover:text-slate-900"
               }`}
             >
-              {copied ? <><CheckCircle2 className="w-4 h-4" />コピー完了</> : <><Copy className="w-4 h-4" />結果URLをコピー</>}
+              {copied ? <><CheckCircle2 className="w-3.5 h-3.5" />コピー完了</> : <><Copy className="w-3.5 h-3.5" />URLをコピー</>}
             </button>
           </div>
         </section>
 
         {/* ─── メール登録ゲート ─── */}
         {!emailSaved ? (
-          <section className="bg-white rounded-2xl p-6 sm:p-8 shadow border border-slate-200 text-center space-y-6">
-            <div className="space-y-3">
-              <div className="text-4xl">⛩</div>
-              <h3 className="text-xl font-black text-slate-900">おみくじを引く</h3>
-              <p className="text-slate-500 text-sm leading-relaxed max-w-xs mx-auto">
-                メールアドレスを登録すると、あなた専用のAI御告げが解禁されます。
+          <section className="border border-slate-100 rounded-2xl p-6 space-y-5">
+            <div className="text-center space-y-1">
+              <h2 className="text-lg font-black">御告げを受け取る</h2>
+              <p className="text-slate-400 text-xs leading-relaxed">
+                メールアドレスを登録すると、あなた専用のAIレポートが解禁されます。
               </p>
             </div>
-            <form onSubmit={handleSaveEmail} className="flex flex-col gap-3 max-w-sm mx-auto w-full">
+            <form onSubmit={handleSaveEmail} className="space-y-3">
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
                 <input
                   type="email"
                   placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-4 py-3.5 rounded-xl border-2 border-slate-200 focus:border-slate-900 focus:outline-none text-sm font-medium transition-colors bg-white"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-slate-900 focus:outline-none text-sm transition-colors bg-white"
                   required
                 />
               </div>
-              {emailError && <p className="text-red-500 text-xs font-bold">{emailError}</p>}
+              {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
               <button
                 type="submit"
                 disabled={isSavingEmail}
-                className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all disabled:opacity-50 shadow-lg"
+                className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all disabled:opacity-50"
               >
-                {isSavingEmail ? "登録中..." : "御告げを受け取る →"}
+                {isSavingEmail ? "登録中..." : "解禁する"}
               </button>
-              <p className="text-xs text-slate-400">大学メール以外でもOK。パスワード不要。</p>
+              <p className="text-center text-xs text-slate-400">パスワード不要。大学メール以外でもOK。</p>
             </form>
           </section>
         ) : (
           <>
-            {/* ─── おみくじカード（3枚） ─── */}
+            {/* ─── おみくじ ─── */}
             {isGenerating ? (
-              <section className="bg-white rounded-2xl p-10 shadow border border-slate-200 flex flex-col items-center gap-4">
-                <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-                <p className="text-slate-500 font-medium text-sm">御告げを生成中...</p>
+              <section className="border border-slate-100 rounded-2xl p-10 flex flex-col items-center gap-3">
+                <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
+                <p className="text-slate-400 text-xs tracking-widest uppercase">生成中</p>
               </section>
-            ) : hasValidSynthesis && omikujiCards.length > 0 ? (
-              <section className="space-y-4">
-                <h2 className="text-xs font-bold text-center text-slate-400 uppercase tracking-widest">デジタルおみくじ</h2>
-                {omikujiCards.map((card) => (
-                  <div key={card.label} className="bg-white rounded-2xl p-6 shadow border border-slate-200 space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{card.emoji}</span>
-                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{card.label}</span>
+            ) : report ? (
+              <section className="space-y-3">
+                <p className="text-xs text-slate-400 text-center tracking-widest uppercase">Digital Omikuji</p>
+                {OMIKUJI_SECTIONS.map((sec, idx) => (
+                  <div key={sec.key} className="border border-slate-100 rounded-2xl p-5 space-y-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      <span className="text-sm font-black text-slate-900">{sec.label}</span>
+                      <span className="text-[10px] text-slate-400">{sec.sub}</span>
                     </div>
-                    <p className="text-slate-700 text-base leading-relaxed">{card.text}</p>
+                    <p className="text-slate-700 text-sm leading-relaxed pl-6">{report[sec.key]}</p>
                   </div>
                 ))}
               </section>
             ) : hasValidSynthesis && plainParagraphs.length > 0 ? (
-              /* 旧フォーマット（プレーンテキスト）フォールバック */
-              <section className="bg-white rounded-2xl p-6 sm:p-8 shadow border border-slate-200 space-y-5">
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                  <span className="text-2xl">⛩</span>
-                  <h2 className="text-xl font-black text-slate-900">御告げ</h2>
-                </div>
-                <div className="space-y-4 text-base leading-relaxed text-slate-700">
-                  {plainParagraphs.map((para: string, i: number) => (
-                    <p key={i}>{para}</p>
-                  ))}
-                </div>
+              <section className="border border-slate-100 rounded-2xl p-5 space-y-3">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">御告げ</p>
+                {plainParagraphs.map((para: string, i: number) => (
+                  <p key={i} className="text-slate-700 text-sm leading-relaxed">{para}</p>
+                ))}
               </section>
             ) : (
-              <section className="bg-white rounded-2xl p-8 shadow border border-slate-200 flex flex-col items-center gap-4">
-                <p className="text-slate-500 font-medium text-sm">御告げの生成中にエラーが発生しました。</p>
-                <button onClick={handleRegenerate} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800">
+              <section className="border border-slate-100 rounded-2xl p-8 flex flex-col items-center gap-4">
+                <p className="text-slate-400 text-sm">生成に失敗しました</p>
+                <button
+                  onClick={handleRegenerate}
+                  className="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800"
+                >
                   もう一度引き直す
                 </button>
               </section>
             )}
 
-            {/* ─── 詳細レポートリンク（保存完了通知）─── */}
-            <section className="text-center py-2">
-              <p className="text-xs text-slate-400">
-                このレポートは保存されました。
-                <a href="/mypage" className="text-slate-900 font-bold underline ml-1">マイページ</a>
-                からいつでも見返せます。
-              </p>
-            </section>
+            {/* 保存通知 */}
+            <p className="text-center text-xs text-slate-400">
+              このレポートは保存されました。
+              <a href="/mypage" className="text-slate-900 font-bold underline ml-1">マイページ</a>
+              からいつでも確認できます。
+            </p>
 
-            {/* ─── マッチング登録 ─── */}
-            <section className="space-y-4">
-              <div className="text-center">
-                <h2 className="text-xl font-black text-slate-900">マッチングに参加する</h2>
-              </div>
+            {/* ─── マッチング ─── */}
+            <section className="space-y-3">
+              <h2 className="text-center text-sm font-black text-slate-900">マッチングに参加する</h2>
 
               {/* キャンパスマッチ */}
-              <div className="bg-white rounded-2xl p-5 sm:p-6 shadow border border-slate-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shrink-0">
-                    <GraduationCap className="w-5 h-5 text-white" />
-                  </div>
+              <div className="border border-slate-100 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4 text-slate-400 shrink-0" />
                   <div>
-                    <h3 className="font-black text-slate-900 text-sm">キャンパスマッチ</h3>
-                    <p className="text-xs text-slate-400">武蔵野大学生限定</p>
+                    <p className="text-sm font-black">キャンパスマッチ</p>
+                    <p className="text-[10px] text-slate-400">武蔵野大学生限定</p>
                   </div>
                 </div>
                 {campusRegistered ? (
-                  <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl">
-                    <CheckCircle2 className="w-5 h-5 text-slate-900 shrink-0" />
-                    <p className="text-sm font-bold text-slate-700">キャンパスマッチに登録しました</p>
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <CheckCircle2 className="w-4 h-4 text-slate-900 shrink-0" />
+                    登録完了
                   </div>
                 ) : (
                   <form onSubmit={handleCampusMatch} className="flex gap-2">
-                    <div className="relative flex-1 min-w-0">
-                      <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input
-                        type="email"
-                        placeholder="@stu.musashino-u.ac.jp"
-                        value={campusEmail}
-                        onChange={(e) => setCampusEmail(e.target.value)}
-                        className="w-full pl-9 pr-3 py-3 rounded-xl border-2 border-slate-200 focus:border-slate-900 focus:outline-none text-sm font-medium transition-colors"
-                        required
-                      />
-                    </div>
+                    <input
+                      type="email"
+                      placeholder="@stu.musashino-u.ac.jp"
+                      value={campusEmail}
+                      onChange={(e) => setCampusEmail(e.target.value)}
+                      className="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-slate-200 focus:border-slate-900 focus:outline-none text-xs transition-colors"
+                      required
+                    />
                     <button
                       type="submit"
                       disabled={isMatchRegistering === 'campus'}
-                      className="px-4 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all disabled:opacity-50 whitespace-nowrap shrink-0"
+                      className="px-4 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 disabled:opacity-50 shrink-0"
                     >
                       {isMatchRegistering === 'campus' ? '...' : '参加'}
                     </button>
                   </form>
                 )}
-                {campusError && <p className="text-red-500 text-xs font-bold mt-2">{campusError}</p>}
+                {campusError && <p className="text-red-500 text-xs">{campusError}</p>}
               </div>
 
               {/* 通常マッチ */}
-              <div className="bg-white rounded-2xl p-5 sm:p-6 shadow border border-slate-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center shrink-0">
-                    <Users className="w-5 h-5 text-slate-700" />
-                  </div>
+              <div className="border border-slate-100 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-slate-400 shrink-0" />
                   <div>
-                    <h3 className="font-black text-slate-900 text-sm">通常マッチ</h3>
-                    <p className="text-xs text-slate-400">誰でも参加可能</p>
+                    <p className="text-sm font-black">通常マッチ</p>
+                    <p className="text-[10px] text-slate-400">誰でも参加可能</p>
                   </div>
                 </div>
                 {generalRegistered ? (
-                  <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl">
-                    <CheckCircle2 className="w-5 h-5 text-slate-900 shrink-0" />
-                    <p className="text-sm font-bold text-slate-700">通常マッチに登録しました</p>
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <CheckCircle2 className="w-4 h-4 text-slate-900 shrink-0" />
+                    登録完了
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <p className="text-sm text-slate-500">
+                  <div className="space-y-2">
+                    <p className="text-xs text-slate-400">
                       登録済みのメール（<span className="font-bold text-slate-700">{email}</span>）で参加します。
                     </p>
                     <button
                       onClick={handleGeneralMatch}
                       disabled={isMatchRegistering === 'general'}
-                      className="w-full py-3 border-2 border-slate-900 text-slate-900 rounded-xl font-bold text-sm hover:bg-slate-900 hover:text-white transition-all disabled:opacity-50"
+                      className="w-full py-2.5 border border-slate-200 text-slate-900 rounded-xl font-bold text-xs hover:bg-slate-900 hover:text-white transition-all disabled:opacity-50"
                     >
-                      {isMatchRegistering === 'general' ? '登録中...' : '通常マッチに参加する'}
+                      {isMatchRegistering === 'general' ? '登録中...' : '参加する'}
                     </button>
                   </div>
                 )}
@@ -434,11 +412,11 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         )}
 
         {/* やり直す */}
-        <section className="text-center pt-4">
-          <Link href="/diagnostic" className="text-slate-400 text-sm font-bold hover:text-slate-900 transition-colors uppercase tracking-widest">
+        <div className="text-center pb-8">
+          <Link href="/diagnostic" className="text-xs text-slate-400 hover:text-slate-900 font-bold uppercase tracking-widest transition-colors">
             やり直す
           </Link>
-        </section>
+        </div>
       </main>
     </div>
   );
