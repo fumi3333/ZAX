@@ -141,21 +141,63 @@ export default function MyPage() {
             </div>
 
             {/* 選択されたレポート */}
-            {selected && (
-              <div className="bg-white rounded-2xl p-8 shadow-xl border border-slate-100">
-                <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-                  <h2 className="text-xl font-black text-slate-900">分析レポート</h2>
-                  <span className="text-sm text-slate-400 font-bold">
-                    {new Date(selected.createdAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
-                  </span>
+            {selected && (() => {
+              let otsuge = '';
+              let machihito = '';
+              let koudou = '';
+              let isJson = false;
+
+              try {
+                const parsed = JSON.parse(selected.synthesis);
+                if (parsed && typeof parsed === 'object') {
+                  otsuge = parsed.otsuge || '';
+                  machihito = parsed.machihito || '';
+                  koudou = parsed.koudou || '';
+                  isJson = true;
+                }
+              } catch {
+                // Not JSON
+              }
+
+              return (
+                <div className="bg-white rounded-2xl p-8 shadow-xl border border-slate-100 space-y-6">
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <h2 className="text-xl font-black text-slate-900">分析レポート</h2>
+                    <span className="text-sm text-slate-400 font-bold">
+                      {new Date(selected.createdAt).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </span>
+                  </div>
+                  {isJson ? (
+                    <div className="space-y-5">
+                      <div className="space-y-1">
+                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">01 おみくじ結果 (本質)</h3>
+                        <p className="text-slate-700 text-sm leading-relaxed">{otsuge}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">02 相性の良い相手 (引き合う存在)</h3>
+                        <p className="text-slate-700 text-sm leading-relaxed">{machihito}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">03 今後のアプローチ</h3>
+                        <p className="text-slate-700 text-sm leading-relaxed">{koudou}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 text-slate-700 leading-relaxed text-sm">
+                      {selected.synthesis
+                        .split('\n')
+                        .map(p => p.replace(/[*#()（）:：\[\]【】「」]/g, ' ').trim())
+                        .filter(p => p.length >= 15)
+                        .filter(p => !/はじめに|レポート|診断|おみくじ|結果|総評|相性|アプローチ/i.test(p))
+                        .map((p, i) => (
+                          <p key={i}>{p}</p>
+                        ))
+                      }
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-4 text-slate-700 leading-relaxed text-sm">
-                  {selected.synthesis.split('\n').filter(p => p.trim()).map((p, i) => (
-                    <p key={i}>{p}</p>
-                  ))}
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             <div className="text-center">
               <button onClick={() => setSubmitted(false)} className="text-slate-400 text-sm underline">別のアドレスで検索</button>
