@@ -107,7 +107,6 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
   const handleSaveEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes("@")) {
@@ -125,25 +124,6 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
       const json = await res.json();
       if (json && json.success) {
         setEmailSaved(true);
-        const needsGeneration = !data?.synthesis ||
-          data.synthesis.includes("分析エラー") ||
-          data.synthesis.includes("分析中") ||
-          data.synthesis.trim() === "";
-        if (needsGeneration && data?.id) {
-          setIsGenerating(true);
-          try {
-            const rRes = await fetch("/api/diagnostic/generate-report", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ resultId: data.id }),
-            });
-            const rData = await rRes.json();
-            if (rData && rData.success && rData.synthesis) {
-              setData(prev => prev ? { ...prev, synthesis: rData.synthesis } : prev);
-            }
-          } catch { /* silent */ }
-          finally { setIsGenerating(false); }
-        }
       } else {
         setEmailError(json?.error || "登録に失敗しました");
       }
@@ -299,8 +279,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
         {/* ヘッダー */}
         <header className="text-center">
-          <h1 className="text-2xl font-black tracking-tight">シンプル分析結果</h1>
-          <p className="text-slate-400 text-[10px] mt-1 tracking-widest uppercase">Value Mapping Result</p>
+          <h1 className="text-2xl font-black tracking-tight">分析結果</h1>
         </header>
 
         {/* レーダーチャート */}
@@ -370,7 +349,6 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
               </section>
             ) : report ? (
               <section className="space-y-3">
-                <p className="text-xs text-slate-400 text-center tracking-widest uppercase">Digital Omikuji</p>
                 {OMIKUJI_SECTIONS.map((sec, idx) => (
                   <div key={sec.key} className="border border-slate-100 rounded-2xl p-5 space-y-2">
                     <div className="flex items-baseline gap-2">

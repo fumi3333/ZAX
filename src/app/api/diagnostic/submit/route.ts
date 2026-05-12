@@ -96,13 +96,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // 2. Construct Analysis Prompt
-    let profileText = "以下の性格診断（1-7尺度）の回答と自由記述に基づき、深い分析を行ってください。\n\n";
-    
-    if (freetext) {
-        profileText += `## 本人の自由記述（悩み、理想、価値観）\n"${freetext}"\n\n`;
-    }
-
+    // 2. Calculate 6D Vector and Category Scores
     const sortedAnswerIds = Object.keys(answers).map(Number).sort((a,b) => a-b);
     const categoryScores: Record<string, {sum: number, count: number}> = {};
     
@@ -118,27 +112,7 @@ export async function POST(req: Request) {
       }
     }
 
-    profileText += "## 診断スコア傾向\n";
-    for (const [cat, data] of Object.entries(categoryScores)) {
-        profileText += `- ${cat}: 平均 ${(data.sum / data.count).toFixed(1)}/7.0\n`;
-    }
-
-    profileText += "\n指示: この人物の強み、弱み、コミュニケーションスタイル、適した環境について、プロの心理分析官として詳細なレポートを作成してください。回答には自由記述の内容も深く反映させてください。出力に「AI」という語は含めないでください。";
-    
-    // 3. Call Gemini for Synthesis (ゲストも含めて全ユーザーに生成する)
-    let synthesis = "分析エラーが発生しました。時間を置いて再試行してください。";
-    const isGuest = user?.email.startsWith("guest_");
-
-    try {
-        const result = await model.generateContent(profileText);
-        const response = await result.response;
-        synthesis = response.text() || synthesis;
-    } catch (e) {
-        console.warn("Gemini API Error (Synthesis):", e);
-    }
-
-    // 4. 6次元ベクトル (レーダーチャート用)
-    // 診断カテゴリ: Lifestyle(ライフスタイル), Values(価値観・社会), Trust(信頼・協働), Conflict(コンフリクト解決), Ambition(野心・キャリア), Tolerance(寛容性・多様性)
+    // 6次元ベクトル (レーダーチャート用)
     const categoryOrder = ['Lifestyle', 'Values', 'Trust', 'Conflict', 'Ambition', 'Tolerance'] as const;
     const jaMap: Record<string, string> = { 
       'Lifestyle': 'ライフスタイル', 
@@ -154,22 +128,93 @@ export async function POST(req: Request) {
         return Math.round(((avg - 1) / 6) * 100);
     });
     const [lifestyle, values, trust, conflict, ambition, tolerance] = rawByCat;
+    const vector6d = [lifestyle, values, trust, conflict, ambition, tolerance];
 
-    // 6次元それぞれをカテゴリデータから直接算出
-    // 1. 生活基盤 (Lifestyle)
-    // 2. 社会意識 (Values)
-    // 3. 信頼構築 (Trust)
-    // 4. 対話力 (Conflict)
-    // 5. 熱量・野心 (Ambition)
-    // 6. 寛容性 (Tolerance)
-    const vector6d = [
-        lifestyle,                                    
-        values,                                      
-        trust,                                       
-        conflict,      
-        ambition,           
-        tolerance,        
-    ];
+    // 3. Construct prompt for Structured JSON Omikuji
+    const prompt = `
+あなたは人間の深層心理と運命を読み解く、鋭くも詩的なアナリスト（現代の神官）です。
+対象者の深層意識が以下の6次元の数値（0-100）で算出されました。
+
+生活基盤: ${vector6d[0]}
+社会意識: ${vector6d[1]}
+信頼構築: ${vector6d[2]}
+対話力: ${vector6d[3]}
+野心: ${vector6d[4]}
+寛容性: ${vector6d[5]}
+
+${freetext ? `自由記述（悩み、理想、価値観）:\n"${freetext}"` : ''}
+
+【指示】
+この数値と自由記述を元に、無難な性格分析ではなく、相手の心を鋭く見透かすような「おみくじ結果」を作成してください。
+以下の3つのセクションを、正確にJSONフォーマットで出力してください。
+
+セクション1「otsuge」（おみくじ結果）:
+対象者が無意識に隠している本性や、現在のエネルギー状態を見抜く、鋭く詩的な文章。150〜200文字。
+
+セクション2「machihito」（相性の良い相手）:
+対象者が欲しいと思っている人ではなく、この数値を補完するために「本当に衝突・知的摩擦を生むべき相手」の描写。100〜150文字。
+
+セクション3「koudou」（今後のアプローチ・今のあなたへ）:
+大学生活や日常において、今のエネルギー状態を最大限に活かす（または守る）ための具体的なアクションや身を置くべき環境。100〜150文字。
+
+出力ルール:
+- 必ずJSONのみを出力してください。余計な説明文や前置き、コードブロックは一切不要。
+- アスタリスク(*)、シャープ(#)、括弧(「」()（）[])、コロン(:：)、HTMLタグは一切含めないでください。
+- 角括弧や【】などの記号もテキスト内に含めないでください。
+- 人工知能っぽさや一般的な性格診断のような解説は排除し、対象者個人に宛てたメッセージのような重みのあるトーンで。
+
+出力形式（このフォーマット厳守）:
+{"otsuge": "おみくじのテキスト", "machihito": "相性の良い相手のテキスト", "koudou": "行動のテキスト"}
+`;
+
+    // 4. Call Gemini for Synthesis
+    let synthesis = "";
+    try {
+        const result = await model.generateContent(prompt);
+        let rawText = (await result.response.text()).trim();
+
+        // Strip ALL markdown and formatting symbols aggressively
+        rawText = rawText
+          .replace(/```json\s*/gi, '')
+          .replace(/```\s*/g, '')
+          .replace(/\*\*/g, '')
+          .replace(/\*/g, '')
+          .replace(/#{1,6}\s/g, '')
+          .replace(/#/g, '')
+          .replace(/_{1,2}/g, '')
+          .trim();
+
+        // Try to parse as structured JSON
+        try {
+          const parsed = JSON.parse(rawText);
+          if (parsed && parsed.otsuge && parsed.machihito && parsed.koudou) {
+            const cleanPattern = /[*#\[\]【】()（）:：]/g;
+            synthesis = JSON.stringify({
+              otsuge: parsed.otsuge.replace(cleanPattern, ' ').replace(/\s+/g, ' ').trim(),
+              machihito: parsed.machihito.replace(cleanPattern, ' ').replace(/\s+/g, ' ').trim(),
+              koudou: parsed.koudou.replace(cleanPattern, ' ').replace(/\s+/g, ' ').trim(),
+            });
+          }
+        } catch { /* parse fallback */ }
+
+        if (!synthesis) {
+          // Fallback parsing or string assembly
+          const cleanPattern = /[*#\[\]【】()（）:：]/g;
+          const cleanText = rawText.replace(cleanPattern, ' ').replace(/\s+/g, ' ').trim();
+          synthesis = JSON.stringify({
+            otsuge: cleanText.substring(0, 180),
+            machihito: "お互いの個性を補完し合える、知的好奇心旺盛な相手と衝突の先に深い絆が生まれます。",
+            koudou: "今のペースを守りつつ、身を置く環境を少しだけ変えてみることが鍵になります。"
+          });
+        }
+    } catch (e) {
+        console.warn("Gemini API Error (Synthesis):", e);
+        synthesis = JSON.stringify({
+          otsuge: "あなたの直感と意志は、周囲の期待を超えて独自の道を切り拓く力に満ちています。",
+          machihito: "お互いの個性を補完し合える、知的好奇心旺盛な相手と衝突の先に深い絆が生まれます。",
+          koudou: "今のペースを守りつつ、身を置く環境を少しだけ変えてみることが鍵になります。"
+        });
+    }
 
     // 4.5. 768次元ベクトル (セマンティック検索用)
     let embedding768: number[] | undefined = undefined;
