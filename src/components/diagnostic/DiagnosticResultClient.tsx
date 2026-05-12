@@ -95,9 +95,9 @@ function parseReport(synthesis: string): StructuredReport | null {
 }
 
 const OMIKUJI_SECTIONS = [
-  { key: "otsuge" as const,   label: "おみくじ結果", sub: "あなたの本質" },
-  { key: "machihito" as const, label: "相性の良い相手", sub: "引き合う存在" },
-  { key: "koudou" as const,   label: "今後のアプローチ", sub: "日常のアクション" },
+  { key: "otsuge" as const,   label: "本質分析", sub: "あなたの本質" },
+  { key: "machihito" as const, label: "共鳴パートナー", sub: "引き合う存在" },
+  { key: "koudou" as const,   label: "行動指針", sub: "日常のアクション" },
 ];
 
 export default function DiagnosticResultClient({ resultId }: DiagnosticResultClientProps) {
@@ -330,9 +330,9 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
         {!emailSaved ? (
           <section className="border border-slate-100 rounded-2xl p-6 space-y-5">
             <div className="text-center space-y-1">
-              <h2 className="text-lg font-black">おみくじを見る</h2>
+              <h2 className="text-lg font-black">分析レポートを見る</h2>
               <p className="text-slate-400 text-xs leading-relaxed">
-                メールアドレスを登録すると、あなた専用のおみくじ結果が解禁されます。
+                メールアドレスを登録すると、あなた専用の深い本質分析と行動指針が解禁されます。
               </p>
             </div>
             <form onSubmit={handleSaveEmail} className="space-y-3">
@@ -353,7 +353,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                 disabled={isSavingEmail}
                 className="w-full py-3 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all disabled:opacity-50"
               >
-                {isSavingEmail ? "分析中..." : "おみくじを見る"}
+                {isSavingEmail ? "分析中..." : "分析レポートを見る"}
               </button>
               <p className="text-center text-xs text-slate-400">パスワード不要。大学メール以外でもOK。</p>
             </form>
