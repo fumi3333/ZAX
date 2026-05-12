@@ -170,15 +170,15 @@ export default function MyPage() {
                   {isJson ? (
                     <div className="space-y-5">
                       <div className="space-y-1">
-                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">01 おみくじ結果 (本質)</h3>
+                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">01 分析結果</h3>
                         <p className="text-slate-700 text-sm leading-relaxed">{otsuge}</p>
                       </div>
                       <div className="space-y-1">
-                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">02 相性の良い相手 (引き合う存在)</h3>
+                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">02 相性のいい相手</h3>
                         <p className="text-slate-700 text-sm leading-relaxed">{machihito}</p>
                       </div>
                       <div className="space-y-1">
-                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">03 今後のアプローチ</h3>
+                        <h3 className="text-xs font-bold text-slate-400 tracking-wider uppercase">03 行動指針</h3>
                         <p className="text-slate-700 text-sm leading-relaxed">{koudou}</p>
                       </div>
                     </div>

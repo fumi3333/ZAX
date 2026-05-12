@@ -95,8 +95,8 @@ function parseReport(synthesis: string): StructuredReport | null {
 }
 
 const OMIKUJI_SECTIONS = [
-  { key: "otsuge" as const,   label: "本質分析", sub: "あなたの本質" },
-  { key: "machihito" as const, label: "共鳴パートナー", sub: "引き合う存在" },
+  { key: "otsuge" as const,   label: "分析結果", sub: "あなたの本質" },
+  { key: "machihito" as const, label: "相性のいい相手", sub: "引き合う存在" },
   { key: "koudou" as const,   label: "行動指針", sub: "日常のアクション" },
 ];
 
