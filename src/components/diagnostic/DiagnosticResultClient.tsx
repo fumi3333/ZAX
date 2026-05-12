@@ -56,23 +56,42 @@ function parseReport(synthesis: string): StructuredReport | null {
     // JSONでない場合はフォールバック
   }
 
-  // プレーンテキストの場合、行で分割してそれらしいブロックを構築
-  const lines = synthesis.split("\n").map(l => sanitizeText(l)).filter(Boolean);
-  if (lines.length >= 3) {
+  // プレーンテキストの場合、行を分割し、15文字以下の短い行（「はじめに」等）を完全に除外して、長めの実質的な段落のみを抽出
+  const paragraphs = synthesis
+    .split("\n")
+    .map(l => sanitizeText(l))
+    .filter(Boolean)
+    .filter(l => {
+      if (l.length < 15) return false;
+      if (/はじめに|レポート|診断|おみくじ|結果|総評|相性|アプローチ/i.test(l)) return false;
+      return true;
+    });
+
+  if (paragraphs.length >= 3) {
     return {
-      otsuge: lines[0] || "",
-      machihito: lines[1] || "",
-      koudou: lines[2] || ""
+      otsuge: paragraphs[0],
+      machihito: paragraphs[1],
+      koudou: paragraphs[2]
     };
-  } else if (lines.length > 0) {
+  } else if (paragraphs.length === 2) {
     return {
-      otsuge: lines.join(" ") || "",
+      otsuge: paragraphs[0],
+      machihito: paragraphs[1],
+      koudou: "今のあなたのリズムを大切にしながら、興味のある小さなコミュニティに顔を出すことで、新たな展開が生まれます。"
+    };
+  } else if (paragraphs.length === 1) {
+    return {
+      otsuge: paragraphs[0],
       machihito: "お互いの個性を補完し合える、知的好奇心旺盛な相手と衝突の先に深い絆が生まれます。",
       koudou: "今のペースを守りつつ、身を置く環境を少しだけ変えてみることが鍵になります。"
     };
   }
   
-  return null;
+  return {
+    otsuge: "あなたの直感と意志は、周囲の期待を超えて独自の道を切り拓く力に満ちています。",
+    machihito: "お互いの個性を補完し合える、知的好奇心旺盛な相手と衝突の先に深い絆が生まれます。",
+    koudou: "今のペースを守りつつ、身を置く環境を少しだけ変えてみることが鍵になります。"
+  };
 }
 
 const OMIKUJI_SECTIONS = [
