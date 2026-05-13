@@ -4,6 +4,7 @@ import { questions } from '@/data/questions';
 import { model, embeddingModel } from '@/lib/gemini';
 import { cookies, headers } from 'next/headers';
 import { signSession, verifySession } from '@/lib/crypto';
+import { createGuestUser } from '@/lib/db/user-factory';
 
 export const maxDuration = 60;
 
@@ -61,17 +62,8 @@ export async function POST(req: Request) {
     let user = await prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
-        const email = `guest_${sessionId}@musashino-u.ac.jp`;
-        user = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
-             try {
-                user = await prisma.user.create({ data: { email, password: "guest-password" } });
-             } catch (e) {
-                 const firstUser = await prisma.user.findFirst();
-                 if (firstUser) user = firstUser;
-                 else throw new Error("Could not create or find user");
-             }
-        }
+      // user-factory 経由でゲストユーザーを作成（ハードコードパスワード・フォールバックなし）
+      user = await createGuestUser(sessionId);
     }
     if (user) userId = user.id;
 

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/client";
+import { cookies } from "next/headers";
+import { verifySession } from "@/lib/crypto";
 
 export async function GET(
   _req: Request,
@@ -14,11 +16,22 @@ export async function GET(
     if (!result) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+
+    // 認証: 自分の結果か、またはゲストユーザーの結果のみ開悧可能
+    const isGuestUser = result.user.email.startsWith("guest_");
+    if (!isGuestUser) {
+      const cookieStore = await cookies();
+      const sessionUserId = verifySession(cookieStore.get("zax-session")?.value);
+      if (!sessionUserId || sessionUserId !== result.userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
     const answers = JSON.parse(result.answers) as Record<string, number>;
     return NextResponse.json({
       id: result.id,
       userId: result.userId,
-      isGuest: result.user.email.startsWith("guest_"),
+      isGuest: isGuestUser,
       synthesis: result.synthesis,
       answers,
       vector: result.vector ? JSON.parse(result.vector) : null,

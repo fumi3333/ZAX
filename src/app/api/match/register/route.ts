@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { hashEmail } from '@/lib/crypto';
+import { createEmailOnlyUser } from '@/lib/db/user-factory';
 
 export async function POST(req: Request) {
   try {
@@ -35,12 +36,7 @@ export async function POST(req: Request) {
       });
     } else {
       // Create user with this email and mark as match-interested
-      const newUser = await prisma.user.create({
-        data: {
-          email: hashedEmail,
-          password: 'email_only',
-        }
-      });
+      await createEmailOnlyUser(hashedEmail);
       return NextResponse.json({
         success: true,
         type,

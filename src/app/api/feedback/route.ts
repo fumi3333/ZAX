@@ -17,23 +17,25 @@ export async function POST(request: Request) {
         const deltaResult = await calculateDeltaVector(feedback, currentVector, tags);
 
         // [DB] Persist Feedback & Delta (Prisma)
-        try {
-            const userId = "guest_demo_user"; // Fixed for MVP demo
-            await prisma.feedback.create({
-                data: {
-                    content: feedback,
-                    deltaVector: JSON.stringify(deltaResult.delta_vector),
-                    growthScore: deltaResult.growth_score,
-                    user: {
-                        connectOrCreate: {
-                            where: { id: userId },
-                            create: { id: userId, email: "guest@example.com" }
-                        }
+        // NOTE: ゲストユーザーはハードコードしない。
+        // セッションIDが存在する場合のみDBに保存する。
+        const { cookies } = await import("next/headers");
+        const cookieStore = await cookies();
+        const sessionUserId = cookieStore.get("zax-session")?.value;
+
+        if (sessionUserId) {
+            try {
+                await prisma.feedback.create({
+                    data: {
+                        content: feedback,
+                        deltaVector: JSON.stringify(deltaResult.delta_vector),
+                        growthScore: deltaResult.growth_score,
+                        userId: sessionUserId,
                     }
-                }
-            });
-        } catch (dbError) {
-            console.error("DB Save Error:", dbError);
+                });
+            } catch (dbError) {
+                console.error("DB Save Error:", dbError);
+            }
         }
 
         return NextResponse.json({

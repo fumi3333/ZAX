@@ -1,25 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
-import { hashEmail } from '@/lib/crypto';
+import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/crypto';
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const email = searchParams.get('email');
+    // 認証: ストレートにセッションCookieで確認。?email=クエリは不要。
+    const cookieStore = await cookies();
+    const userId = verifySession(cookieStore.get('zax-session')?.value);
 
-    if (!email || !email.includes('@')) {
-      return NextResponse.json({ success: false, error: '有効なメールアドレスを入力してください' }, { status: 400 });
-    }
-
-    const hashedEmail = hashEmail(email);
-    const user = await prisma.user.findUnique({ where: { email: hashedEmail } });
-
-    if (!user) {
-      return NextResponse.json({ success: true, diagnostics: [] });
+    if (!userId) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const diagnostics = await (prisma as any).diagnosticResult.findMany({
-      where: { userId: user.id },
+      where: { userId },
       orderBy: { createdAt: 'desc' },
       take: 20,
       select: {

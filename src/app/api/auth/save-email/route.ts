@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { cookies } from 'next/headers';
 import { hashEmail } from '@/lib/crypto';
+import { createEmailOnlyUser, upgradeGuestToEmailOnly } from '@/lib/db/user-factory';
 
 // メールアドレスだけで登録（パスワードなし）
 // 変遷記録・おみくじ保存のためのシンプルな登録API
@@ -36,34 +37,12 @@ export async function POST(req: Request) {
     let userId: string;
 
     if (sessionId) {
-      // Upgrade guest session to real user
-      try {
-        const updated = await prisma.user.update({
-          where: { id: sessionId },
-          data: {
-            email: hashedEmail,
-            password: 'email_only', // no password for email-only registration
-          }
-        });
-        userId = updated.id;
-      } catch {
-        // Session user doesn't exist, create new
-        const newUser = await prisma.user.create({
-          data: {
-            email: hashedEmail,
-            password: 'email_only',
-          }
-        });
-        userId = newUser.id;
-      }
+      // ゲストセッションをメールのみ登録にアップグレード（user-factory経由）
+      const upgraded = await upgradeGuestToEmailOnly(sessionId, hashedEmail);
+      userId = upgraded.id;
     } else {
-      // No session, create new user
-      const newUser = await prisma.user.create({
-        data: {
-          email: hashedEmail,
-          password: 'email_only',
-        }
-      });
+      // セッションなし → 新規ユーザー作成（user-factory経由）
+      const newUser = await createEmailOnlyUser(hashedEmail);
       userId = newUser.id;
     }
 

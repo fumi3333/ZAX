@@ -47,7 +47,7 @@ export async function GET(req: Request) {
       if (record.userId === user.id) continue;
       if (candidates.length >= 3) break;
 
-      // Fetch user details for contact info and name/affiliation (if available)
+      // Fetch user details to check if they have a real (non-guest) email
       const candidateUser = await prisma.user.findUnique({
         where: { id: record.userId },
         select: { email: true }
@@ -56,12 +56,9 @@ export async function GET(req: Request) {
       // Default pseudo profile info since we don't have separate profile table yet
       let nickname = "匿名ユーザー";
       let affiliation = "武蔵野大学";
-      let contactEmail = candidateUser?.email || null;
 
-      // Make sure contact email is only shown if it's not a guest email
-      if (contactEmail && contactEmail.startsWith('guest_')) {
-        contactEmail = null;
-      }
+      // 他ユーザーのメールアドレスはレスポンスに含めない。実メールを持つかどうかのフラグのみ返す。
+      const hasRealEmail = !!(candidateUser?.email && !candidateUser.email.startsWith('guest_'));
 
       candidates.push({
         userId: record.userId,
@@ -70,7 +67,7 @@ export async function GET(req: Request) {
         reasoning: record.reasoning || "価値観の方向性が共鳴しています。",
         statsVector: record.vectorJson,
         distance: record.distance,
-        contactEmail
+        hasEmail: hasRealEmail, // 連絡可能かどうかのフラグのみ（実アドレスは行ったましい）
       });
     }
 

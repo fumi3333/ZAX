@@ -32,23 +32,23 @@ export async function POST(request: Request) {
         const numericBiases = biases?.map((b) => Number(b));
         const result = await analyzeEssence(inputs, numericBiases);
 
-        // [DB] Persist the analysis result
+        // [DB] Persist the analysis result (セッションが存在する場合のみ保存)
         const cookieStore = await cookies();
-
         const sessionId = cookieStore.get('zax-session')?.value;
-        const userId = sessionId || "guest_" + new Date().getTime();
-        
-        // 3. Data Encryption (Encrypt sensitive reasoning before saving)
-        const encryptedReasoning = encrypt(result.reasoning);
 
-        // Save with encrypted reasoning
-        await vectorStore.saveEmbedding(
-            userId,
-            result.vector,
-            encryptedReasoning,
-            result.resonance_score || 0,
-            result.embedding
-        );
+        if (sessionId) {
+            // 3. Data Encryption (Encrypt sensitive reasoning before saving)
+            const encryptedReasoning = encrypt(result.reasoning);
+
+            // Save with encrypted reasoning
+            await vectorStore.saveEmbedding(
+                sessionId,
+                result.vector,
+                encryptedReasoning,
+                result.resonance_score || 0,
+                result.embedding
+            );
+        }
 
         // Return PLAIN text to the user (they need to see their own result immediately)
         return NextResponse.json(result);
