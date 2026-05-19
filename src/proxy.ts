@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 // セッション署名はせず、シンプルなUUIDのみをセッションIDとして使用する
 // （開発フェーズ: セキュリティより動作優先）
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const response = NextResponse.next()
   
   const sessionCookie = request.cookies.get('zax-session')
