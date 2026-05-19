@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma, vectorStore } from '@/lib/db/client';
-import { questions } from '@/data/questions';
+import { questions, effectiveScore } from '@/data/questions';
 import { model, embeddingModel } from '@/lib/gemini';
 import { cookies, headers } from 'next/headers';
 import { signSession, verifySession } from '@/lib/crypto';
@@ -94,8 +94,8 @@ export async function POST(req: Request) {
     
     for (const id of sortedAnswerIds) {
       const q = questions.find(q => q.id === id);
-      const score = answers[id];
       if (q) {
+        const score = effectiveScore(q, answers[id]);
         if (!categoryScores[q.categoryJa]) {
             categoryScores[q.categoryJa] = { sum: 0, count: 0 };
         }

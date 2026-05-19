@@ -6,30 +6,7 @@ export type Question = {
   reverse?: boolean;
 };
 
-// 開発フェーズ: 各カテゴリ1問ずつ（計6問）で高速テスト
-// 本番リリース時は questions_full.ts に差し替える
 export const questions: Question[] = [
-  // 生活基盤 (Lifestyle)
-  { id: 1, text: "休日は家でリラックスするより、外に出かけてアクティブに過ごしたい。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
-
-  // 社会意識 (Values)
-  { id: 11, text: "伝統や社会的規範よりも、個人の自由な選択が何より尊重されるべきだ。", category: 'Values', categoryJa: '価値観・社会' },
-
-  // 信頼構築 (Trust)
-  { id: 22, text: "他人を完全に信用するまでには、かなりの時間と実績の証明が必要だ。", category: 'Trust', categoryJa: '信頼・協働' },
-
-  // 対話力 (Conflict)
-  { id: 31, text: "喧嘩をしたときは、一旦距離を置くより、その場ですぐに話し合って解決したい。", category: 'Conflict', categoryJa: 'コンフリクト解決' },
-
-  // 野心 (Ambition)
-  { id: 41, text: "安定した職業に就くことより、リスクを取ってでも自分のやりたいことに挑戦したい。", category: 'Ambition', categoryJa: '野心・キャリア' },
-
-  // 寛容性 (Tolerance)
-  { id: 51, text: "自分とは全く異なる文化的背景や価値観を持つ人に対しても、偏見なく接することができる。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
-];
-
-// 全問版（本番リリース時に上記を差し替え）
-export const questions_full: Question[] = [
   // --- Lifestyle (ライフスタイル) ---
   { id: 1, text: "休日は家でリラックスするより、外に出かけてアクティブに過ごしたい。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
   { id: 2, text: "金銭感覚は、節約よりも「今の経験」にお金を使いたい派だ。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
