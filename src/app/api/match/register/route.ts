@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
+import { randomBytes } from 'crypto';
 import { prisma } from '@/lib/db/client';
 import { hashEmail } from '@/lib/crypto';
 
 export async function POST(req: Request) {
   try {
-    const { email, type, campus, resultId } = await req.json();
+    const { email, type, campus } = await req.json();
     // campus: 'musashino' | 'ariake' | undefined
     // type: 'campus' | 'general'
 
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
       await prisma.user.create({
         data: {
           email: hashedEmail,
-          password: `locked_${require('crypto').randomBytes(32).toString('hex')}`,
+          password: `locked_${randomBytes(32).toString('hex')}`,
           ...(campus ? { campus } : {}),
         }
       });
