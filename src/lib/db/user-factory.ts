@@ -34,7 +34,9 @@ function generateLockedPassword(): string {
  * @throws Error - 作成失敗時はエラーをスローする。他ユーザーへのフォールバックは絶対にしない。
  */
 export async function createGuestUser(sessionId: string): Promise<User> {
-  const email = `guest_${sessionId}@musashino-u.ac.jp`;
+  // sessionIdが既に"guest_"で始まる場合は重複しない
+  const emailPrefix = sessionId.startsWith('guest_') ? sessionId : `guest_${sessionId}`;
+  const email = `${emailPrefix}@musashino-u.ac.jp`;
 
   // 既存チェック（重複防止）
   const existing = await prisma.user.findUnique({ where: { email } });
