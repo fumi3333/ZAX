@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { hashEmail } from '@/lib/crypto';
-import { createEmailOnlyUser } from '@/lib/db/user-factory';
 
 export async function POST(req: Request) {
   try {
-    const { email, type, resultId } = await req.json();
+    const { email, type, campus, resultId } = await req.json();
+    // campus: 'musashino' | 'ariake' | undefined
     // type: 'campus' | 'general'
 
     if (!email || !email.includes('@')) {
@@ -22,24 +22,35 @@ export async function POST(req: Request) {
     }
 
     const hashedEmail = hashEmail(email);
+    const campusLabel = campus === 'ariake' ? '有明キャンパス' : campus === 'musashino' ? '武蔵野キャンパス' : null;
     const user = await prisma.user.findUnique({ where: { email: hashedEmail } });
 
-    // For now, just record the match interest by updating the user record
-    // In the future, this would create a match_waitlist entry
     if (user) {
-      // User exists — mark them as interested in matching
-      // We store match type in a notes field (or simply confirm their interest)
+      // キャンパス情報があればnicknameに保存
+      if (campusLabel) {
+        await prisma.user.update({
+          where: { email: hashedEmail },
+          data: { nickname: campusLabel }
+        });
+      }
       return NextResponse.json({
         success: true,
         type,
+        campus: campusLabel,
         message: type === 'campus' ? 'campus_registered' : 'general_registered'
       });
     } else {
-      // Create user with this email and mark as match-interested
-      await createEmailOnlyUser(hashedEmail);
+      await prisma.user.create({
+        data: {
+          email: hashedEmail,
+          password: `locked_${require('crypto').randomBytes(32).toString('hex')}`,
+          ...(campusLabel ? { nickname: campusLabel } : {}),
+        }
+      });
       return NextResponse.json({
         success: true,
         type,
+        campus: campusLabel,
         message: type === 'campus' ? 'campus_registered' : 'general_registered'
       });
     }

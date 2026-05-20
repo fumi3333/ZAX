@@ -111,6 +111,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
   const [emailError, setEmailError] = useState<string | null>(null);
 
   const [campusEmail, setCampusEmail] = useState("");
+  const [campusName, setCampusName] = useState<'musashino' | 'ariake' | ''>('');
   const [campusError, setCampusError] = useState<string | null>(null);
   const [campusRegistered, setCampusRegistered] = useState(false);
   const [generalRegistered, setGeneralRegistered] = useState(false);
@@ -155,6 +156,10 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
   const handleCampusMatch = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!campusName) {
+      setCampusError('所属キャンパスを選択してください');
+      return;
+    }
     if (!campusEmail.includes('@')) {
       setCampusError('大学のメールアドレスを入力してください');
       return;
@@ -165,7 +170,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
       const res = await fetch("/api/match/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: campusEmail, type: 'campus', resultId: data?.id }),
+        body: JSON.stringify({ email: campusEmail, type: 'campus', campus: campusName, resultId: data?.id }),
       });
       const json = await res.json();
       if (json && json.success) setCampusRegistered(true);
@@ -426,22 +431,45 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                     登録完了
                   </div>
                 ) : (
-                  <form onSubmit={handleCampusMatch} className="flex gap-2">
-                    <input
-                      type="email"
-                      placeholder="@stu.musashino-u.ac.jp"
-                      value={campusEmail}
-                      onChange={(e) => setCampusEmail(e.target.value)}
-                      className="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-slate-200 focus:border-slate-900 focus:outline-none text-xs transition-colors"
-                      required
-                    />
-                    <button
-                      type="submit"
-                      disabled={isMatchRegistering === 'campus'}
-                      className="px-4 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 disabled:opacity-50 shrink-0"
-                    >
-                      {isMatchRegistering === 'campus' ? '...' : '参加'}
-                    </button>
+                  <form onSubmit={handleCampusMatch} className="space-y-3">
+                    {/* キャンパス選択 */}
+                    <div className="flex gap-2">
+                      {[
+                        { value: 'musashino', label: '武蔵野' },
+                        { value: 'ariake',    label: '有明' },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setCampusName(opt.value as 'musashino' | 'ariake')}
+                          className={`flex-1 py-2 rounded-xl border text-xs font-bold transition-all ${
+                            campusName === opt.value
+                              ? 'bg-slate-900 text-white border-slate-900'
+                              : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'
+                          }`}
+                        >
+                          {opt.label}キャンパス
+                        </button>
+                      ))}
+                    </div>
+                    {/* メール入力 */}
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        placeholder="@stu.musashino-u.ac.jp"
+                        value={campusEmail}
+                        onChange={(e) => setCampusEmail(e.target.value)}
+                        className="flex-1 min-w-0 px-3 py-2.5 rounded-xl border border-slate-200 focus:border-slate-900 focus:outline-none text-xs transition-colors"
+                        required
+                      />
+                      <button
+                        type="submit"
+                        disabled={isMatchRegistering === 'campus'}
+                        className="px-4 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 disabled:opacity-50 shrink-0"
+                      >
+                        {isMatchRegistering === 'campus' ? '...' : '参加'}
+                      </button>
+                    </div>
                   </form>
                 )}
                 {campusError && <p className="text-red-500 text-xs">{campusError}</p>}
