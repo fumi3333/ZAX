@@ -98,6 +98,11 @@ try {
                 mockUsers.push(newUser);
                 return newUser;
             },
+            update: async ({ where, data }: any) => {
+                const idx = mockUsers.findIndex((u) => u.email === where.email || u.id === where.id);
+                if (idx >= 0) mockUsers[idx] = { ...mockUsers[idx], ...data };
+                return mockUsers[idx] || null;
+            },
             findFirst: async () => mockUsers[0] || null,
         },
         diagnosticResult: {
@@ -112,6 +117,9 @@ try {
             },
             findUnique: async ({ where }: any) =>
                 mockDiagnostics.find((d) => d.id === where.id) || null,
+        },
+        diagnosticAnswer: {
+            createMany: async () => ({ count: 0 }),
         },
         essenceVector: {
             create: async () => {},

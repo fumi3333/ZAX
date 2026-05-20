@@ -1,15 +1,10 @@
 import crypto from 'crypto';
 
-// Use a secure key from environment variables or fallback to a hardcoded one for dev (WARNING: Change this in production!)
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'zax_dev_key_32chars_placeholder!'; 
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'zax_dev_key_32chars_placeholder!';
 
 if (process.env.NODE_ENV === 'production' && !process.env.ENCRYPTION_KEY) {
-    console.warn("WARNING: ENCRYPTION_KEY is not defined. Using fallback for build.");
-}
-
-if (ENCRYPTION_KEY.length !== 32) {
-    // console.warn("WARNING: ENCRYPTION_KEY should be 32 characters for AES-256.");
-    // We allow it to pass here but the hash below ensures we get a 32-byte key anyway.
+    // 本番でキー未設定はセキュリティリスク。エラーログを出す。
+    console.error("CRITICAL: ENCRYPTION_KEY is not set in production environment.");
 }
 const IV_LENGTH = 16; // For AES, this is always 16
 
@@ -17,9 +12,8 @@ const IV_LENGTH = 16; // For AES, this is always 16
  * Encrypts a text string using AES-256-CBC
  */
 export function encrypt(text: string): string {
-    // Ensure the key is 32 bytes (256 bits)
-    // If the provided key is short, we pad it or hash it. Here we assume it's roughly correct or just hash it to be safe.
-    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').substr(0, 32);
+    // SHA-256のhex出力は64文字 = 32バイト。AES-256-CBCに必要な正確なキー長。
+    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('hex').substring(0, 32);
     
     const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
@@ -41,8 +35,8 @@ export function decrypt(text: string): string {
     
     const iv = Buffer.from(ivPart, 'hex');
     const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('base64').substr(0, 32);
-    
+    const key = crypto.createHash('sha256').update(String(ENCRYPTION_KEY)).digest('hex').substring(0, 32);
+
     const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
     
     let decrypted = decipher.update(encryptedText);

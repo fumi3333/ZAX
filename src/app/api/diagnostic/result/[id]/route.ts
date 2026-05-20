@@ -17,11 +17,13 @@ export async function GET(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // 認証: 自分の結果か、またはゲストユーザーの結果のみ開悧可能
     const isGuestUser = result.user.email.startsWith("guest_");
+    const cookieStore = await cookies();
+    const sessionUserId = verifySession(cookieStore.get("zax-session")?.value);
+
+    // メール登録済みユーザーの結果は本人のみ閲覧可能
+    // ゲストユーザーの結果はURLを知っていれば閲覧可能（共有機能のため）
     if (!isGuestUser) {
-      const cookieStore = await cookies();
-      const sessionUserId = verifySession(cookieStore.get("zax-session")?.value);
       if (!sessionUserId || sessionUserId !== result.userId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
