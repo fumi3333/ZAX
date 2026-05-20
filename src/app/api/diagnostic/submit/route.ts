@@ -232,8 +232,32 @@ ${freetext ? `自由記述（本人の本音や生の声）:\n"${freetext}"` : '
         answers: JSON.stringify(answers),
         synthesis: synthesis,
         vector: JSON.stringify(vector6d),
+        freetext: freetext || null,
       },
     });
+
+    // 5b. 質問別回答を保存（分析用）
+    try {
+      const answerRows = sortedAnswerIds
+        .map(id => {
+          const q = questions.find(q => q.id === id);
+          if (!q) return null;
+          return {
+            id: `${diagnosticResult.id}_q${id}`,
+            resultId: diagnosticResult.id,
+            questionId: id,
+            score: answers[id],
+            category: q.category,
+          };
+        })
+        .filter(Boolean);
+
+      if (answerRows.length > 0) {
+        await prisma.diagnosticAnswer.createMany({ data: answerRows as any[] });
+      }
+    } catch (e) {
+      console.warn('DiagnosticAnswer save error (non-fatal):', e);
+    }
 
     await vectorStore.saveEmbedding(
         userId,

@@ -12,10 +12,13 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  password  String   // bcryptでハッシュ化されたパスワード
-  nickname  String?  // 表示用名
+  password  String
+  nickname  String?
+  campus    String?  // 'musashino' | 'ariake'
+  grade     Int?     // 1〜4年
+  faculty   String?  // 学部名（任意）
   createdAt DateTime @default(now())
-  
+
   // Relations
   vectors    EssenceVector[]
   feedbacks  Feedback[]
@@ -84,12 +87,29 @@ model DiagnosticResult {
   id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  answers   String   // JSON
-  synthesis String   
+  answers   String   // JSON（バックアップ）
+  synthesis String
   vector    String   // JSON
+  freetext  String?  // 自由記述
   createdAt DateTime @default(now())
 
+  questionAnswers DiagnosticAnswer[]
+
   @@map("diagnostic_results")
+}
+
+// 質問ごとの回答（分析用）
+model DiagnosticAnswer {
+  id         String           @id @default(uuid())
+  resultId   String
+  result     DiagnosticResult @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  questionId Int              // 1〜60
+  score      Int              // 1〜7
+  category   String           // 'Lifestyle' | 'Values' | 'Trust' | 'Conflict' | 'Ambition' | 'Tolerance'
+
+  @@index([questionId])
+  @@index([resultId])
+  @@map("diagnostic_answers")
 }
 
 model GeminiLog {

@@ -24,13 +24,13 @@ export async function POST(req: Request) {
     const hashedEmail = hashEmail(email);
     const campusLabel = campus === 'ariake' ? '有明キャンパス' : campus === 'musashino' ? '武蔵野キャンパス' : null;
     const user = await prisma.user.findUnique({ where: { email: hashedEmail } });
+    // campusLabel は レスポンス表示用のみ
 
     if (user) {
-      // キャンパス情報があればnicknameに保存
-      if (campusLabel) {
+      if (campus) {
         await prisma.user.update({
           where: { email: hashedEmail },
-          data: { nickname: campusLabel }
+          data: { campus },
         });
       }
       return NextResponse.json({
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
         data: {
           email: hashedEmail,
           password: `locked_${require('crypto').randomBytes(32).toString('hex')}`,
-          ...(campusLabel ? { nickname: campusLabel } : {}),
+          ...(campus ? { campus } : {}),
         }
       });
       return NextResponse.json({

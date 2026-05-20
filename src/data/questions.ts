@@ -6,7 +6,7 @@ export type Question = {
   reverse?: boolean;
 };
 
-export const questions: Question[] = [
+const _questions: Question[] = [
   // --- Lifestyle (ライフスタイル) --- 自律・情緒の安定・行動力・ユーモア・好奇心
   { id: 1,  text: "「面白そう」という感覚だけで、まだ何も知らない場所に飛び込んだことがある。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
   { id: 2,  text: "気分が落ちているとき、自分で気持ちを切り替えられる方だ。", category: 'Lifestyle', categoryJa: 'ライフスタイル' },
@@ -79,6 +79,9 @@ export const questions: Question[] = [
   { id: 59, text: "自分の「当たり前」が、誰かにとっては全く当たり前でないことを日常的に意識している。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
   { id: 60, text: "自分のことを「まだよくわかっていない」と感じながら生きている。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
 ];
+
+// テスト中: 1問のみ。本番は _questions を questions に戻す
+export const questions: Question[] = _questions.slice(0, 1);
 
 export function effectiveScore(question: Question, rawScore: number): number {
   if (question.reverse) return 8 - rawScore;
