@@ -80,11 +80,7 @@ const _questions: Question[] = [
   { id: 60, text: "自分のことを「まだよくわかっていない」と感じながら生きている。", category: 'Tolerance', categoryJa: '寛容性・多様性' },
 ];
 
-// ========================================
-// 🔧 テスト中: 1問のみ表示
-// 本番に戻すとき → この行を下の行に置き換える:
-//   export const questions: Question[] = _questions;
-// ========================================
+// テスト中: 1問のみ。本番は _questions を questions に戻す
 export const questions: Question[] = _questions.slice(0, 1);
 
 export function effectiveScore(question: Question, rawScore: number): number {

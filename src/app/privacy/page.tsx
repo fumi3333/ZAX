@@ -18,49 +18,56 @@ export default function PrivacyPolicyPage() {
           
           <div className="space-y-8 text-sm leading-relaxed">
             <section>
-              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">1. 個人情報の収集と管理</h2>
-              <p>
-                ZAX（以下「本サービス」）は、ユーザーのプライバシーを最優先事項として設計されています。
-                本サービスでは、以下の情報を収集・管理します。
-              </p>
+              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">1. 収集する情報</h2>
+              <p>ZAX（以下「本サービス」）は、以下の情報を収集します。</p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li><strong>メールアドレス</strong>: 入力されたメールアドレスは、送信された瞬間にSHA-256アルゴリズムを用いてハッシュ化（匿名化）されます。生のメールアドレスはデータベースに保存されず、管理者も閲覧できません。</li>
-                <li><strong>解析データ</strong>: 入力された診断への回答内容は一時的にAI（Gemini）によって解析され、性格特性ベクトルとして数値化されます。生の回答データ自体は解析とベクトル化のためにのみ使用されます。</li>
+                <li><strong>メールアドレス</strong>: 入力された瞬間にSHA-256でハッシュ化され、元のアドレスは保存されません。管理者も閲覧不可です。</li>
+                <li><strong>診断回答データ</strong>: 60問への回答（1〜7のスコア）。AIによる分析・マッチング・サービス改善のために保存されます。</li>
+                <li><strong>所属キャンパス</strong>: 任意入力。マッチング精度向上のために使用します。</li>
+                <li><strong>自由記述テキスト</strong>: 任意入力。AI分析の精度向上に使用し、個人特定には利用しません。</li>
+                <li><strong>セッションID</strong>: ブラウザのCookieに保存される匿名識別子。診断履歴の管理に使用します。</li>
               </ul>
             </section>
 
             <section>
               <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">2. データの利用目的</h2>
-              <p>
-                収集したデータは、以下の目的のためにのみ利用されます。
-              </p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>ユーザーごとの診断履歴の管理および表示</li>
-                <li>価値観に基づいた仲間の候補生成</li>
-                <li>AI（Gemini API）による性格分析レポートの生成</li>
-                <li>学内コミュニティの活性化に関する統計データの作成（個人を特定できない形での利用）</li>
+                <li>診断履歴の管理・表示</li>
+                <li>価値観ベクトルに基づくマッチング候補の生成</li>
+                <li>AI（Google Gemini API）による性格分析レポートの生成</li>
+                <li>サービス改善のための統計分析（個人を特定しない形式）</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">3. AI（人工知能）の利用について</h2>
+              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">3. AIの利用について</h2>
               <p>
-                本サービスはGoogleのGemini APIを利用してテキスト分析を行っています。
-                APIに送信されるデータは、診断の回答内容とハッシュ化された識別子のみであり、個人を特定できる情報は含まれません。
+                本サービスはGoogle Gemini APIを使用します。APIに送信されるデータは診断スコアと自由記述のみで、メールアドレス等の個人情報は含まれません。
+                Googleのデータ処理方針については<a href="https://policies.google.com/privacy" className="underline" target="_blank" rel="noopener noreferrer">Google プライバシーポリシー</a>をご参照ください。
               </p>
             </section>
 
             <section>
               <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">4. 第三者への提供</h2>
+              <p>法令に基づく要請がある場合を除き、ユーザーの同意なく個人データを第三者に提供しません。</p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">5. データの保存期間と削除</h2>
               <p>
-                本サービスは、ユーザーの同意なく個人データを第三者に提供することはありません。
-                ただし、法令に基づく要請がある場合を除きます。
+                診断データはサービス提供に必要な期間保存します。削除を希望される場合は下記連絡先までご連絡ください。確認後、速やかに対応します。
               </p>
             </section>
 
+            <section>
+              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">6. お問い合わせ</h2>
+              <p>個人情報に関するご質問・削除依頼は以下までご連絡ください。</p>
+              <p className="mt-2 font-bold">Email: hrf.mtd@gmail.com</p>
+            </section>
+
             <section className="pt-8 border-t border-slate-100 italic text-slate-400">
-              <p>最終更新日: 2026年2月25日</p>
-              <p>ZAX プロジェクト運営チーム</p>
+              <p>最終更新日: 2026年5月20日</p>
+              <p>ZAX 運営（武蔵野大学 経済学部）</p>
             </section>
           </div>
         </motion.div>
