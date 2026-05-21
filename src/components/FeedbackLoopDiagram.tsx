@@ -148,16 +148,6 @@ export default function FeedbackLoopDiagram() {
               >
                 {node.label}
               </text>
-              <text
-                x={`${node.x}%`}
-                y={`${node.y + 15.5}%`}
-                textAnchor="middle"
-                fontSize="2.4"
-                fill="#94a3b8"
-                fontFamily="sans-serif"
-              >
-                {node.sub}
-              </text>
             </motion.g>
           );
         })}
