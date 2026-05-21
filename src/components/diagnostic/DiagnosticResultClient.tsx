@@ -112,6 +112,8 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
 
   const [campusEmail, setCampusEmail] = useState("");
   const [campusName, setCampusName] = useState<'musashino' | 'ariake' | ''>('');
+  const [campusGrade, setCampusGrade] = useState<number | ''>('');
+  const [generalAge, setGeneralAge] = useState<number | ''>('');
   const [campusError, setCampusError] = useState<string | null>(null);
   const [campusRegistered, setCampusRegistered] = useState(false);
   const [generalRegistered, setGeneralRegistered] = useState(false);
@@ -170,7 +172,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
       const res = await fetch("/api/match/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: campusEmail, type: 'campus', campus: campusName, resultId: data?.id }),
+        body: JSON.stringify({ email: campusEmail, type: 'campus', campus: campusName, grade: campusGrade || null, resultId: data?.id }),
       });
       const json = await res.json();
       if (json && json.success) setCampusRegistered(true);
@@ -188,7 +190,7 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
       const res = await fetch("/api/match/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, type: 'general', resultId: data?.id }),
+        body: JSON.stringify({ email, type: 'general', age: generalAge || null, resultId: data?.id }),
       });
       const json = await res.json();
       if (json && json.success) setGeneralRegistered(true);
@@ -452,6 +454,29 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                         </button>
                       ))}
                     </div>
+                    {/* 学年選択 */}
+                    <div className="flex gap-1.5 flex-wrap">
+                      {[
+                        { value: 1, label: '1年' },
+                        { value: 2, label: '2年' },
+                        { value: 3, label: '3年' },
+                        { value: 4, label: '4年' },
+                        { value: 5, label: '院生' },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setCampusGrade(opt.value)}
+                          className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
+                            campusGrade === opt.value
+                              ? 'bg-slate-900 text-white border-slate-900'
+                              : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
                     {/* メール入力 */}
                     <div className="flex gap-2">
                       <input
@@ -494,6 +519,18 @@ export default function DiagnosticResultClient({ resultId }: DiagnosticResultCli
                     <p className="text-xs text-slate-400">
                       登録済みのメール（<span className="font-bold text-slate-700">{email}</span>）で参加します。
                     </p>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="number"
+                        placeholder="年齢"
+                        min={13}
+                        max={99}
+                        value={generalAge}
+                        onChange={(e) => setGeneralAge(e.target.value ? Number(e.target.value) : '')}
+                        className="w-20 px-3 py-2.5 rounded-xl border border-slate-200 focus:border-slate-900 focus:outline-none text-xs transition-colors text-center"
+                      />
+                      <span className="text-xs text-slate-400">歳</span>
+                    </div>
                     <button
                       onClick={handleGeneralMatch}
                       disabled={isMatchRegistering === 'general'}

@@ -5,7 +5,7 @@ import { hashEmail } from '@/lib/crypto';
 
 export async function POST(req: Request) {
   try {
-    const { email, type, campus } = await req.json();
+    const { email, type, campus, grade, age } = await req.json();
     // campus: 'musashino' | 'ariake' | undefined
     // type: 'campus' | 'general'
 
@@ -27,12 +27,18 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { email: hashedEmail } });
     // campusLabel は レスポンス表示用のみ
 
+    // grade: キャンパスマッチ用学年 (1〜5), age: 通常マッチ用年齢
+    const gradeValue = grade ? Number(grade) : null;
+    const ageValue = age ? Number(age) : null;
+
     if (user) {
-      if (campus) {
-        await prisma.user.update({
-          where: { email: hashedEmail },
-          data: { campus },
-        });
+      const updateData: any = {};
+      if (campus) updateData.campus = campus;
+      if (gradeValue) updateData.grade = gradeValue;
+      // age は grade フィールドに統一して保存（一般ユーザーの場合）
+      if (ageValue && !gradeValue) updateData.grade = ageValue;
+      if (Object.keys(updateData).length > 0) {
+        await prisma.user.update({ where: { email: hashedEmail }, data: updateData });
       }
       return NextResponse.json({
         success: true,
@@ -46,6 +52,8 @@ export async function POST(req: Request) {
           email: hashedEmail,
           password: `locked_${randomBytes(32).toString('hex')}`,
           ...(campus ? { campus } : {}),
+          ...(gradeValue ? { grade: gradeValue } : {}),
+          ...(ageValue && !gradeValue ? { grade: ageValue } : {}),
         }
       });
       return NextResponse.json({
