@@ -26,7 +26,7 @@ export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <main className="w-full h-screen bg-white text-slate-900 flex flex-col overflow-hidden">
+    <main className="w-full min-h-screen lg:h-screen bg-white text-slate-900 flex flex-col lg:overflow-hidden">
 
       {/* ヘッダー */}
       <header className="px-8 pt-6 flex items-center justify-between shrink-0 relative">
@@ -88,10 +88,10 @@ export default function LandingPage() {
       </header>
 
       {/* メイン：左テキスト・右ビジュアル */}
-      <div className="flex-1 grid grid-cols-[1fr_1.1fr] min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] min-h-0">
 
         {/* ── 左：コピー ── */}
-        <div className="flex flex-col justify-center px-12 gap-7">
+        <div className="flex flex-col justify-center px-6 sm:px-12 py-10 lg:py-0 gap-6 lg:gap-7">
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -105,13 +105,13 @@ export default function LandingPage() {
             </span>
 
             {/* メインコピー */}
-            <h1 className="text-[2.6rem] font-black leading-[1.15] tracking-tight text-slate-900">
+            <h1 className="text-[2.2rem] sm:text-[2.6rem] font-black leading-[1.15] tracking-tight text-slate-900">
               知るほど、<br />
               出会える。
             </h1>
 
             {/* サブ */}
-            <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
+            <p className="text-sm text-slate-400 leading-relaxed max-w-md">
               診断 → 出会い → 自己理解の深化。<br />
               繰り返すほど、<em className="not-italic text-slate-600 font-medium">本当に合う相手</em>に近づく。
             </p>
@@ -166,7 +166,7 @@ export default function LandingPage() {
         </div>
 
         {/* ── 右：散布図ビジュアル ── */}
-        <div className="flex items-center justify-center bg-slate-50 relative overflow-hidden border-l border-slate-100">
+        <div className="flex items-center justify-center bg-slate-50 relative overflow-hidden border-t lg:border-t-0 lg:border-l border-slate-100 min-h-[280px] lg:min-h-0 aspect-square lg:aspect-auto">
 
           <motion.div
             initial={{ opacity: 0 }}
