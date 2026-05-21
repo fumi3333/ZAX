@@ -13,8 +13,13 @@ const DOTS = [
   { x: 50, y: 62 }, { x: 30, y: 35 }, { x: 78, y: 50 },
 ];
 
-// 「補完し合う2人」— 中程度の距離感
-const YOU =  { x: 38, y: 42 };
+// あなたの軌跡（過去 → 現在）— 自己理解が深まると座標が動く
+const YOU_TRAIL = [
+  { x: 30, y: 32 },  // 最初の自分
+  { x: 34, y: 38 },  // 2回目
+  { x: 38, y: 42 },  // 現在の自分
+];
+const YOU = YOU_TRAIL[YOU_TRAIL.length - 1];
 const THEM = { x: 64, y: 58 };
 
 export default function LandingPage() {
@@ -96,20 +101,30 @@ export default function LandingPage() {
           >
             {/* タグ */}
             <span className="inline-block text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 border border-slate-200 rounded-full px-3 py-1">
-              価値観診断 × AI × マッチング
+              自己理解 × AI × 出会い
             </span>
 
             {/* メインコピー */}
             <h1 className="text-[2.6rem] font-black leading-[1.15] tracking-tight text-slate-900">
-              あなたを、<br />
-              座標にする。
+              知るほど、<br />
+              出会える。
             </h1>
 
             {/* サブ */}
             <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
-              60問の診断でAIがあなたの本質を数値化。<br />
-              完全一致ではなく、<em className="not-italic text-slate-600 font-medium">補完し合える相手</em>と出会う。
+              診断 → 出会い → 自己理解の深化。<br />
+              繰り返すほど、<em className="not-italic text-slate-600 font-medium">本当に合う相手</em>に近づく。
             </p>
+
+            {/* ループ表示 */}
+            <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-slate-400 pt-1">
+              <span>診断</span>
+              <span className="text-slate-300">→</span>
+              <span>出会う</span>
+              <span className="text-slate-300">→</span>
+              <span>深まる</span>
+              <span className="text-slate-300">↻</span>
+            </div>
           </motion.div>
 
           {/* CTA */}
@@ -190,6 +205,37 @@ export default function LandingPage() {
                 />
               ))}
 
+              {/* あなたの軌跡（過去の座標→現在） */}
+              {YOU_TRAIL.slice(0, -1).map((point, i) => (
+                <motion.circle
+                  key={`trail-${i}`}
+                  cx={point.x}
+                  cy={point.y}
+                  r="1.6"
+                  fill="#cbd5e1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.5 - i * 0.15 }}
+                  transition={{ delay: 0.6 + i * 0.2, duration: 0.4 }}
+                />
+              ))}
+              {/* 軌跡の接続線 */}
+              {YOU_TRAIL.slice(0, -1).map((point, i) => {
+                const next = YOU_TRAIL[i + 1];
+                return (
+                  <motion.line
+                    key={`trail-line-${i}`}
+                    x1={point.x} y1={point.y}
+                    x2={next.x} y2={next.y}
+                    stroke="#cbd5e1"
+                    strokeWidth="0.3"
+                    strokeDasharray="0.8 0.6"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 0.6 }}
+                    transition={{ delay: 0.7 + i * 0.2, duration: 0.4 }}
+                  />
+                );
+              })}
+
               {/* 2人の接続線 */}
               <motion.line
                 x1={YOU.x} y1={YOU.y}
@@ -202,7 +248,7 @@ export default function LandingPage() {
                 transition={{ delay: 1.2, duration: 0.8 }}
               />
 
-              {/* あなた */}
+              {/* あなた（現在の座標） */}
               <motion.circle
                 cx={YOU.x} cy={YOU.y} r="2.2"
                 fill="#0f172a"
@@ -242,7 +288,7 @@ export default function LandingPage() {
                 引き合う相手
               </motion.text>
 
-              {/* 補完性スコアラベル */}
+              {/* 補完性スコアラベル（％が上がっていく演出） */}
               <motion.rect
                 x="44" y="46" width="16" height="5" rx="1"
                 fill="white" stroke="#e2e8f0" strokeWidth="0.4"
@@ -258,7 +304,19 @@ export default function LandingPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.6 }}
               >
-                補完性 82%
+                補完性 82% ↑
+              </motion.text>
+
+              {/* ループを示すサブテキスト */}
+              <motion.text
+                x="50" y="6"
+                textAnchor="middle" fontSize="1.8" fill="#94a3b8"
+                fontFamily="sans-serif" letterSpacing="0.3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.8 }}
+              >
+                知るほど、座標は深まる
               </motion.text>
             </svg>
           </motion.div>
