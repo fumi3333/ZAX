@@ -10,14 +10,15 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  nickname  String?
-  campus    String?  // 'musashino' | 'ariake'
-  grade     Int?     // 1〜4年
-  faculty   String?  // 学部名（任意）
-  createdAt DateTime @default(now())
+  id           String   @id @default(uuid())
+  email        String   @unique // SHA-256 hashed (検索用)
+  contactEmail String?  // AES-256-CBC 暗号化された送信用メール
+  password     String
+  nickname     String?
+  campus       String?  // 'musashino' | 'ariake'
+  grade        Int?     // 1〜4年
+  faculty      String?  // 学部名（任意）
+  createdAt    DateTime @default(now())
 
   // Relations
   vectors    EssenceVector[]

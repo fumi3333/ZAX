@@ -58,11 +58,15 @@ export async function createGuestUser(sessionId: string): Promise<User> {
  *
  * @throws Error - 重複時やDB障害時はエラーをスロー
  */
-export async function createEmailOnlyUser(hashedEmail: string): Promise<User> {
+export async function createEmailOnlyUser(
+  hashedEmail: string,
+  contactEmail?: string
+): Promise<User> {
   return await prisma.user.create({
     data: {
       email: hashedEmail,
       password: generateLockedPassword(),
+      ...(contactEmail ? { contactEmail } : {}),
     },
   });
 }
@@ -104,7 +108,8 @@ export async function upgradeGuestToUser(
  */
 export async function upgradeGuestToEmailOnly(
   sessionId: string,
-  hashedEmail: string
+  hashedEmail: string,
+  contactEmail?: string
 ): Promise<User> {
   const lockedPassword = generateLockedPassword();
   try {
@@ -113,9 +118,10 @@ export async function upgradeGuestToEmailOnly(
       data: {
         email: hashedEmail,
         password: lockedPassword,
+        ...(contactEmail ? { contactEmail } : {}),
       },
     });
   } catch {
-    return await createEmailOnlyUser(hashedEmail);
+    return await createEmailOnlyUser(hashedEmail, contactEmail);
   }
 }

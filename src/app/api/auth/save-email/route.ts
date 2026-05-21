@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { cookies } from 'next/headers';
-import { hashEmail, verifySession } from '@/lib/crypto';
+import { hashEmail, verifySession, encrypt } from '@/lib/crypto';
 import { createEmailOnlyUser, upgradeGuestToEmailOnly } from '@/lib/db/user-factory';
 
 // メールアドレスだけで登録（パスワードなし）
@@ -19,10 +19,20 @@ export async function POST(req: Request) {
     }
 
     const hashedEmail = hashEmail(email);
+    const encryptedContactEmail = encrypt(email); // 送信用に暗号化保存
 
     // Check if email already registered
     const existing = await prisma.user.findUnique({ where: { email: hashedEmail } });
     if (existing) {
+      // contactEmail が未登録なら埋める
+      if (!existing.contactEmail) {
+        try {
+          await prisma.user.update({
+            where: { id: existing.id },
+            data: { contactEmail: encryptedContactEmail }
+          });
+        } catch { /* non-fatal */ }
+      }
       // Already registered — link this result to existing user if we have a result
       if (resultId) {
         try {
@@ -39,11 +49,11 @@ export async function POST(req: Request) {
 
     if (sessionId) {
       // ゲストセッションをメールのみ登録にアップグレード（user-factory経由）
-      const upgraded = await upgradeGuestToEmailOnly(sessionId, hashedEmail);
+      const upgraded = await upgradeGuestToEmailOnly(sessionId, hashedEmail, encryptedContactEmail);
       userId = upgraded.id;
     } else {
       // セッションなし → 新規ユーザー作成（user-factory経由）
-      const newUser = await createEmailOnlyUser(hashedEmail);
+      const newUser = await createEmailOnlyUser(hashedEmail, encryptedContactEmail);
       userId = newUser.id;
     }
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { prisma } from '@/lib/db/client';
-import { hashEmail } from '@/lib/crypto';
+import { hashEmail, encrypt } from '@/lib/crypto';
 
 export async function POST(req: Request) {
   try {
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
     }
 
     const hashedEmail = hashEmail(email);
+    const encryptedContactEmail = encrypt(email); // 送信用に暗号化
     const campusLabel = campus === 'ariake' ? '有明キャンパス' : campus === 'musashino' ? '武蔵野キャンパス' : null;
     const user = await prisma.user.findUnique({ where: { email: hashedEmail } });
     // campusLabel は レスポンス表示用のみ
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
       if (gradeValue) updateData.grade = gradeValue;
       // age は grade フィールドに統一して保存（一般ユーザーの場合）
       if (ageValue && !gradeValue) updateData.grade = ageValue;
+      if (!user.contactEmail) updateData.contactEmail = encryptedContactEmail;
       if (Object.keys(updateData).length > 0) {
         await prisma.user.update({ where: { email: hashedEmail }, data: updateData });
       }
@@ -50,6 +52,7 @@ export async function POST(req: Request) {
       await prisma.user.create({
         data: {
           email: hashedEmail,
+          contactEmail: encryptedContactEmail,
           password: `locked_${randomBytes(32).toString('hex')}`,
           ...(campus ? { campus } : {}),
           ...(gradeValue ? { grade: gradeValue } : {}),
