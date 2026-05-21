@@ -54,7 +54,7 @@ export default function MyPage() {
           <span className="text-xs font-bold text-slate-400 tracking-widest uppercase">My Page</span>
           <h1 className="text-4xl font-black text-slate-900">変遷ログ</h1>
           <p className="text-slate-500 text-sm max-w-sm mx-auto">
-            登録したメールアドレスで過去の診断レポートと6Dベクトルの変化を確認できます。
+            診断時に入力したメールアドレスで過去のレポートを確認できます。
           </p>
         </div>
 
