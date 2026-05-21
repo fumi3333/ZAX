@@ -59,6 +59,16 @@ export default function DiagnosticWizard() {
     localStorage.setItem('zax_diagnostic_draft_v2', JSON.stringify(data));
   }, [answers, freetext, currentQuestionIndex]);
 
+  // 3. 最終画面に来たとき未回答があれば自動的に未回答の質問へ戻す
+  useEffect(() => {
+    if (currentQuestionIndex === questions.length) {
+      const firstUnansweredIndex = questions.findIndex(q => answers[q.id] === undefined);
+      if (firstUnansweredIndex !== -1) {
+        setCurrentQuestionIndex(firstUnansweredIndex);
+      }
+    }
+  }, [currentQuestionIndex, answers]);
+
   const totalQuestions = questions.length;
   const isFinalStep = currentQuestionIndex === totalQuestions;
   const currentQuestion = !isFinalStep ? questions[currentQuestionIndex] : null;
@@ -79,14 +89,6 @@ export default function DiagnosticWizard() {
       setDirection('next');
       setCurrentQuestionIndex((prev) => Math.min(prev + 1, totalQuestions));
     }, 300);
-  };
-
-  const handleJumpToUnanswered = () => {
-    const firstUnansweredIndex = questions.findIndex(q => answers[q.id] === undefined);
-    if (firstUnansweredIndex !== -1) {
-      setDirection('prev');
-      setCurrentQuestionIndex(firstUnansweredIndex);
-    }
   };
 
   const handleNext = () => {
@@ -235,25 +237,16 @@ export default function DiagnosticWizard() {
                   <div className="space-y-2">
                     <h2 className="text-2xl font-bold text-slate-800">最後に、教えてください</h2>
                     <p className="text-sm text-slate-500">
-                      最近の悩みや、これから挑戦したいこと、大切にしている価値観などを自由に入力してください（詳細なほど分析が正確になります）。
+                      最近の悩み・大切にしている価値観・<strong className="text-slate-700">どんな人と繋がりたいか</strong>などを自由に入力してください（詳細なほど分析が正確になります）。
                     </p>
                   </div>
                   <textarea
                     value={freetext}
                     onChange={(e) => setFreetext(e.target.value)}
-                    placeholder="例：友人関係でよくモヤモヤすること、家族関係での悩み、仕事で大切にしている価値観など、今のあなたの頭の中をそのまま書き出してみてください。"
-                    className="w-full min-h-[150px] p-4 rounded-xl border-2 border-slate-200 focus:border-slate-800 focus:ring-0 transition-all resize-none bg-white text-slate-700 font-medium"
+                    placeholder="例：友人関係でモヤモヤすること、仕事で大切にしている価値観、こんな人と出会いたい（どんな価値観の人/どんな場面で話したいか）など、今のあなたの頭の中をそのまま書き出してみてください。"
+                    className="w-full min-h-[180px] p-4 rounded-xl border-2 border-slate-200 focus:border-slate-800 focus:ring-0 transition-all resize-none bg-white text-slate-700 font-medium"
                   />
-                  {answeredCount < totalQuestions ? (
-                    <div className="flex flex-col items-center gap-2 mt-4 p-4 bg-slate-50 rounded-lg">
-                      <p className="text-sm text-slate-600 font-bold">
-                        ⚠️ 未回答の質問が {totalQuestions - answeredCount} 問あります
-                      </p>
-                      <Button variant="outline" onClick={handleJumpToUnanswered} className="text-slate-500 border-slate-300 hover:bg-slate-100">
-                        未回答の質問に戻る
-                      </Button>
-                    </div>
-                  ) : !allAnswered ? (
+                  {!allAnswered && answeredCount === totalQuestions ? (
                     <p className="text-xs text-slate-500 font-bold">分析を開始するには、自由記述を入力してください（5文字以上）。</p>
                   ) : null}
                 </div>
