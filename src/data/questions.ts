@@ -85,7 +85,8 @@ const _questions: Question[] = [
 // 本番に戻すとき → この行を下の行に置き換える:
 //   export const questions: Question[] = _questions;
 // ========================================
-export const questions: Question[] = _questions.slice(0, 1);
+// テストモード: export const questions: Question[] = _questions.slice(0, 1);
+export const questions: Question[] = _questions;
 
 export function effectiveScore(question: Question, rawScore: number): number {
   if (question.reverse) return 8 - rawScore;

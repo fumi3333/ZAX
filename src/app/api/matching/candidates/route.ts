@@ -7,15 +7,17 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: Request) {
   try {
     const cookieStore = await cookies();
-    const sessionId = cookieStore.get('zax-session')?.value;
+    // verifySession で署名を除去し、実際のuserIdを取得する
+    const { verifySession } = await import('@/lib/crypto');
+    const userId = verifySession(cookieStore.get('zax-session')?.value);
 
-    if (!sessionId) {
+    if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // Find the current user and their latest diagnostic result
     const user = await prisma.user.findUnique({
-      where: { id: sessionId },
+      where: { id: userId },
       include: {
         diagnosticResults: {
           orderBy: { createdAt: 'desc' },
