@@ -63,6 +63,13 @@ export default function LandingPage() {
                   診断を始める
                 </Link>
                 <Link
+                  href="/terms"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-5 py-3.5 text-xs text-slate-400 hover:bg-slate-50 transition-colors border-t border-slate-50"
+                >
+                  利用規約
+                </Link>
+                <Link
                   href="/privacy"
                   onClick={() => setMenuOpen(false)}
                   className="block px-5 py-3.5 text-xs text-slate-400 hover:bg-slate-50 transition-colors border-t border-slate-50"

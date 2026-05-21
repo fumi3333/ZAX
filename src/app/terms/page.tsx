@@ -1,73 +1,96 @@
-"use client";
+export const metadata = {
+  title: '利用規約 | ZAX',
+};
 
-import { motion } from "framer-motion";
-
-export default function TermsOfServicePage() {
+export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      <div className="h-16" />
-      <main className="max-w-3xl mx-auto px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white border-2 border-black p-8 md:p-12 shadow-sm"
-        >
-          <h1 className="text-3xl font-black mb-8 border-b-4 border-black pb-4 uppercase tracking-tighter">
-            Terms of Service
-          </h1>
-          
-          <div className="space-y-8 text-sm leading-relaxed">
-            <section>
-              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">1. 本サービスの目的</h2>
-              <p>
-                ZAXは、武蔵野大学の学生を対象とした、認知科学に基づく自己理解と価値観ベースのコミュニティ形成を支援する学術・体験型プロジェクトです。
-              </p>
-            </section>
+    <main className="min-h-screen bg-white text-slate-900">
+      <div className="max-w-2xl mx-auto px-6 py-20 space-y-12">
 
-            <section>
-              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">2. 利用資格</h2>
-              <p>
-                本サービスは、以下の条件を満たす方のみ利用可能です。
-              </p>
-              <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>18歳以上の大学生であること。</li>
-                <li>武蔵野大学のメールアドレスを保持していること。</li>
-                <li>本規約およびプライバシーポリシーに同意すること。</li>
-              </ul>
-            </section>
+        <div className="space-y-2">
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400">Terms of Use</span>
+          <h1 className="text-3xl font-black">利用規約</h1>
+          <p className="text-xs text-slate-400">最終更新日：2026年5月21日</p>
+        </div>
 
-            <section>
-              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">3. 禁止事項</h2>
-              <p>本サービスを利用するにあたり、以下の行為を禁止します。</p>
-              <ul className="list-disc pl-5 mt-2 space-y-2">
-                <li><strong>過度な異性交際を目的とした利用</strong>: 本サービスは出会い系サイトではありません。学術的、学友的な関わり以外を主目的とした利用は固く禁じます。</li>
-                <li><strong>他者への嫌がらせ・ハラスメント</strong>: 提案された相手や多人数に対する誹謗中傷、不適切な連絡。</li>
-                <li><strong>虚偽の情報入力</strong>: 他者の学籍番号やメールアドレスを無断で使用する行為。</li>
-                <li><strong>システムへの攻撃</strong>: 本サービスの運営を妨げるような不正アクセスや改ざん。</li>
-              </ul>
-            </section>
+        <p className="text-sm text-slate-600 leading-relaxed">
+          本規約は、ZAX（以下「本サービス」）の利用条件を定めるものです。
+          本サービスを利用した時点で、本規約に同意したものとみなします。
+        </p>
 
-            <section>
-              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">4. コミュニケーションと安全性</h2>
-              <p>
-                本サービスは価値観の近いユーザーを提案する機能を提供しますが、実際の交流は各ユーザーの責任において行ってください。本サービス内での直接的な無差別チャット機能は提供しておらず、安全性を考慮した設計となっています。
-              </p>
-            </section>
+        <Section title="1. サービスの概要">
+          <p>
+            本サービスは、価値観診断とAI分析によって自己理解を深め、補完的な他者との出会いを提供するプラットフォームです。
+            武蔵野大学（東京都西東京市・江東区）を主な対象としていますが、診断機能はどなたでも利用できます。
+          </p>
+        </Section>
 
-            <section>
-              <h2 className="text-lg font-bold mb-3 border-l-4 border-black pl-3">5. 免責事項</h2>
-              <p>
-                本サービスにおけるAIの分析結果はあくまで参考材料であり、その正確性や妥当性を保証するものではありません。また、本サービスを通じて生じたユーザー間のトラブルについて、運営側は一切の責任を負いません。
-              </p>
-            </section>
+        <Section title="2. キャンパスマッチについて">
+          <p>
+            キャンパスマッチ機能は、武蔵野大学の在学生（学部生・大学院生）を対象とした限定機能です。
+            参加には大学発行のメールアドレスが必要です。在学生以外の方はご利用いただけません。
+          </p>
+        </Section>
 
-            <section className="pt-8 border-t border-slate-100 italic text-slate-400">
-              <p>最終更新日: 2026年2月25日</p>
-              <p>ZAX プロジェクト運営チーム</p>
-            </section>
-          </div>
-        </motion.div>
-      </main>
-    </div>
+        <Section title="3. 診断データの利用">
+          <p>診断の回答・AI分析結果・ベクトルデータは、以下の目的で使用します。</p>
+          <ul className="list-disc list-inside space-y-1 mt-2">
+            <li>マッチング精度の向上</li>
+            <li>本サービスの研究・開発・改善</li>
+            <li>統計的な分析（個人を特定しない形で集計）</li>
+          </ul>
+          <p className="mt-2">
+            詳細は<a href="/privacy" className="underline hover:text-slate-600">プライバシーポリシー</a>をご確認ください。
+          </p>
+        </Section>
+
+        <Section title="4. 禁止事項">
+          <ul className="list-disc list-inside space-y-1">
+            <li>他人のメールアドレスを使った登録・なりすまし</li>
+            <li>本サービスへの不正アクセス・過度な負荷をかける行為</li>
+            <li>虚偽の情報を登録する行為</li>
+            <li>その他、法令または公序良俗に反する行為</li>
+          </ul>
+        </Section>
+
+        <Section title="5. 免責事項">
+          <p>
+            本サービスは現状のまま提供されます。診断結果・マッチング結果について特定の成果を保証するものではありません。
+            本サービスの利用によって生じた損害について、運営者は責任を負いません。
+          </p>
+        </Section>
+
+        <Section title="6. サービスの変更・終了">
+          <p>
+            運営者は予告なくサービスの内容を変更、または提供を終了する場合があります。
+          </p>
+        </Section>
+
+        <Section title="7. 規約の変更">
+          <p>
+            本規約は必要に応じて更新します。更新後も本サービスを継続して利用した場合、変更後の規約に同意したものとみなします。
+          </p>
+        </Section>
+
+        <Section title="8. お問い合わせ">
+          <p>
+            本規約に関するお問い合わせは{' '}
+            <a href="mailto:hrf.mtd@gmail.com" className="underline hover:text-slate-600">hrf.mtd@gmail.com</a> までご連絡ください。
+          </p>
+        </Section>
+
+      </div>
+    </main>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="space-y-3">
+      <h2 className="text-sm font-black text-slate-900 border-b border-slate-100 pb-2">{title}</h2>
+      <div className="text-sm text-slate-600 leading-relaxed space-y-2">
+        {children}
+      </div>
+    </section>
   );
 }
