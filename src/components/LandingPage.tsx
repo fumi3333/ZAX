@@ -116,15 +116,6 @@ export default function LandingPage() {
               繰り返すほど、<em className="not-italic text-slate-600 font-medium">本当に合う相手</em>に近づく。
             </p>
 
-            {/* ループ表示 */}
-            <div className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-slate-400 pt-1">
-              <span>診断</span>
-              <span className="text-slate-300">→</span>
-              <span>出会う</span>
-              <span className="text-slate-300">→</span>
-              <span>深まる</span>
-              <span className="text-slate-300">↻</span>
-            </div>
           </motion.div>
 
           {/* CTA */}
@@ -144,23 +135,33 @@ export default function LandingPage() {
             <p className="text-[11px] text-slate-300">登録不要 · 無料 · 約5分</p>
           </motion.div>
 
-          {/* 数字 */}
+          {/* フィードバックループ */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex gap-6 pt-2 border-t border-slate-100"
+            className="pt-4 border-t border-slate-100"
           >
-            {[
-              { n: "60", label: "診断問題" },
-              { n: "6", label: "分析軸" },
-              { n: "AI", label: "分析エンジン" },
-            ].map((item) => (
-              <div key={item.label}>
-                <div className="text-xl font-black text-slate-900">{item.n}</div>
-                <div className="text-[10px] text-slate-400">{item.label}</div>
-              </div>
-            ))}
+            <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-slate-300 mb-3">The Loop</p>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {[
+                { n: "01", label: "診断" },
+                { n: "02", label: "出会い" },
+                { n: "03", label: "フィードバック" },
+                { n: "04", label: "自己理解の深化" },
+              ].map((item, idx, arr) => (
+                <div key={item.label} className="flex items-center gap-1.5">
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-bold text-slate-300 tracking-wider">{item.n}</span>
+                    <span className="text-[11px] font-black text-slate-900 leading-tight">{item.label}</span>
+                  </div>
+                  {idx < arr.length - 1 && (
+                    <span className="text-slate-300 text-sm font-light">→</span>
+                  )}
+                </div>
+              ))}
+              <span className="text-slate-400 text-sm font-bold ml-1">↻</span>
+            </div>
           </motion.div>
         </div>
 
