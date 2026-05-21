@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { cookies } from 'next/headers';
-import { hashEmail } from '@/lib/crypto';
+import { hashEmail, verifySession } from '@/lib/crypto';
 import { createEmailOnlyUser, upgradeGuestToEmailOnly } from '@/lib/db/user-factory';
 
 // メールアドレスだけで登録（パスワードなし）
@@ -9,7 +9,8 @@ import { createEmailOnlyUser, upgradeGuestToEmailOnly } from '@/lib/db/user-fact
 export async function POST(req: Request) {
   try {
     const cookieStore = await cookies();
-    const sessionId = cookieStore.get('zax-session')?.value;
+    // verifySession で署名を除去し、実際のuserIdを取得する
+    const sessionId = verifySession(cookieStore.get('zax-session')?.value);
 
     const { email, resultId } = await req.json();
 

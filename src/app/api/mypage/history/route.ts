@@ -1,13 +1,28 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/client';
 import { cookies } from 'next/headers';
-import { verifySession } from '@/lib/crypto';
+import { verifySession, hashEmail } from '@/lib/crypto';
 
 export async function GET(req: Request) {
   try {
-    // 認証: ストレートにセッションCookieで確認。?email=クエリは不要。
-    const cookieStore = await cookies();
-    const userId = verifySession(cookieStore.get('zax-session')?.value);
+    const url = new URL(req.url);
+    const emailParam = url.searchParams.get('email');
+
+    let userId: string | null = null;
+
+    if (emailParam && emailParam.includes('@')) {
+      // メールアドレスで検索（別端末・Cookie なし対応）
+      const hashed = hashEmail(emailParam);
+      const user = await prisma.user.findUnique({ where: { email: hashed } });
+      if (!user) {
+        return NextResponse.json({ success: true, diagnostics: [] });
+      }
+      userId = user.id;
+    } else {
+      // セッションCookieで検索
+      const cookieStore = await cookies();
+      userId = verifySession(cookieStore.get('zax-session')?.value);
+    }
 
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
